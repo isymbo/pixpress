@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"path"
+	"strconv"
 
 	"github.com/go-macaron/gzip"
 	"github.com/gogits/gogs/pkg/template"
@@ -21,7 +22,7 @@ var Web = cli.Command{
 	Description: `PixPress web server is the only thing you need to run, and it takes care of all the other things for you.`,
 	Action:      runWeb,
 	Flags: []cli.Flag{
-		stringFlag("port, p", "7611", "Specify network port to serve"),
+		stringFlag("port, p", strconv.Itoa(setting.APP_HTTPPORT), "Specify network port to serve"),
 	},
 }
 
