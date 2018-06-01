@@ -5,12 +5,11 @@ import (
 	"strconv"
 
 	"github.com/go-macaron/gzip"
-	"github.com/gogits/gogs/pkg/template"
 	"github.com/urfave/cli"
 	"gopkg.in/macaron.v1"
 
 	"github.com/isymbo/pixpress/app/controllers/context"
-	settingctlr "github.com/isymbo/pixpress/app/controllers/setting"
+	"github.com/isymbo/pixpress/app/controllers/template"
 	"github.com/isymbo/pixpress/app/controllers/user"
 	"github.com/isymbo/pixpress/setting"
 )
@@ -103,10 +102,8 @@ func runWeb(c *cli.Context) error {
 }
 
 func initRoutes(m *macaron.Macaron) {
-	m.Get("/setting", settingctlr.ConfigInfo)
 
-	m.Group("/user", func() {
-		m.Get("/login", user.Login)
-		m.Get("/logout", user.Logout)
-	})
+	setting.InitRoutes(m)
+	user.InitRoutes(m)
+
 }

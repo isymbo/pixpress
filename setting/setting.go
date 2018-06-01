@@ -1,11 +1,13 @@
 package setting
 
 import (
+	"net/http"
 	"path"
 
 	"github.com/urfave/cli"
 	log "gopkg.in/clog.v1"
 	"gopkg.in/ini.v1"
+	"gopkg.in/macaron.v1"
 
 	"github.com/isymbo/pixpress/util"
 )
@@ -23,6 +25,15 @@ var (
 	StaticRootPath   string
 	EnableGzip       bool
 
+	// App settings
+	AppVer         string
+	AppName        string
+	AppURL         string
+	AppSubURL      string
+	AppSubURLDepth int // Number of slashes
+	AppPath        string
+	AppDataPath    string
+
 	// Database struct
 	Database struct {
 		Host string `ini:"HOST"`
@@ -36,6 +47,11 @@ var (
 		BindDn   string `ini:"BIND_DN"`
 		User     string `ini:"USER"`
 		Password string `ini:"PASSWORD"`
+	}
+
+	// Other struct
+	Other struct {
+		ShowFooterTemplateLoadTime bool `ini:"SHOW_FOOTER_TEMPLATE_LOAD_TIME"`
 	}
 )
 
@@ -57,10 +73,17 @@ func LoadConfig(c *cli.Context) error {
 	StaticRootPath = sec.Key("STATIC_ROOT_PATH").MustString(workDir)
 	EnableGzip = sec.Key("ENABLE_GZIP").MustBool()
 
+	AppVer = APP_VER
+	AppName = APP_NAME
+
+	AppSubURL = ""
+
 	if err = cfg.Section("database").MapTo(&Database); err != nil {
 		log.Fatal(2, "Fail to map database settings: %v", err)
 	} else if err = cfg.Section("ldap").MapTo(&Ldap); err != nil {
 		log.Fatal(2, "Fail to map ldap settings: %v", err)
+	} else if err = cfg.Section("other").MapTo(&Other); err != nil {
+		log.Fatal(2, "Fail to map other settings: %v", err)
 	}
 
 	return nil
@@ -72,4 +95,30 @@ func cfgAbsPath(cf string) (string, error) {
 	}
 
 	return cf, nil
+}
+
+// ConfigInfo return application configuration info
+func ConfigInfo(c *macaron.Context) {
+	c.JSON(
+		http.StatusOK,
+		map[string]interface{}{
+			"App version":                          AppVer,
+			"App config filepath":                  CfgPath,
+			"Database host":                        Database.Host,
+			"Database port":                        Database.Port,
+			"Ldap host":                            Ldap.Host,
+			"Ldap port":                            Ldap.Port,
+			"Ldap bind_dn":                         Ldap.BindDn,
+			"Ldap user":                            Ldap.User,
+			"Ldap password":                        Ldap.Password,
+			"Server DISABLE_ROURTER_LOG":           DisableRouterLog,
+			"Server STATIC_ROOT_PATH":              StaticRootPath,
+			"Server ENABLE_GZIP":                   EnableGzip,
+			"Other SHOW_FOOTER_TEMPLATE_LOAD_TIME": Other.ShowFooterTemplateLoadTime,
+		},
+	)
+}
+
+func InitRoutes(m *macaron.Macaron) {
+	m.Get("/setting", ConfigInfo)
 }

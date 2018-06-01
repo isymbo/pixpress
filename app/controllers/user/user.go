@@ -1,9 +1,8 @@
 package user
 
 import (
-	"net/http"
-
 	"github.com/isymbo/pixpress/app/controllers/context"
+	"gopkg.in/macaron.v1"
 )
 
 const (
@@ -11,16 +10,22 @@ const (
 	LOGOUT = "user/logout"
 )
 
-func Login(c *context.Context) {
-	// c.Title("sign_in")
+func InitRoutes(m *macaron.Macaron) {
+	m.Group("/user", func() {
+		m.Get("/login", Login)
+		m.Get("/logout", Logout)
+	})
+}
 
-	//c.Success(LOGIN)
-	c.HTML(http.StatusOK, LOGIN)
+func Login(c *context.Context) {
+	c.Title("sign_in")
+
+	c.Success(LOGIN)
+	// c.HTML(http.StatusOK, LOGIN)
 }
 
 func Logout(c *context.Context) {
-	// c.Title("sign_out")
+	c.Title("sign_out")
 
-	//c.Success(LOGOUT)
-	c.HTML(http.StatusOK, LOGOUT)
+	c.Success(LOGOUT)
 }

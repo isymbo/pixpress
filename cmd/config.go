@@ -29,5 +29,7 @@ func showConfig(c *cli.Context) error {
 	fmt.Println("Ldap user: ", setting.Ldap.User)
 	fmt.Println("Ldap password: ", setting.Ldap.Password)
 
+	fmt.Println("Other show footer template load time: ", setting.Other.ShowFooterTemplateLoadTime)
+
 	return nil
 }

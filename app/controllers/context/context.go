@@ -32,7 +32,8 @@ type Context struct {
 
 // Title sets "Title" field in template data.
 func (c *Context) Title(locale string) {
-	c.Data["Title"] = c.Tr(locale)
+	// c.Data["Title"] = c.Tr(locale)
+	c.Data["Title"] = locale
 }
 
 // PageIs sets "PageIsxxx" field in template data.
@@ -194,7 +195,7 @@ func Contexter() macaron.Handler {
 	return func(ctx *macaron.Context) {
 		c := &Context{
 			Context: ctx,
-			Link:    setting.StaticRootPath + strings.TrimSuffix(ctx.Req.URL.Path, "/"),
+			Link:    setting.AppSubURL + strings.TrimSuffix(ctx.Req.URL.Path, "/"),
 		}
 		// 	return func(ctx *macaron.Context, l i18n.Locale, cache cache.Cache, sess session.Store, f *session.Flash, x csrf.CSRF) {
 		// 		c := &Context{
