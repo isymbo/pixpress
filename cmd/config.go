@@ -25,8 +25,8 @@ func showConfig(c *cli.Context) error {
 
 	fmt.Println("Ldap host: ", setting.Ldap.Host)
 	fmt.Println("Ldap port: ", setting.Ldap.Port)
+	fmt.Println("Ldap base: ", setting.Ldap.Base)
 	fmt.Println("Ldap bind dn: ", setting.Ldap.BindDn)
-	fmt.Println("Ldap user: ", setting.Ldap.User)
 	fmt.Println("Ldap password: ", setting.Ldap.Password)
 
 	fmt.Println("Other show footer template load time: ", setting.Other.ShowFooterTemplateLoadTime)

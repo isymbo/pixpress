@@ -44,8 +44,8 @@ var (
 	Ldap struct {
 		Host     string `ini:"HOST"`
 		Port     int    `ini:"PORT"`
+		Base     string `ini:"BASE"`
 		BindDn   string `ini:"BIND_DN"`
-		User     string `ini:"USER"`
 		Password string `ini:"PASSWORD"`
 	}
 
@@ -108,8 +108,8 @@ func ConfigInfo(c *macaron.Context) {
 			"Database port":                        Database.Port,
 			"Ldap host":                            Ldap.Host,
 			"Ldap port":                            Ldap.Port,
+			"Ldap base":                            Ldap.Base,
 			"Ldap bind_dn":                         Ldap.BindDn,
-			"Ldap user":                            Ldap.User,
 			"Ldap password":                        Ldap.Password,
 			"Server DISABLE_ROURTER_LOG":           DisableRouterLog,
 			"Server STATIC_ROOT_PATH":              StaticRootPath,
