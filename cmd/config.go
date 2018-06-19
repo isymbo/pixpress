@@ -21,7 +21,7 @@ func showConfig(c *cli.Context) error {
 	fmt.Println("Web server port: ", setting.WebPort)
 
 	fmt.Println("Database host: ", setting.Database.Host)
-	fmt.Println("Database port: ", setting.Database.Port)
+	fmt.Println("Database type: ", setting.Database.DbType)
 
 	fmt.Println("Ldap host: ", setting.Ldap.Host)
 	fmt.Println("Ldap port: ", setting.Ldap.Port)

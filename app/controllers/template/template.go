@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gogits/gogs/pkg/markup"
 	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/isymbo/pixpress/setting"
@@ -51,7 +50,7 @@ func NewFuncMap() []template.FuncMap {
 		// "AppendAvatarSize": tool.AppendAvatarSize,
 		"Safe":     Safe,
 		"Sanitize": bluemonday.UGCPolicy().Sanitize,
-		"Str2html": Str2html,
+		//"Str2html": Str2html,
 		// "TimeSince":    tool.TimeSince,
 		// "RawTimeSince": tool.RawTimeSince,
 		// "FileSize":     tool.FileSize,
@@ -139,6 +138,6 @@ func ReplaceLeft(s, old, new string) string {
 	return string(replacement)
 }
 
-func Str2html(raw string) template.HTML {
-	return template.HTML(markup.Sanitize(raw))
-}
+// func Str2html(raw string) template.HTML {
+// 	return template.HTML(markup.Sanitize(raw))
+// }

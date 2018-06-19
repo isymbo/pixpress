@@ -93,6 +93,7 @@ func runWeb(c *cli.Context) error {
 	}
 
 	m := newMacaron()
+	
 
 	m.SetAutoHead(true)
 	initRoutes(m)

@@ -36,8 +36,13 @@ var (
 
 	// Database struct
 	Database struct {
-		Host string `ini:"HOST"`
-		Port int    `ini:"PORT"`
+		DbType   string `ini:"DB_TYPE"`
+		Host     string `ini:"HOST"`
+		Name     string `ini:"NAME"`
+		User     string `ini:"USER"`
+		Password string `ini:"PASSWD"`
+		SslMode  string `ini:"SSL_MODE"`
+		Path     string `ini:"PATH"`
 	}
 
 	// Ldap struct
@@ -102,19 +107,14 @@ func ConfigInfo(c *macaron.Context) {
 	c.JSON(
 		http.StatusOK,
 		map[string]interface{}{
-			"App version":                          AppVer,
-			"App config filepath":                  CfgPath,
-			"Database host":                        Database.Host,
-			"Database port":                        Database.Port,
-			"Ldap host":                            Ldap.Host,
-			"Ldap port":                            Ldap.Port,
-			"Ldap base":                            Ldap.Base,
-			"Ldap bind_dn":                         Ldap.BindDn,
-			"Ldap password":                        Ldap.Password,
-			"Server DISABLE_ROURTER_LOG":           DisableRouterLog,
-			"Server STATIC_ROOT_PATH":              StaticRootPath,
-			"Server ENABLE_GZIP":                   EnableGzip,
-			"Other SHOW_FOOTER_TEMPLATE_LOAD_TIME": Other.ShowFooterTemplateLoadTime,
+			"Server DISABLE_ROURTER_LOG": DisableRouterLog,
+			"Server STATIC_ROOT_PATH":    StaticRootPath,
+			"Server ENABLE_GZIP":         EnableGzip,
+			"App version":                AppVer,
+			"App config filepath":        CfgPath,
+			"LDAP":                       Ldap,
+			"Database":                   Database,
+			"Other":                      Other,
 		},
 	)
 }
