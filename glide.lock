@@ -1,0 +1,81 @@
+hash: f5194f71065703878e975f489ed7d904ea310e59f897cd2a36a0d7b7fb60d6e7
+updated: 2018-06-22T12:33:42.811804683+08:00
+imports:
+- name: cloud.google.com/go
+  version: 438edea0905bb3226217e0b56eb1e4b3b736df2c
+  subpackages:
+  - civil
+- name: github.com/denisenkom/go-mssqldb
+  version: 94c9c97e8c9f9844d15c846854a7a6031ae2132c
+  subpackages:
+  - internal/cp
+- name: github.com/fatih/color
+  version: 2d684516a8861da43017284349b7e303e809ac21
+- name: github.com/go-macaron/binding
+  version: ac54ee249c27dca7e76fad851a4a04b73bd1b183
+- name: github.com/go-macaron/gzip
+  version: cad1c6580a07c56f5f6bc52d66002a05985c5854
+- name: github.com/go-macaron/inject
+  version: d8a0b8677191f4380287cfebd08e462217bac7ad
+- name: github.com/go-sql-driver/mysql
+  version: 749ddf1598b47e3cd909414bda735fe790ef3d30
+- name: github.com/go-xorm/builder
+  version: 9283e7910554af2071cdb04c71b18e5a6ee1ca40
+- name: github.com/go-xorm/core
+  version: c10e21e7e1cec20e09398f2dfae385e58c8df555
+- name: github.com/go-xorm/xorm
+  version: ee5b31ecae2c7a77438875728ba1f1bbb466f3dc
+- name: github.com/hokaccha/go-prettyjson
+  version: d229c224a219dcf41e9d2af4684b9782f33f5eb7
+- name: github.com/jtblin/go-ldap-client
+  version: b73f66626b33ca4ac4fd6558efbb062c4fe4e52c
+- name: github.com/klauspost/compress
+  version: 5fb1f31b0a61e9858f12f39266e059848a5f1cea
+  subpackages:
+  - flate
+  - gzip
+- name: github.com/klauspost/cpuid
+  version: e7e905edc00ea8827e58662220139109efea09db
+- name: github.com/lib/pq
+  version: 90697d60dd844d5ef6ff15135d0203f65d2f53b8
+  subpackages:
+  - oid
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: github.com/microcosm-cc/bluemonday
+  version: f0761eb8ed07c1cc892ef631b00c33463b9b6868
+- name: github.com/Unknwon/com
+  version: da59b551951d50441ca26b7a8cd81317f34df87f
+- name: github.com/urfave/cli
+  version: 8e01ec4cd3e2d84ab2fe90d8210528ffbb06d8ff
+- name: golang.org/x/crypto
+  version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
+  subpackages:
+  - md4
+  - pbkdf2
+- name: golang.org/x/net
+  version: afe8f62b1d6bbd81f31868121a50b06d8188e1f9
+  subpackages:
+  - html
+  - html/atom
+- name: golang.org/x/sys
+  version: d75a52659825e75fff6158388dddc6a5b04f9ba5
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: b1f26356af11148e710935ed1ac8a7f5702c7612
+  subpackages:
+  - cloudsql
+- name: gopkg.in/asn1-ber.v1
+  version: 379148ca0225df7a432012b8df0355c2a2063ac0
+- name: gopkg.in/clog.v1
+  version: 3bc2eaba5fa35df0338549cc1180dc45f6fc2a16
+- name: gopkg.in/ini.v1
+  version: 06f5f3d67269ccec1fe5fe4134ba6e982984f7f5
+- name: gopkg.in/ldap.v2
+  version: bb7a9ca6e4fbc2129e3db588a34bc970ffe811a9
+- name: gopkg.in/macaron.v1
+  version: c1be95e6d21e769e44e1ec33cec9da5837861c10
+testImports: []
