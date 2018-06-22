@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	prettyjson "github.com/hokaccha/go-prettyjson"
 	"github.com/urfave/cli"
 
 	"github.com/isymbo/pixpress/setting"
@@ -20,16 +21,20 @@ func showConfig(c *cli.Context) error {
 
 	fmt.Println("Web server port: ", setting.WebPort)
 
-	fmt.Println("Database host: ", setting.Database.Host)
-	fmt.Println("Database type: ", setting.Database.DbType)
+	database, _ := prettyjson.Marshal(setting.Database)
+	fmt.Printf("Database:\n%+v\n", string(database))
 
-	fmt.Println("Ldap host: ", setting.Ldap.Host)
-	fmt.Println("Ldap port: ", setting.Ldap.Port)
-	fmt.Println("Ldap base: ", setting.Ldap.Base)
-	fmt.Println("Ldap bind dn: ", setting.Ldap.BindDn)
-	fmt.Println("Ldap password: ", setting.Ldap.Password)
+	ldap, _ := prettyjson.Marshal(setting.Ldap)
+	fmt.Printf("LDAP:\n%+v\n", string(ldap))
 
-	fmt.Println("Other show footer template load time: ", setting.Other.ShowFooterTemplateLoadTime)
+	log, _ := prettyjson.Marshal(setting.Log)
+	fmt.Printf("Log:\n%+v\n", string(log))
+
+	other, _ := prettyjson.Marshal(setting.Other)
+	fmt.Printf("Other:\n%+v\n", string(other))
+
+	server, _ := prettyjson.Marshal(setting.Server)
+	fmt.Printf("Server:\n%+v\n", string(server))
 
 	return nil
 }

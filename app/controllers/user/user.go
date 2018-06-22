@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"log"
 
 	"gopkg.in/macaron.v1"
@@ -11,12 +10,14 @@ import (
 
 	//"github.com/isymbo/pixpress/app/controllers/auth/ldap"
 	"github.com/isymbo/pixpress/app/controllers/context"
+	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
 )
 
 const (
 	LOGIN  = "user/login"
 	LOGOUT = "user/logout"
+	HOME   = "user/home"
 )
 
 type User struct {
@@ -31,6 +32,7 @@ func InitRoutes(m *macaron.Macaron) {
 	bindIgnErr := binding.BindIgnErr
 
 	m.Group("/user", func() {
+		m.Get("/:id", Home)
 		m.Combo("/login").
 			Get(Login).
 			Post(bindIgnErr(User{}), LoginPost)
@@ -65,7 +67,17 @@ func Logout(c *context.Context) {
 	c.Success(LOGOUT)
 }
 
-func LoginPost(c *context.Context, u User) string {
+func Home(c *context.Context) {
+	c.Title("home")
+
+	id := c.ParamsInt64("id")
+
+	models.GetUserProfile(id)
+
+	c.Success(HOME)
+}
+
+func LoginPost(c *context.Context, u User) {
 	c.Title("sign_in")
 
 	//return fmt.Sprintf("LoginName: %s\nPassword: %v", u.LoginName, u.Password)
@@ -78,21 +90,29 @@ func LoginPost(c *context.Context, u User) string {
 		BindDN:       setting.Ldap.BindDn,
 		BindPassword: setting.Ldap.Password,
 		UserFilter:   "(sAMAccountName=%s)",
-		//		Attributes:   []string{"givenName", "sn", "mail", "uid"},
-		Attributes: []string{"displayName", "mail", "mobile", "sAMAccountName"},
+		Attributes:   []string{"displayName", "mail", "mobile", "sAMAccountName"},
 	}
 	// It is the responsibility of the caller to close the connection
 	defer client.Close()
 
-	ok, user, err := client.Authenticate(u.LoginName, u.Password)
-	log.Printf("User:", u.LoginName)
+	ok, rmap, err := client.Authenticate(u.LoginName, u.Password)
 	if err != nil {
-		log.Fatalf("Error authenticating user %s: %+v", u.LoginName, err)
+		log.Printf("Error authenticating user %s: %+v", u.LoginName, err)
 	}
-	if !ok {
-		log.Fatalf("Authenticating failed for user %s", "username")
+	if ok {
+		newUser := &models.User{
+			LoginName:   rmap["sAMAccountName"],
+			DisplayName: rmap["displayName"],
+			Email:       rmap["mail"],
+			Mobile:      rmap["mobile"],
+		}
+		if err = models.CreateUser(newUser); err != nil {
+			if models.IsErrLoginNameAlreadyExist(err) {
+				c.Success(HOME)
+				return
+			}
+		}
 	}
-	log.Printf("User: %+v", user)
 
-	return fmt.Sprintf("User: %+v", user)
+	c.Success(LOGIN)
 }

@@ -3,14 +3,17 @@ package cmd
 import (
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/go-macaron/gzip"
 	"github.com/urfave/cli"
+	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 
 	"github.com/isymbo/pixpress/app/controllers/context"
 	"github.com/isymbo/pixpress/app/controllers/template"
 	"github.com/isymbo/pixpress/app/controllers/user"
+	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
 )
 
@@ -28,18 +31,18 @@ var Web = cli.Command{
 // newMacaron initializes Macaron instance.
 func newMacaron() *macaron.Macaron {
 	m := macaron.New()
-	if !setting.DisableRouterLog {
+	if !setting.Server.DisableRouterLog {
 		m.Use(macaron.Logger())
 	}
 	m.Use(macaron.Recovery())
-	if setting.EnableGzip {
+	if setting.Server.EnableGzip {
 		m.Use(gzip.Gziper())
 	}
 
 	m.Use(macaron.Static(
-		path.Join(setting.StaticRootPath, "public"),
+		path.Join(setting.Server.StaticRootPath, "public"),
 		macaron.StaticOptions{
-			SkipLogging: setting.DisableRouterLog,
+			SkipLogging: setting.Server.DisableRouterLog,
 		},
 	))
 
@@ -53,7 +56,7 @@ func newMacaron() *macaron.Macaron {
 
 	funcMap := template.NewFuncMap()
 	m.Use(macaron.Renderer(macaron.RenderOptions{
-		Directory:  path.Join(setting.StaticRootPath, "app/views/templates"),
+		Directory:  path.Join(setting.Server.StaticRootPath, "app/views/templates"),
 		Funcs:      funcMap,
 		IndentJSON: macaron.Env != macaron.PROD,
 	}))
@@ -93,7 +96,12 @@ func runWeb(c *cli.Context) error {
 	}
 
 	m := newMacaron()
-	
+
+	models.LoadConfigs()
+	if err := models.NewEngine(); err != nil {
+		log.Fatal(2, "Fail to initialize ORM engine: %v", err)
+	}
+	models.HasEngine = true
 
 	m.SetAutoHead(true)
 	initRoutes(m)
@@ -107,4 +115,12 @@ func initRoutes(m *macaron.Macaron) {
 	setting.InitRoutes(m)
 	user.InitRoutes(m)
 
+}
+
+func checkRunMode() {
+	if setting.ProdMode {
+		macaron.Env = macaron.PROD
+		macaron.ColorLog = false
+	}
+	log.Info("Run Mode: %s", strings.Title(macaron.Env))
 }
