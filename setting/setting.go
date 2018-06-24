@@ -19,6 +19,17 @@ type ServerType struct {
 	RunMode          string `ini:"RUN_MODE"`
 }
 
+type SessionType struct {
+	Provider        string `ini:"PROVIDER"`
+	ProviderConfig  string `ini:"PROVIDER_CONFIG"`
+	CookieName      string `ini:"COOKIE_NAME"`
+	CookieSecure    bool   `ini:"COOKIE_SECURE"`
+	EnableSetCookie bool   `ini:"ENABLE_SET_COOKIE"`
+	GCIntervalTime  int    `ini:"GC_INTERVAL_TIME"`
+	SessionLifeTime int    `ini:"SESSION_LIFE_TIME"`
+	CSRFCookieName  string `ini:"CSRF_COOKIE_NAME"`
+}
+
 type DatabaseType struct {
 	DbType  string `ini:"DB_TYPE"`
 	Host    string `ini:"HOST"`
@@ -82,6 +93,7 @@ var (
 
 	Server   ServerType
 	Database DatabaseType
+	Session  SessionType
 	Ldap     LDAPType
 	Log      LogType
 	Other    OtherType
@@ -104,6 +116,8 @@ func LoadConfig(c *cli.Context) error {
 
 	if err = Cfg.Section("server").MapTo(&Server); err != nil {
 		log.Fatal(2, "Fail to map server settings: %v", err)
+	} else if err = Cfg.Section("session").MapTo(&Session); err != nil {
+		log.Fatal(2, "Fail to map session settings: %v", err)
 	} else if err = Cfg.Section("database").MapTo(&Database); err != nil {
 		log.Fatal(2, "Fail to map database settings: %v", err)
 	} else if err = Cfg.Section("ldap").MapTo(&Ldap); err != nil {
@@ -142,6 +156,7 @@ func ConfigInfo(c *macaron.Context) {
 			"App config filepath": CfgPath,
 			"ProdMode":            ProdMode,
 			"Server":              Server,
+			"Session":             Session,
 			"LDAP":                Ldap,
 			"Database":            Database,
 			"Log":                 Log,
