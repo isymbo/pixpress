@@ -7,9 +7,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-macaron/session"
 	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 
+	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
 )
 
@@ -18,12 +20,12 @@ type Context struct {
 	*macaron.Context
 	// Cache   cache.Cache
 	// csrf    csrf.CSRF
-	// Flash   *session.Flash
-	// Session session.Store
+	Flash   *session.Flash
+	Session session.Store
 
-	Link string // Current request URL
-	// User        *models.User
-	// IsLogged    bool
+	Link     string // Current request URL
+	User     *models.User
+	IsLogged bool
 	// IsBasicAuth bool
 
 	// Repo *Repository
@@ -61,14 +63,14 @@ func (c *Context) FormErr(names ...string) {
 	}
 }
 
-// // UserID returns ID of current logged in user.
-// // It returns 0 if visitor is anonymous.
-// func (c *Context) UserID() int64 {
-// 	if !c.IsLogged {
-// 		return 0
-// 	}
-// 	return c.User.ID
-// }
+// UserID returns ID of current logged in user.
+// It returns 0 if visitor is anonymous.
+func (c *Context) UserID() int64 {
+	if !c.IsLogged {
+		return 0
+	}
+	return c.User.ID
+}
 
 // HasError returns true if error occurs in form validation.
 func (c *Context) HasApiError() bool {
@@ -89,8 +91,8 @@ func (c *Context) HasError() bool {
 	if !ok {
 		return false
 	}
-	// c.Flash.ErrorMsg = c.Data["ErrorMsg"].(string)
-	// c.Data["Flash"] = c.Flash
+	c.Flash.ErrorMsg = c.Data["ErrorMsg"].(string)
+	c.Data["Flash"] = c.Flash
 	return hasErr.(bool)
 }
 

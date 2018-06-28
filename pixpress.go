@@ -24,7 +24,7 @@ func main() {
 		cli.StringFlag{
 			Name:  "config, c",
 			Usage: "specify `FILE` for configuration of " + setting.APP_NAME,
-			Value: setting.CfgPath,
+			Value: setting.AppCfgPath,
 		},
 	}
 

@@ -19,7 +19,7 @@ var Config = cli.Command{
 
 func showConfig(c *cli.Context) error {
 
-	fmt.Println("Web server port: ", setting.WebPort)
+	fmt.Println("Web server port: ", setting.Server.HTTPPort)
 
 	database, _ := prettyjson.Marshal(setting.Database)
 	fmt.Printf("Database:\n%+v\n", string(database))

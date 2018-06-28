@@ -5,7 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/gzip"
+	"github.com/go-macaron/session"
+	"github.com/go-macaron/toolbox"
 	"github.com/urfave/cli"
 	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
@@ -67,22 +70,22 @@ func newMacaron() *macaron.Macaron {
 	// 	Interval:      setting.CacheInterval,
 	// }))
 
-	// m.Use(session.Sessioner(setting.SessionConfig))
-	// m.Use(csrf.Csrfer(csrf.Options{
-	// 	Secret:     setting.SecretKey,
-	// 	Cookie:     setting.CSRFCookieName,
-	// 	SetCookie:  true,
-	// 	Header:     "X-Csrf-Token",
-	// 	CookiePath: setting.AppSubURL,
-	// }))
-	// m.Use(toolbox.Toolboxer(m, toolbox.Options{
-	// 	HealthCheckFuncs: []*toolbox.HealthCheckFuncDesc{
-	// 		&toolbox.HealthCheckFuncDesc{
-	// 			Desc: "Database connection",
-	// 			Func: models.Ping,
-	// 		},
-	// 	},
-	// }))
+	m.Use(session.Sessioner(setting.SessionConfig))
+	m.Use(csrf.Csrfer(csrf.Options{
+		Secret:     setting.Security.SecretKey,
+		Cookie:     setting.Session.CSRFCookieName,
+		SetCookie:  true,
+		Header:     "X-Csrf-Token",
+		CookiePath: setting.AppSubURL,
+	}))
+	m.Use(toolbox.Toolboxer(m, toolbox.Options{
+		HealthCheckFuncs: []*toolbox.HealthCheckFuncDesc{
+			&toolbox.HealthCheckFuncDesc{
+				Desc: "Database connection",
+				Func: models.Ping,
+			},
+		},
+	}))
 
 	m.Use(context.Contexter())
 	return m
@@ -92,7 +95,7 @@ func newMacaron() *macaron.Macaron {
 func runWeb(c *cli.Context) error {
 
 	if c.IsSet("port") {
-		setting.WebPort = c.Int("port")
+		setting.Server.HTTPPort = c.Int("port")
 	}
 
 	m := newMacaron()
@@ -105,7 +108,7 @@ func runWeb(c *cli.Context) error {
 
 	m.SetAutoHead(true)
 	initRoutes(m)
-	m.Run(setting.WebPort)
+	m.Run(setting.Server.HTTPPort)
 
 	return nil
 }
