@@ -7,7 +7,8 @@ import (
 
 	"github.com/Unknwon/com"
 	"github.com/go-xorm/xorm"
-	"github.com/gogits/gogs/models/errors"
+
+	"github.com/isymbo/pixpress/app/models/errors"
 	"github.com/isymbo/pixpress/setting"
 )
 
