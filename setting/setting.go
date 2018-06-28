@@ -237,6 +237,7 @@ func ConfigInfo(c *macaron.Context) {
 			"ProdMode":        ProdMode,
 			"Server":          Server,
 			"Session":         Session,
+			"Security":        Security,
 			"LDAP":            Ldap,
 			"Database":        Database,
 			"Log":             Log,
