@@ -61,15 +61,16 @@ type LDAPType struct {
 }
 
 type SecurityType struct {
-	InstallLock             bool   `ini:"INSTALL_LOCK"`
-	SecretKey               string `ini:"SECRET_KEY"`
-	LoginRememberDays       int    `ini:"LOGIN_REMEMBER_DAYS"`
-	CookieUserName          string `ini:"COOKIE_USERNAME"`
-	CookieRememberName      string `ini:"COOKIE_REMEMBER_NAME"`
-	CookieSecure            bool   `ini:"COOKIE_SECURE"`
-	ReverseProxyAuthUser    string `ini:"REVERSE_PROXY_AUTHENTICATION_USER"`
-	EnableLoginStatusCookie bool   `ini:"ENABLE_LOGIN_STATUS_COOKIE"`
-	LoginStatusCookieName   string `ini:"LOGIN_STATUS_COOKIE_NAME"`
+	InstallLock              bool   `ini:"INSTALL_LOCK"`
+	SecretKey                string `ini:"SECRET_KEY"`
+	LoginRememberDays        int    `ini:"LOGIN_REMEMBER_DAYS"`
+	CookieUserName           string `ini:"COOKIE_USERNAME"`
+	CookieRememberName       string `ini:"COOKIE_REMEMBER_NAME"`
+	CookieSecure             bool   `ini:"COOKIE_SECURE"`
+	ReverseProxyAuthUser     string `ini:"REVERSE_PROXY_AUTHENTICATION_USER"`
+	EnableLoginStatusCookie  bool   `ini:"ENABLE_LOGIN_STATUS_COOKIE"`
+	LoginStatusCookieName    string `ini:"LOGIN_STATUS_COOKIE_NAME"`
+	AccessControlAllowOrigin string `ini:"ACCESS_CONTROL_ALLOW_ORIGIN"`
 }
 
 type ServiceType struct {
@@ -98,6 +99,8 @@ type LogType struct {
 
 type OtherType struct {
 	ShowFooterTemplateLoadTime bool `ini:"SHOW_FOOTER_TEMPLATE_LOAD_TIME"`
+	ShowFooterBranding         bool `ini:"SHOW_FOOTER_BRANDING"`
+	ShowFooterVersion          bool `ini:"SHOW_FOOTER_VERSION"`
 }
 
 type XormLogType struct {

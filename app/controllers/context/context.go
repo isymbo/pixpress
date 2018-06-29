@@ -2,15 +2,18 @@ package context
 
 import (
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/session"
 	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 
+	"github.com/isymbo/pixpress/app/controllers/auth"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
 )
@@ -19,7 +22,7 @@ import (
 type Context struct {
 	*macaron.Context
 	// Cache   cache.Cache
-	// csrf    csrf.CSRF
+	csrf    csrf.CSRF
 	Flash   *session.Flash
 	Session session.Store
 
@@ -194,9 +197,12 @@ func (c *Context) ServeContent(name string, r io.ReadSeeker, params ...interface
 
 // Contexter initializes a classic context for a request.
 func Contexter() macaron.Handler {
-	return func(ctx *macaron.Context) {
+	return func(ctx *macaron.Context, sess session.Store, f *session.Flash, x csrf.CSRF) {
 		c := &Context{
 			Context: ctx,
+			csrf:    x,
+			Flash:   f,
+			Session: sess,
 			Link:    setting.AppSubURL + strings.TrimSuffix(ctx.Req.URL.Path, "/"),
 		}
 		// 	return func(ctx *macaron.Context, l i18n.Locale, cache cache.Cache, sess session.Store, f *session.Flash, x csrf.CSRF) {
@@ -256,27 +262,29 @@ func Contexter() macaron.Handler {
 		// 			return
 		// 		}
 
-		// 		if len(setting.HTTP.AccessControlAllowOrigin) > 0 {
-		// 			c.Header().Set("Access-Control-Allow-Origin", setting.HTTP.AccessControlAllowOrigin)
-		// 			c.Header().Set("'Access-Control-Allow-Credentials' ", "true")
-		// 			c.Header().Set("Access-Control-Max-Age", "3600")
-		// 			c.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-		// 		}
+		if len(setting.Security.AccessControlAllowOrigin) > 0 {
+			c.Header().Set("Access-Control-Allow-Origin", setting.Security.AccessControlAllowOrigin)
+			c.Header().Set("'Access-Control-Allow-Credentials' ", "true")
+			c.Header().Set("Access-Control-Max-Age", "3600")
+			c.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
+		}
 
-		// 		// Get user from session if logined.
-		// 		c.User, c.IsBasicAuth = auth.SignedInUser(c.Context, c.Session)
+		// Get user from session if logined.
+		// c.User, c.IsBasicAuth = auth.SignedInUser(c.Context, c.Session)
+		// ignore bool value returned, FIXME, TODO
+		c.User, _ = auth.SignedInUser(c.Context, c.Session)
 
-		// 		if c.User != nil {
-		// 			c.IsLogged = true
-		// 			c.Data["IsLogged"] = c.IsLogged
-		// 			c.Data["LoggedUser"] = c.User
-		// 			c.Data["LoggedUserID"] = c.User.ID
-		// 			c.Data["LoggedUserName"] = c.User.Name
-		// 			c.Data["IsAdmin"] = c.User.IsAdmin
-		// 		} else {
-		// 			c.Data["LoggedUserID"] = 0
-		// 			c.Data["LoggedUserName"] = ""
-		// 		}
+		if c.User != nil {
+			c.IsLogged = true
+			c.Data["IsLogged"] = c.IsLogged
+			c.Data["LoggedUser"] = c.User
+			c.Data["LoggedUserID"] = c.User.ID
+			c.Data["LoggedUserName"] = c.User.LoginName
+			c.Data["IsAdmin"] = c.User.IsAdmin
+		} else {
+			c.Data["LoggedUserID"] = 0
+			c.Data["LoggedUserName"] = ""
+		}
 
 		// 		// If request sends files, parse them here otherwise the Query() can't be parsed and the CsrfToken will be invalid.
 		// 		if c.Req.Method == "POST" && strings.Contains(c.Req.Header.Get("Content-Type"), "multipart/form-data") {
@@ -286,14 +294,14 @@ func Contexter() macaron.Handler {
 		// 			}
 		// 		}
 
-		// 		c.Data["CSRFToken"] = x.GetToken()
-		// 		c.Data["CSRFTokenHTML"] = template.HTML(`<input type="hidden" name="_csrf" value="` + x.GetToken() + `">`)
-		// 		log.Trace("Session ID: %s", sess.ID())
-		// 		log.Trace("CSRF Token: %v", c.Data["CSRFToken"])
+		c.Data["CSRFToken"] = x.GetToken()
+		c.Data["CSRFTokenHTML"] = template.HTML(`<input type="hidden" name="_csrf" value="` + x.GetToken() + `">`)
+		log.Trace("Session ID: %s", sess.ID())
+		log.Trace("CSRF Token: %v", c.Data["CSRFToken"])
 
 		// 		c.Data["ShowRegistrationButton"] = setting.Service.ShowRegistrationButton
-		// 		c.Data["ShowFooterBranding"] = setting.ShowFooterBranding
-		// 		c.Data["ShowFooterVersion"] = setting.ShowFooterVersion
+		c.Data["ShowFooterBranding"] = setting.Other.ShowFooterBranding
+		c.Data["ShowFooterVersion"] = setting.Other.ShowFooterVersion
 
 		ctx.Map(c)
 	}
