@@ -19,22 +19,29 @@ var Config = cli.Command{
 
 func showConfig(c *cli.Context) error {
 
-	fmt.Println("Web server port: ", setting.Server.HTTPPort)
+	server, _ := prettyjson.Marshal(setting.Server)
+	fmt.Printf("Server:\n%+v\n", string(server))
 
-	database, _ := prettyjson.Marshal(setting.Database)
-	fmt.Printf("Database:\n%+v\n", string(database))
+	session, _ := prettyjson.Marshal(setting.Session)
+	fmt.Printf("Session:\n%+v\n", string(session))
+
+	security, _ := prettyjson.Marshal(setting.Security)
+	fmt.Printf("Security:\n%+v\n", string(security))
 
 	ldap, _ := prettyjson.Marshal(setting.Ldap)
 	fmt.Printf("LDAP:\n%+v\n", string(ldap))
 
+	database, _ := prettyjson.Marshal(setting.Database)
+	fmt.Printf("Database:\n%+v\n", string(database))
+
 	log, _ := prettyjson.Marshal(setting.Log)
 	fmt.Printf("Log:\n%+v\n", string(log))
 
+	xormlog, _ := prettyjson.Marshal(setting.XormLog)
+	fmt.Printf("XormLog:\n%+v\n", string(xormlog))
+
 	other, _ := prettyjson.Marshal(setting.Other)
 	fmt.Printf("Other:\n%+v\n", string(other))
-
-	server, _ := prettyjson.Marshal(setting.Server)
-	fmt.Printf("Server:\n%+v\n", string(server))
 
 	return nil
 }
