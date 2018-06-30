@@ -1,22 +1,30 @@
 hash: f5194f71065703878e975f489ed7d904ea310e59f897cd2a36a0d7b7fb60d6e7
-updated: 2018-06-22T12:33:42.811804683+08:00
+updated: 2018-06-30T15:03:23.638579+08:00
 imports:
 - name: cloud.google.com/go
-  version: 438edea0905bb3226217e0b56eb1e4b3b736df2c
+  version: 89bc1a88dfa104f67f103818f6835dec6cbe9b15
   subpackages:
   - civil
 - name: github.com/denisenkom/go-mssqldb
-  version: 94c9c97e8c9f9844d15c846854a7a6031ae2132c
+  version: 3724b4745ca99cd0374ace516e93c022c00dfda9
   subpackages:
   - internal/cp
 - name: github.com/fatih/color
   version: 2d684516a8861da43017284349b7e303e809ac21
 - name: github.com/go-macaron/binding
   version: ac54ee249c27dca7e76fad851a4a04b73bd1b183
+- name: github.com/go-macaron/cache
+  version: 56173531277692bc2925924d51fda1cd0a6b8178
+- name: github.com/go-macaron/csrf
+  version: 503617c6b37257a55dff6293ec28556506c3a9a8
 - name: github.com/go-macaron/gzip
   version: cad1c6580a07c56f5f6bc52d66002a05985c5854
 - name: github.com/go-macaron/inject
   version: d8a0b8677191f4380287cfebd08e462217bac7ad
+- name: github.com/go-macaron/session
+  version: b8e286a0dba8f4999042d6b258daf51b31d08938
+- name: github.com/go-macaron/toolbox
+  version: 6766b8f16d1b135b250f09ba4dc4e24ab65b1107
 - name: github.com/go-sql-driver/mysql
   version: 749ddf1598b47e3cd909414bda735fe790ef3d30
 - name: github.com/go-xorm/builder
@@ -24,13 +32,13 @@ imports:
 - name: github.com/go-xorm/core
   version: c10e21e7e1cec20e09398f2dfae385e58c8df555
 - name: github.com/go-xorm/xorm
-  version: ee5b31ecae2c7a77438875728ba1f1bbb466f3dc
+  version: f16ce722ec150ade2c2e5a08a6fed64706c79465
 - name: github.com/hokaccha/go-prettyjson
   version: d229c224a219dcf41e9d2af4684b9782f33f5eb7
 - name: github.com/jtblin/go-ldap-client
   version: b73f66626b33ca4ac4fd6558efbb062c4fe4e52c
 - name: github.com/klauspost/compress
-  version: 5fb1f31b0a61e9858f12f39266e059848a5f1cea
+  version: a17685a03bf4c0a9219e110eb90e028b36193570
   subpackages:
   - flate
   - gzip
@@ -46,17 +54,21 @@ imports:
   version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
 - name: github.com/microcosm-cc/bluemonday
   version: f0761eb8ed07c1cc892ef631b00c33463b9b6868
+- name: github.com/satori/go.uuid
+  version: 36e9d2ebbde5e3f13ab2e25625fd453271d6522e
 - name: github.com/Unknwon/com
   version: da59b551951d50441ca26b7a8cd81317f34df87f
+- name: github.com/Unknwon/i18n
+  version: b64d336589669d317928070e70ba0ae558f16633
 - name: github.com/urfave/cli
   version: 8e01ec4cd3e2d84ab2fe90d8210528ffbb06d8ff
 - name: golang.org/x/crypto
-  version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
+  version: a49355c7e3f8fe157a85be2f77e6e269a0f89602
   subpackages:
   - md4
   - pbkdf2
 - name: golang.org/x/net
-  version: afe8f62b1d6bbd81f31868121a50b06d8188e1f9
+  version: 4cb1c02c05b0e749b0365f61ae859a8e0cfceed9
   subpackages:
   - html
   - html/atom
