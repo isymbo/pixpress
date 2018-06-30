@@ -409,6 +409,7 @@ func newLogService() {
 // Set cache related variables
 func newCacheService() {
 	switch Cache.Adapter {
+	case "memory":
 	case "redis", "memcache":
 		Cache.Conn = strings.Trim(Cache.Host, "\" ")
 	default:
