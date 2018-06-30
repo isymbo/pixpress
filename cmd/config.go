@@ -21,6 +21,9 @@ func showConfig(c *cli.Context) error {
 	server, _ := prettyjson.Marshal(setting.Server)
 	fmt.Printf("Server:\n%+v\n", string(server))
 
+	cache, _ := prettyjson.Marshal(setting.Cache)
+	fmt.Printf("Cache:\n%+v\n", string(cache))
+
 	session, _ := prettyjson.Marshal(setting.Session)
 	fmt.Printf("Session:\n%+v\n", string(session))
 

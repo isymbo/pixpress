@@ -296,6 +296,7 @@ func ConfigInfo(c *macaron.Context) {
 			"App Sub URL":     AppSubURL,
 			"ProdMode":        ProdMode,
 			"Server":          Server,
+			"Cache":           Cache,
 			"Session":         Session,
 			"Security":        Security,
 			"Service":         Service,
