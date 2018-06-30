@@ -114,12 +114,15 @@ func GlobalInit() {
 }
 
 func runWeb(c *cli.Context) error {
-
 	// override HTTPPort if it is set by command run option -p / --port
 	if c.IsSet("port") {
 		setting.Server.HTTPPort = c.Int("port")
 	}
 
+	// Get all services right
+	setting.NewServices()
+
+	// Get backend database running
 	GlobalInit()
 
 	m := newMacaron()
