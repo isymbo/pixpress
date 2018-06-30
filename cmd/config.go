@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	prettyjson "github.com/hokaccha/go-prettyjson"
-	"github.com/urfave/cli"
-
 	"github.com/isymbo/pixpress/setting"
+	"github.com/urfave/cli"
 )
 
 // Config show application configurations
@@ -34,11 +33,26 @@ func showConfig(c *cli.Context) error {
 	database, _ := prettyjson.Marshal(setting.Database)
 	fmt.Printf("Database:\n%+v\n", string(database))
 
+	service, _ := prettyjson.Marshal(setting.Service)
+	fmt.Printf("Service:\n%+v\n", string(service))
+
 	log, _ := prettyjson.Marshal(setting.Log)
 	fmt.Printf("Log:\n%+v\n", string(log))
 
-	xormlog, _ := prettyjson.Marshal(setting.XormLog)
-	fmt.Printf("XormLog:\n%+v\n", string(xormlog))
+	logconsole, _ := prettyjson.Marshal(setting.LogConsole)
+	fmt.Printf("LogConsole:\n%+v\n", string(logconsole))
+
+	logfile, _ := prettyjson.Marshal(setting.LogFile)
+	fmt.Printf("LogFile:\n%+v\n", string(logfile))
+
+	logslack, _ := prettyjson.Marshal(setting.LogSlack)
+	fmt.Printf("LogSlack:\n%+v\n", string(logslack))
+
+	logdiscord, _ := prettyjson.Marshal(setting.LogDiscord)
+	fmt.Printf("LogDiscord:\n%+v\n", string(logdiscord))
+
+	logxorm, _ := prettyjson.Marshal(setting.LogXorm)
+	fmt.Printf("LogXorm:\n%+v\n", string(logxorm))
 
 	other, _ := prettyjson.Marshal(setting.Other)
 	fmt.Printf("Other:\n%+v\n", string(other))

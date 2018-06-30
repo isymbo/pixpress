@@ -3,10 +3,12 @@ package setting
 import (
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strings"
 	"time"
 
+	"github.com/Unknwon/com"
 	"github.com/go-macaron/session"
 	"github.com/urfave/cli"
 	log "gopkg.in/clog.v1"
@@ -31,14 +33,21 @@ type ServerType struct {
 	LandingPageURL   LandingPage `ini:"LANDING_PAGE"`
 }
 
+type CacheType struct {
+	Adapter  string `ini:"ADAPTER"`
+	Interval int    `ini:"INTERVAL"`
+	Host     string `ini:"HOST"`
+	Conn     string `ini:"-"`
+}
+
 type SessionType struct {
 	Provider        string `ini:"PROVIDER"`
 	ProviderConfig  string `ini:"PROVIDER_CONFIG"`
 	CookieName      string `ini:"COOKIE_NAME"`
 	CookieSecure    bool   `ini:"COOKIE_SECURE"`
 	EnableSetCookie bool   `ini:"ENABLE_SET_COOKIE"`
-	GCIntervalTime  int    `ini:"GC_INTERVAL_TIME"`
-	SessionLifeTime int    `ini:"SESSION_LIFE_TIME"`
+	GCLifeTime      int64  `ini:"GC_LIFE_TIME"`
+	SessionLifeTime int64  `ini:"SESSION_LIFE_TIME"`
 	CSRFCookieName  string `ini:"CSRF_COOKIE_NAME"`
 }
 
@@ -93,8 +102,39 @@ type TimeType struct {
 type LogType struct {
 	RootPath  string `ini:"ROOT_PATH"`
 	Mode      string `ini:"MODE"`
-	BufferLen int    `ini:"BUFFER_LEN"`
+	BufferLen int64  `ini:"BUFFER_LEN"`
 	Level     string `ini:"LEVEL"`
+}
+
+type LogConsoleType struct {
+	Level string `ini:"LEVEL"`
+}
+
+type LogFileType struct {
+	Level        string `ini:"LEVEL"`
+	LogRotate    bool   `ini:"LOG_ROTATE"`
+	DailyRotate  bool   `ini:"DAILY_ROTATE"`
+	MaxSizeShift int64  `ini:"MAX_SIZE_SHIFT"`
+	MaxLines     int64  `ini:"MAX_LINES"`
+	MaxDays      int64  `ini:"MAX_DAYS"`
+}
+
+type LogSlackType struct {
+	Level string `ini:"LEVEL"`
+	URL   string `ini:"URL"`
+}
+
+type LogDiscordType struct {
+	Level    string `ini:"LEVEL"`
+	URL      string `ini:"URL"`
+	UserName string `ini:"USERNAME"`
+}
+
+type LogXormType struct {
+	Rotate      bool  `ini:"ROTATE"`
+	RotateDaily bool  `ini:"ROTATE_DAILY"`
+	MaxSize     int64 `ini:"MAX_SIZE"`
+	MaxDays     int64 `ini:"MAX_DAYS"`
 }
 
 type OtherType struct {
@@ -103,14 +143,11 @@ type OtherType struct {
 	ShowFooterVersion          bool `ini:"SHOW_FOOTER_VERSION"`
 }
 
-type XormLogType struct {
-	Rotate      bool  `ini:"ROTATE"`
-	RotateDaily bool  `ini:"ROTATE_DAILY"`
-	MaxSize     int64 `ini:"MAX_SIZE"`
-	MaxDays     int64 `ini:"MAX_DAYS"`
-}
-
 var (
+	// Build information should only be set by -ldflags.
+	BuildTime    string
+	BuildGitHash string
+
 	// Cfg is the file descriptor of configuration
 	Cfg *ini.File
 
@@ -127,6 +164,11 @@ var (
 
 	ProdMode bool
 
+	// Log settings
+	LogRootPath string
+	LogModes    []string
+	LogConfigs  []interface{}
+
 	UseSQLite3    bool
 	UseMySQL      bool
 	UsePostgreSQL bool
@@ -134,16 +176,21 @@ var (
 
 	SessionConfig session.Options
 
-	Server   ServerType
-	Database DatabaseType
-	Session  SessionType
-	Ldap     LDAPType
-	Security SecurityType
-	Time     TimeType
-	Service  ServiceType
-	Log      LogType
-	Other    OtherType
-	XormLog  XormLogType
+	Server     ServerType
+	Database   DatabaseType
+	Cache      CacheType
+	Session    SessionType
+	Ldap       LDAPType
+	Security   SecurityType
+	Time       TimeType
+	Service    ServiceType
+	Log        LogType
+	LogConsole LogConsoleType
+	LogFile    LogFileType
+	LogSlack   LogSlackType
+	LogDiscord LogDiscordType
+	LogXorm    LogXormType
+	Other      OtherType
 )
 
 // LoadConfig load configuration settings
@@ -166,6 +213,8 @@ func LoadConfig(c *cli.Context) error {
 
 	if err = Cfg.Section("server").MapTo(&Server); err != nil {
 		log.Fatal(2, "Fail to map server settings: %s", err)
+	} else if err = Cfg.Section("cache").MapTo(&Cache); err != nil {
+		log.Fatal(2, "Fail to map cache settings: %s", err)
 	} else if err = Cfg.Section("session").MapTo(&Session); err != nil {
 		log.Fatal(2, "Fail to map session settings: %s", err)
 	} else if err = Cfg.Section("database").MapTo(&Database); err != nil {
@@ -180,7 +229,15 @@ func LoadConfig(c *cli.Context) error {
 		log.Fatal(2, "Fail to map service settings: %s", err)
 	} else if err = Cfg.Section("log").MapTo(&Log); err != nil {
 		log.Fatal(2, "Fail to map log settings: %s", err)
-	} else if err = Cfg.Section("log.xorm").MapTo(&XormLog); err != nil {
+	} else if err = Cfg.Section("log.console").MapTo(&LogConsole); err != nil {
+		log.Fatal(2, "Fail to map log.console settings: %s", err)
+	} else if err = Cfg.Section("log.file").MapTo(&LogFile); err != nil {
+		log.Fatal(2, "Fail to map log.file settings: %s", err)
+	} else if err = Cfg.Section("log.slack").MapTo(&LogSlack); err != nil {
+		log.Fatal(2, "Fail to map log.slack settings: %s", err)
+	} else if err = Cfg.Section("log.discord").MapTo(&LogDiscord); err != nil {
+		log.Fatal(2, "Fail to map log.discord settings: %s", err)
+	} else if err = Cfg.Section("log.xorm").MapTo(&LogXorm); err != nil {
 		log.Fatal(2, "Fail to map log.xorm settings: %s", err)
 	} else if err = Cfg.Section("other").MapTo(&Other); err != nil {
 		log.Fatal(2, "Fail to map other settings: %s", err)
@@ -241,10 +298,15 @@ func ConfigInfo(c *macaron.Context) {
 			"Server":          Server,
 			"Session":         Session,
 			"Security":        Security,
+			"Service":         Service,
 			"LDAP":            Ldap,
 			"Database":        Database,
 			"Log":             Log,
-			"XormLog":         XormLog,
+			"LogConsole":      LogConsole,
+			"LogFile":         LogFile,
+			"LogSlack":        LogSlack,
+			"LogDiscord":      LogDiscord,
+			"XormLog":         LogXorm,
 			"Other":           Other,
 		},
 	)
@@ -254,16 +316,134 @@ func InitRoutes(m *macaron.Macaron) {
 	m.Get("/setting", ConfigInfo)
 }
 
-// func newSessionService() {
-// 	SessionConfig.Provider = Cfg.Section("session").Key("PROVIDER").In("memory",
-// 		[]string{"memory", "file", "redis", "mysql"})
-// 	SessionConfig.ProviderConfig = strings.Trim(Cfg.Section("session").Key("PROVIDER_CONFIG").String(), "\" ")
-// 	SessionConfig.CookieName = Cfg.Section("session").Key("COOKIE_NAME").MustString("i_like_gogs")
-// 	SessionConfig.CookiePath = AppSubURL
-// 	SessionConfig.Secure = Cfg.Section("session").Key("COOKIE_SECURE").MustBool()
-// 	SessionConfig.Gclifetime = Cfg.Section("session").Key("GC_INTERVAL_TIME").MustInt64(3600)
-// 	SessionConfig.Maxlifetime = Cfg.Section("session").Key("SESSION_LIFE_TIME").MustInt64(86400)
-// 	CSRFCookieName = Cfg.Section("session").Key("CSRF_COOKIE_NAME").MustString("_csrf")
+// Set Log configurations
+func newLogService() {
+	if len(BuildTime) > 0 {
+		log.Trace("Build Time: %s", BuildTime)
+		log.Trace("Build Git Hash: %s", BuildGitHash)
+	}
 
-// 	log.Info("Session Service Enabled")
-// }
+	// Because we always create a console logger as primary logger before all settings are loaded,
+	// thus if user doesn't set console logger, we should remove it after other loggers are created.
+	hasConsole := false
+
+	// Get and check log modes.
+	LogModes = strings.Split(Log.Mode, ",")
+	LogConfigs = make([]interface{}, len(LogModes))
+	levelNames := map[string]log.LEVEL{
+		"trace": log.TRACE,
+		"info":  log.INFO,
+		"warn":  log.WARN,
+		"error": log.ERROR,
+		"fatal": log.FATAL,
+	}
+
+	var level string
+	for i, mode := range LogModes {
+		mode = strings.ToLower(strings.TrimSpace(mode))
+		validTypes := []string{"console", "file", "slack", "discord"}
+		if !com.IsSliceContainsStr(validTypes, mode) {
+			log.Fatal(2, "Unknown logger mode: %s", mode)
+		}
+
+		// Generate log configuration.
+		switch log.MODE(mode) {
+		case log.CONSOLE:
+			hasConsole = true
+			level = validateLogLevel(LogConsole.Level)
+			LogConfigs[i] = log.ConsoleConfig{
+				Level:      levelNames[level],
+				BufferSize: Log.BufferLen,
+			}
+
+		case log.FILE:
+			logPath := path.Join(LogRootPath, "pixpress.log")
+			if err := os.MkdirAll(path.Dir(logPath), os.ModePerm); err != nil {
+				log.Fatal(2, "Fail to create log directory '%s': %v", path.Dir(logPath), err)
+			}
+
+			level = validateLogLevel(LogFile.Level)
+			LogConfigs[i] = log.FileConfig{
+				Level:      levelNames[level],
+				BufferSize: Log.BufferLen,
+				Filename:   logPath,
+				FileRotationConfig: log.FileRotationConfig{
+					Rotate:   LogFile.LogRotate,
+					Daily:    LogFile.DailyRotate,
+					MaxSize:  1 << uint(LogFile.MaxSizeShift),
+					MaxLines: LogFile.MaxLines,
+					MaxDays:  LogFile.MaxDays,
+				},
+			}
+
+		case log.SLACK:
+			level = validateLogLevel(LogSlack.Level)
+			LogConfigs[i] = log.SlackConfig{
+				Level:      levelNames[level],
+				BufferSize: Log.BufferLen,
+				URL:        LogSlack.URL,
+			}
+
+		case log.DISCORD:
+			level = validateLogLevel(LogDiscord.Level)
+			LogConfigs[i] = log.DiscordConfig{
+				Level:      levelNames[level],
+				BufferSize: Log.BufferLen,
+				URL:        LogDiscord.URL,
+				Username:   LogDiscord.UserName,
+			}
+		}
+
+		log.New(log.MODE(mode), LogConfigs[i])
+		log.Trace("Log Mode: %s (Level: %s)", strings.Title(mode), strings.Title(level))
+	}
+
+	// Make sure everyone gets version info printed.
+	log.Info("%s %s", AppName, AppVer)
+	if !hasConsole {
+		log.Delete(log.CONSOLE)
+	}
+}
+
+// Set cache related variables
+func newCacheService() {
+	switch Cache.Adapter {
+	case "redis", "memcache":
+		Cache.Conn = strings.Trim(Cache.Host, "\" ")
+	default:
+		log.Fatal(2, "Unknown cache adapter: %s", Cache.Adapter)
+	}
+
+	log.Info("Cache Service Enabled")
+}
+
+// Set session config variable
+func newSessionService() {
+	SessionConfig.Provider = Session.Provider
+	SessionConfig.ProviderConfig = strings.Trim(Session.ProviderConfig, "\" ")
+	SessionConfig.CookieName = Session.CookieName
+	SessionConfig.CookiePath = AppSubURL
+	SessionConfig.Secure = Session.CookieSecure
+	SessionConfig.Gclifetime = Session.GCLifeTime
+	SessionConfig.Maxlifetime = Session.SessionLifeTime
+	// CSRFCookieName = Session.CSRFCookieName
+
+	log.Info("Session Service Enabled")
+}
+
+func NewServices() {
+	newLogService()
+	newCacheService()
+	newSessionService()
+}
+
+func validateLogLevel(level string) string {
+	// FIXME, TODO
+	validLevels := []string{"trace", "info", "warn", "error", "fatal"}
+	level = strings.ToLower(level)
+	if com.IsSliceContainsStr(validLevels, level) {
+		return level
+	}
+
+	return "trace"
+}

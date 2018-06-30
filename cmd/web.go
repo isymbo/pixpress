@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-macaron/cache"
 	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/gzip"
 	"github.com/go-macaron/session"
@@ -64,11 +65,11 @@ func newMacaron() *macaron.Macaron {
 		IndentJSON: macaron.Env != macaron.PROD,
 	}))
 
-	// m.Use(cache.Cacher(cache.Options{
-	// 	Adapter:       setting.CacheAdapter,
-	// 	AdapterConfig: setting.CacheConn,
-	// 	Interval:      setting.CacheInterval,
-	// }))
+	m.Use(cache.Cacher(cache.Options{
+		Adapter:       setting.Cache.Adapter,
+		AdapterConfig: setting.Cache.Conn,
+		Interval:      setting.Cache.Interval,
+	}))
 
 	m.Use(session.Sessioner(setting.SessionConfig))
 	m.Use(csrf.Csrfer(csrf.Options{
@@ -78,6 +79,7 @@ func newMacaron() *macaron.Macaron {
 		Header:     "X-Csrf-Token",
 		CookiePath: setting.AppSubURL,
 	}))
+
 	m.Use(toolbox.Toolboxer(m, toolbox.Options{
 		HealthCheckFuncs: []*toolbox.HealthCheckFuncDesc{
 			&toolbox.HealthCheckFuncDesc{
@@ -92,20 +94,35 @@ func newMacaron() *macaron.Macaron {
 
 }
 
-func runWeb(c *cli.Context) error {
+// GlobalInit use loaded configurations to set internal variables and init services
+func GlobalInit() {
+	// Set database type
+	models.InitDBType()
 
-	if c.IsSet("port") {
-		setting.Server.HTTPPort = c.Int("port")
-	}
-
-	m := newMacaron()
-
-	models.LoadConfigs()
+	// Initialize database engine
 	if err := models.NewEngine(); err != nil {
 		log.Fatal(2, "Fail to initialize ORM engine: %v", err)
 	}
 	models.HasEngine = true
 
+	// Kept for development/test usage only
+	if models.EnableSQLite3 {
+		log.Info("SQLite3 Supported")
+	}
+	checkRunMode()
+
+}
+
+func runWeb(c *cli.Context) error {
+
+	// override HTTPPort if it is set by command run option -p / --port
+	if c.IsSet("port") {
+		setting.Server.HTTPPort = c.Int("port")
+	}
+
+	GlobalInit()
+
+	m := newMacaron()
 	m.SetAutoHead(true)
 	initRoutes(m)
 	m.Run(setting.Server.HTTPPort)

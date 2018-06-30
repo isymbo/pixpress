@@ -28,6 +28,7 @@ func main() {
 		},
 	}
 
+	// Load all settings at one time before any subcommands execute
 	app.Before = setting.LoadConfig
 
 	app.Run(os.Args)

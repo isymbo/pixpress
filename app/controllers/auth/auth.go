@@ -76,6 +76,7 @@ func SignedInID(c *macaron.Context, sess session.Store) int64 {
 
 // SignedInUser returns the user object of signed user.
 // It returns a bool value to indicate whether user uses basic auth or not.
+// FIXME, TODO
 func SignedInUser(ctx *macaron.Context, sess session.Store) (*models.User, bool) {
 	if !models.HasEngine {
 		return nil, false

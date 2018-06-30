@@ -42,6 +42,7 @@ var (
 
 	DbCfg setting.DatabaseType
 
+	// Kept for development/test usage only
 	EnableSQLite3 bool
 )
 
@@ -55,17 +56,21 @@ func init() {
 	}
 }
 
-func LoadConfigs() {
+func InitDBType() {
 	DbCfg = setting.Database
 	switch DbCfg.DbType {
 	case "sqlite3":
 		setting.UseSQLite3 = true
+		log.Info("SQLite3 is used as database.")
 	case "mysql":
 		setting.UseMySQL = true
+		log.Info("MySQL is used as database.")
 	case "postgres":
 		setting.UsePostgreSQL = true
+		log.Info("PostgreSQL is used as database.")
 	case "mssql":
 		setting.UseMSSQL = true
+		log.Info("MSSQL is used as database.")
 	}
 }
 
@@ -128,6 +133,7 @@ func getEngine() (*xorm.Engine, error) {
 		host, port := parseMSSQLHostPort(DbCfg.Host)
 		connStr = fmt.Sprintf("server=%s; port=%s; database=%s; user id=%s; password=%s;", host, port, DbCfg.Name, DbCfg.User, DbCfg.Passwd)
 	case "sqlite3":
+		// Kept for development/test usage only
 		if !EnableSQLite3 {
 			return nil, errors.New("This binary version does not build support for SQLite3.")
 		}
@@ -162,10 +168,10 @@ func SetEngine() (err error) {
 	// use log file to instead print to stdout.
 	logger, err := log.NewFileWriter(path.Join(setting.Log.RootPath, "xorm.log"),
 		log.FileRotationConfig{
-			Rotate:  setting.XormLog.Rotate,
-			Daily:   setting.XormLog.RotateDaily,
-			MaxSize: setting.XormLog.MaxSize * 1024 * 1024,
-			MaxDays: setting.XormLog.MaxDays,
+			Rotate:  setting.LogXorm.Rotate,
+			Daily:   setting.LogXorm.RotateDaily,
+			MaxSize: setting.LogXorm.MaxSize * 1024 * 1024,
+			MaxDays: setting.LogXorm.MaxDays,
 		})
 	if err != nil {
 		return fmt.Errorf("Fail to create 'xorm.log': %v", err)
