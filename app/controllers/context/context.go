@@ -285,9 +285,11 @@ func Contexter() macaron.Handler {
 			c.Data["LoggedUserID"] = c.User.ID
 			c.Data["LoggedUserName"] = c.User.LoginName
 			c.Data["IsAdmin"] = c.User.IsAdmin
+			log.Trace("%s is logged in.", c.User.LoginName)
 		} else {
 			c.Data["LoggedUserID"] = 0
 			c.Data["LoggedUserName"] = ""
+			log.Trace("User is not logged in yet.")
 		}
 
 		// // If request sends files, parse them here otherwise the Query() can't be parsed and the CsrfToken will be invalid.
