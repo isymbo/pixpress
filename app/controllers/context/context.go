@@ -11,10 +11,12 @@ import (
 	"github.com/go-macaron/cache"
 	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/session"
+
 	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 
 	"github.com/isymbo/pixpress/app/controllers/auth"
+	"github.com/isymbo/pixpress/app/controllers/form"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
 )
@@ -122,21 +124,21 @@ func (c *Context) JSONSuccess(data interface{}) {
 	c.JSON(http.StatusOK, data)
 }
 
-// // SubURLRedirect responses redirection wtih given location and status.
-// // It prepends setting.AppSubURL to the location string.
-// func (c *Context) SubURLRedirect(location string, status ...int) {
-// 	c.Redirect(setting.AppSubURL + location)
-// }
+// SubURLRedirect responses redirection wtih given location and status.
+// It prepends setting.AppSubURL to the location string.
+func (c *Context) SubURLRedirect(location string, status ...int) {
+	c.Redirect(setting.AppSubURL + location)
+}
 
-// // RenderWithErr used for page has form validation but need to prompt error to users.
-// func (c *Context) RenderWithErr(msg, tpl string, f interface{}) {
-// 	if f != nil {
-// 		form.Assign(f, c.Data)
-// 	}
-// 	c.Flash.ErrorMsg = msg
-// 	c.Data["Flash"] = c.Flash
-// 	c.HTML(http.StatusOK, tpl)
-// }
+// RenderWithErr used for page has form validation but need to prompt error to users.
+func (c *Context) RenderWithErr(msg, tpl string, f interface{}) {
+	if f != nil {
+		form.Assign(f, c.Data)
+	}
+	c.Flash.ErrorMsg = msg
+	c.Data["Flash"] = c.Flash
+	c.HTML(http.StatusOK, tpl)
+}
 
 // Handle handles and logs error by given status.
 func (c *Context) Handle(status int, title string, err error) {
@@ -198,9 +200,10 @@ func (c *Context) ServeContent(name string, r io.ReadSeeker, params ...interface
 
 // Contexter initializes a classic context for a request.
 func Contexter() macaron.Handler {
-	return func(ctx *macaron.Context, sess session.Store, f *session.Flash, x csrf.CSRF) {
+	return func(ctx *macaron.Context, cache cache.Cache, sess session.Store, f *session.Flash, x csrf.CSRF) {
 		c := &Context{
 			Context: ctx,
+			Cache:   cache,
 			csrf:    x,
 			Flash:   f,
 			Session: sess,

@@ -4,8 +4,9 @@ import (
 	"fmt"
 
 	prettyjson "github.com/hokaccha/go-prettyjson"
-	"github.com/isymbo/pixpress/setting"
 	"github.com/urfave/cli"
+
+	"github.com/isymbo/pixpress/setting"
 )
 
 // Config show application configurations

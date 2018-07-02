@@ -17,6 +17,7 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/isymbo/pixpress/setting"
+	"github.com/isymbo/pixpress/util"
 )
 
 // TODO: only initialize map once and save to a local variable to reduce copies.
@@ -51,10 +52,10 @@ func NewFuncMap() []template.FuncMap {
 		"Safe":     Safe,
 		"Sanitize": bluemonday.UGCPolicy().Sanitize,
 		//"Str2html": Str2html,
-		// "TimeSince":    tool.TimeSince,
-		// "RawTimeSince": tool.RawTimeSince,
-		// "FileSize":     tool.FileSize,
-		// "Subtract":     tool.Subtract,
+		"TimeSince":    util.TimeSince,
+		"RawTimeSince": util.RawTimeSince,
+		"FileSize":     util.FileSize,
+		"Subtract":     util.Subtract,
 		"Add": func(a, b int) int {
 			return a + b
 		},
@@ -79,12 +80,10 @@ func NewFuncMap() []template.FuncMap {
 			}
 			return str[start:end]
 		},
-		"Join": strings.Join,
-		// "EllipsisString":    tool.EllipsisString,
-		// "Sha1": Sha1,
-		// "ShortSHA1":         tool.ShortSHA1,
-		// "MD5":               tool.MD5,
-		// "RenderCommitMessage":   RenderCommitMessage,
+		"Join":           strings.Join,
+		"EllipsisString": util.EllipsisString,
+		"ShortSHA1":      util.ShortSHA1,
+		"MD5":            util.MD5,
 		"FilenameIsImage": func(filename string) bool {
 			mimeType := mime.TypeByExtension(filepath.Ext(filename))
 			return strings.HasPrefix(mimeType, "image/")
@@ -138,6 +137,43 @@ func ReplaceLeft(s, old, new string) string {
 	return string(replacement)
 }
 
-// func Str2html(raw string) template.HTML {
-// 	return template.HTML(markup.Sanitize(raw))
+// NewLine2br simply replaces "\n" to "<br>".
+func NewLine2br(raw string) string {
+	return strings.Replace(raw, "\n", "<br>", -1)
+}
+
+func Sha1(str string) string {
+	return util.SHA1(str)
+}
+
+// func ToUTF8WithErr(content []byte) (error, string) {
+// 	charsetLabel, err := util.DetectEncoding(content)
+// 	if err != nil {
+// 		return err, ""
+// 	} else if charsetLabel == "UTF-8" {
+// 		return nil, string(content)
+// 	}
+
+// 	encoding, _ := charset.Lookup(charsetLabel)
+// 	if encoding == nil {
+// 		return fmt.Errorf("Unknown encoding: %s", charsetLabel), string(content)
+// 	}
+
+// 	// If there is an error, we concatenate the nicely decoded part and the
+// 	// original left over. This way we won't loose data.
+// 	result, n, err := transform.String(encoding.NewDecoder(), string(content))
+// 	if err != nil {
+// 		result = result + string(content[n:])
+// 	}
+
+// 	return err, result
 // }
+
+// func ToUTF8(content string) string {
+// 	_, res := ToUTF8WithErr([]byte(content))
+// 	return res
+// }
+
+func EscapePound(str string) string {
+	return strings.NewReplacer("%", "%25", "#", "%23", " ", "%20", "?", "%3F").Replace(str)
+}

@@ -14,6 +14,7 @@ import (
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	_ "github.com/lib/pq"
+	// _ "github.com/mattn/go-sqlite3"
 	log "gopkg.in/clog.v1"
 
 	"github.com/isymbo/pixpress/setting"
@@ -42,7 +43,8 @@ var (
 
 	DbCfg setting.DatabaseType
 
-	// Kept for development/test usage only
+	// Kept for development/test usage only, needs to set true if using SQLite3 for dev/test
+	// EnableSQLite3 bool = true
 	EnableSQLite3 bool
 )
 
