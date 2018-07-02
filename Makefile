@@ -79,6 +79,9 @@ fixme:
 todo:
 	grep -rnw "TODO" cmd app setting util
 
+cloc:
+	gocloc .
+
 # Legacy code should be remove by the time of release
 legacy:
 	grep -rnw "LEGACY" cmd app setting util
