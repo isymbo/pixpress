@@ -61,6 +61,7 @@ func SignedInID(c *macaron.Context, sess session.Store) int64 {
 	}
 
 	uid := sess.Get("uid")
+	log.Trace("sess.Get(uid) is %s", uid)
 	if uid == nil {
 		return 0
 	}
