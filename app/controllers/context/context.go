@@ -148,9 +148,9 @@ func (c *Context) Handle(status int, title string, err error) {
 	case http.StatusInternalServerError:
 		c.Data["Title"] = "Internal Server Error"
 		log.Error(3, "%s: %v", title, err)
-		// if !setting.ProdMode || (c.IsLogged && c.User.IsAdmin) {
-		// 	c.Data["ErrorMsg"] = err
-		// }
+		if !setting.ProdMode || (c.IsLogged && c.User.IsAdmin) {
+			c.Data["ErrorMsg"] = err
+		}
 	}
 	c.HTML(status, fmt.Sprintf("status/%d", status))
 }
@@ -290,13 +290,13 @@ func Contexter() macaron.Handler {
 			c.Data["LoggedUserName"] = ""
 		}
 
-		// 		// If request sends files, parse them here otherwise the Query() can't be parsed and the CsrfToken will be invalid.
-		// 		if c.Req.Method == "POST" && strings.Contains(c.Req.Header.Get("Content-Type"), "multipart/form-data") {
-		// 			if err := c.Req.ParseMultipartForm(setting.AttachmentMaxSize << 20); err != nil && !strings.Contains(err.Error(), "EOF") { // 32MB max size
-		// 				c.Handle(500, "ParseMultipartForm", err)
-		// 				return
-		// 			}
-		// 		}
+		// // If request sends files, parse them here otherwise the Query() can't be parsed and the CsrfToken will be invalid.
+		// if c.Req.Method == "POST" && strings.Contains(c.Req.Header.Get("Content-Type"), "multipart/form-data") {
+		// 	if err := c.Req.ParseMultipartForm(setting.AttachmentMaxSize << 20); err != nil && !strings.Contains(err.Error(), "EOF") { // 32MB max size
+		// 		c.Handle(500, "ParseMultipartForm", err)
+		// 		return
+		// 	}
+		// }
 
 		c.Data["CSRFToken"] = x.GetToken()
 		c.Data["CSRFTokenHTML"] = template.HTML(`<input type="hidden" name="_csrf" value="` + x.GetToken() + `">`)
