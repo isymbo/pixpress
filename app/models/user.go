@@ -1,29 +1,46 @@
 package models
 
 import (
+	"crypto/sha256"
+	"crypto/subtle"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/Unknwon/com"
 	"github.com/go-xorm/xorm"
+	"golang.org/x/crypto/pbkdf2"
 
 	"github.com/isymbo/pixpress/app/models/errors"
 	"github.com/isymbo/pixpress/setting"
 )
 
+type UserType int
+
+const (
+	USER_TYPE_INDIVIDUAL UserType = iota // Historic reason to make it starts at 0.
+	USER_TYPE_ORGANIZATION
+)
+
 type User struct {
 	ID          int64
-	LoginName   string
-	DisplayName string
+	LoginName   string //登录英文用户名
+	DisplayName string //显示中文名
 	Email       string `xorm:"NOT NULL"`
 	Mobile      string
+	Passwd      string
+	LoginSource int64 `xorm:"NOT NULL DEFAULT 0"`
+	LoginType   LoginType
+	Type        UserType
+	Rands       string `xorm:"VARCHAR(10)"`
+	Salt        string `xorm:"VARCHAR(10)"`
 
 	Created     time.Time `xorm:"-" json:"-"`
 	CreatedUnix int64
 	Updated     time.Time `xorm:"-" json:"-"`
 	UpdatedUnix int64
 
+	IsActive      bool
 	IsAdmin       bool
 	ProhibitLogin bool
 }
@@ -286,18 +303,18 @@ func GetUserProfile(id int64) {
 // 	}
 // }
 
-// // EncodePasswd encodes password to safe format.
-// func (u *User) EncodePasswd() {
-// 	newPasswd := pbkdf2.Key([]byte(u.Passwd), []byte(u.Salt), 10000, 50, sha256.New)
-// 	u.Passwd = fmt.Sprintf("%x", newPasswd)
-// }
+// EncodePasswd encodes password to safe format.
+func (u *User) EncodePasswd() {
+	newPasswd := pbkdf2.Key([]byte(u.Passwd), []byte(u.Salt), 10000, 50, sha256.New)
+	u.Passwd = fmt.Sprintf("%x", newPasswd)
+}
 
-// // ValidatePassword checks if given password matches the one belongs to the user.
-// func (u *User) ValidatePassword(passwd string) bool {
-// 	newUser := &User{Passwd: passwd, Salt: u.Salt}
-// 	newUser.EncodePasswd()
-// 	return subtle.ConstantTimeCompare([]byte(u.Passwd), []byte(newUser.Passwd)) == 1
-// }
+// ValidatePassword checks if given password matches the one belongs to the user.
+func (u *User) ValidatePassword(passwd string) bool {
+	newUser := &User{Passwd: passwd, Salt: u.Salt}
+	newUser.EncodePasswd()
+	return subtle.ConstantTimeCompare([]byte(u.Passwd), []byte(newUser.Passwd)) == 1
+}
 
 // // UploadAvatar saves custom avatar for user.
 // // FIXME: split uploads to different subdirs in case we have massive users.
@@ -364,10 +381,10 @@ func GetUserProfile(id int64) {
 // 	return has
 // }
 
-// // IsOrganization returns true if user is actually a organization.
-// func (u *User) IsOrganization() bool {
-// 	return u.Type == USER_TYPE_ORGANIZATION
-// }
+// IsOrganization returns true if user is actually a organization.
+func (u *User) IsOrganization() bool {
+	return u.Type == USER_TYPE_ORGANIZATION
+}
 
 // // IsUserOrgOwner returns true if user is in the owner team of given organization.
 // func (u *User) IsUserOrgOwner(orgId int64) bool {
@@ -451,16 +468,16 @@ func GetUserProfile(id int64) {
 // 	return u.IsActive
 // }
 
-// // IsUserExist checks if given user name exist,
-// // the user name should be noncased unique.
-// // If uid is presented, then check will rule out that one,
-// // it is used when update a user name in settings page.
-// func IsUserExist(uid int64, name string) (bool, error) {
-// 	if len(name) == 0 {
-// 		return false, nil
-// 	}
-// 	return x.Where("id != ?", uid).Get(&User{LowerName: strings.ToLower(name)})
-// }
+// IsUserExist checks if given user name exist,
+// the user name should be noncased unique.
+// If uid is presented, then check will rule out that one,
+// it is used when update a user name in settings page.
+func IsUserExist(uid int64, name string) (bool, error) {
+	if len(name) == 0 {
+		return false, nil
+	}
+	return x.Where("id != ?", uid).Get(&User{LoginName: strings.ToLower(name)})
+}
 
 // // GetUserSalt returns a ramdom user salt token.
 // func GetUserSalt() (string, error) {
@@ -664,36 +681,36 @@ func GetUserProfile(id int64) {
 // 	return os.MkdirAll(newBaseDir, os.ModePerm)
 // }
 
-// func updateUser(e Engine, u *User) error {
-// 	// Organization does not need email
-// 	if !u.IsOrganization() {
-// 		u.Email = strings.ToLower(u.Email)
-// 		has, err := e.Where("id!=?", u.ID).And("type=?", u.Type).And("email=?", u.Email).Get(new(User))
-// 		if err != nil {
-// 			return err
-// 		} else if has {
-// 			return ErrEmailAlreadyUsed{u.Email}
-// 		}
+func updateUser(e Engine, u *User) error {
+	// Organization does not need email
+	if !u.IsOrganization() {
+		u.Email = strings.ToLower(u.Email)
+		has, err := e.Where("id!=?", u.ID).And("type=?", u.Type).And("email=?", u.Email).Get(new(User))
+		if err != nil {
+			return err
+		} else if has {
+			return ErrEmailAlreadyUsed{u.Email}
+		}
 
-// 		if len(u.AvatarEmail) == 0 {
-// 			u.AvatarEmail = u.Email
-// 		}
-// 		u.Avatar = tool.HashEmail(u.AvatarEmail)
-// 	}
+		// if len(u.AvatarEmail) == 0 {
+		// 	u.AvatarEmail = u.Email
+		// }
+		// u.Avatar = tool.HashEmail(u.AvatarEmail)
+	}
 
-// 	u.LowerName = strings.ToLower(u.Name)
-// 	u.Location = tool.TruncateString(u.Location, 255)
-// 	u.Website = tool.TruncateString(u.Website, 255)
-// 	u.Description = tool.TruncateString(u.Description, 255)
+	// u.LowerName = strings.ToLower(u.Name)
+	// u.Location = util.TruncateString(u.Location, 255)
+	// u.Website = util.TruncateString(u.Website, 255)
+	// u.Description = util.TruncateString(u.Description, 255)
 
-// 	_, err := e.Id(u.ID).AllCols().Update(u)
-// 	return err
-// }
+	_, err := e.Id(u.ID).AllCols().Update(u)
+	return err
+}
 
-// // UpdateUser updates user's information.
-// func UpdateUser(u *User) error {
-// 	return updateUser(x, u)
-// }
+// UpdateUser updates user's information.
+func UpdateUser(u *User) error {
+	return updateUser(x, u)
+}
 
 // // deleteBeans deletes all given beans, beans should contain delete conditions.
 // func deleteBeans(e Engine, beans ...interface{}) (err error) {

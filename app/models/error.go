@@ -22,6 +22,45 @@ func (err ErrLoginNameAlreadyExist) Error() string {
 	return fmt.Sprintf("login_name already exists [login_name: %s]", err.LoginName)
 }
 
+type ErrEmailAlreadyUsed struct {
+	Email string
+}
+
+func IsErrEmailAlreadyUsed(err error) bool {
+	_, ok := err.(ErrEmailAlreadyUsed)
+	return ok
+}
+
+func (err ErrEmailAlreadyUsed) Error() string {
+	return fmt.Sprintf("e-mail has been used [email: %s]", err.Email)
+}
+
+// type ErrUserOwnRepos struct {
+// 	UID int64
+// }
+
+// func IsErrUserOwnRepos(err error) bool {
+// 	_, ok := err.(ErrUserOwnRepos)
+// 	return ok
+// }
+
+// func (err ErrUserOwnRepos) Error() string {
+// 	return fmt.Sprintf("user still has ownership of repositories [uid: %d]", err.UID)
+// }
+
+// type ErrUserHasOrgs struct {
+// 	UID int64
+// }
+
+// func IsErrUserHasOrgs(err error) bool {
+// 	_, ok := err.(ErrUserHasOrgs)
+// 	return ok
+// }
+
+// func (err ErrUserHasOrgs) Error() string {
+// 	return fmt.Sprintf("user still has membership of organizations [uid: %d]", err.UID)
+// }
+
 //    _____                                   ___________     __
 //   /  _  \   ____  ____  ____   ______ _____\__    ___/___ |  | __ ____   ____
 //  /  /_\  \_/ ___\/ ___\/ __ \ /  ___//  ___/ |    | /  _ \|  |/ // __ \ /    \
@@ -52,4 +91,37 @@ func IsErrAccessTokenEmpty(err error) bool {
 
 func (err ErrAccessTokenEmpty) Error() string {
 	return fmt.Sprintf("access token is empty")
+}
+
+// .____                 .__           _________
+// |    |    ____   ____ |__| ____    /   _____/ ____  __ _________   ____  ____
+// |    |   /  _ \ / ___\|  |/    \   \_____  \ /  _ \|  |  \_  __ \_/ ___\/ __ \
+// |    |__(  <_> ) /_/  >  |   |  \  /        (  <_> )  |  /|  | \/\  \__\  ___/
+// |_______ \____/\___  /|__|___|  / /_______  /\____/|____/ |__|    \___  >___  >
+//         \/    /_____/         \/          \/                          \/    \/
+
+type ErrLoginSourceAlreadyExist struct {
+	Name string
+}
+
+func IsErrLoginSourceAlreadyExist(err error) bool {
+	_, ok := err.(ErrLoginSourceAlreadyExist)
+	return ok
+}
+
+func (err ErrLoginSourceAlreadyExist) Error() string {
+	return fmt.Sprintf("login source already exists [name: %s]", err.Name)
+}
+
+type ErrLoginSourceInUse struct {
+	ID int64
+}
+
+func IsErrLoginSourceInUse(err error) bool {
+	_, ok := err.(ErrLoginSourceInUse)
+	return ok
+}
+
+func (err ErrLoginSourceInUse) Error() string {
+	return fmt.Sprintf("login source is still used by some users [id: %d]", err.ID)
 }

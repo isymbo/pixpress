@@ -193,10 +193,7 @@ var (
 	Other      OtherType
 )
 
-// LoadConfig load configuration settings
-func LoadConfig(c *cli.Context) error {
-	log.New(log.CONSOLE, log.ConsoleConfig{})
-
+func loadAppConfig(c *cli.Context) error {
 	AppWorkDir = runtime.ExecDir()
 
 	config := c.GlobalString("config")
@@ -283,6 +280,22 @@ func LoadConfig(c *cli.Context) error {
 	}[Time.Format]
 
 	return nil
+
+}
+
+// LoadConfig load configuration settings
+func LoadConfig(c *cli.Context) error {
+	log.New(log.CONSOLE, log.ConsoleConfig{})
+
+	var err error
+	if err = loadAppConfig(c); err != nil {
+		return err
+	}
+
+	// LoadAuthSources()
+
+	return nil
+
 }
 
 // ConfigInfo return application configuration info

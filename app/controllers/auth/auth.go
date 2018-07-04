@@ -12,6 +12,7 @@ import (
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/app/models/errors"
 	"github.com/isymbo/pixpress/setting"
+	"github.com/isymbo/pixpress/util"
 )
 
 func IsAPIPath(url string) bool {
@@ -110,8 +111,8 @@ func SignedInUser(ctx *macaron.Context, sess session.Store) (*models.User, bool)
 						u := &models.User{
 							LoginName: webAuthUser,
 							Email:     t.String() + "@localhost",
-							// Passwd:    webAuthUser,
-							// IsActive:  true,
+							Passwd:    webAuthUser,
+							IsActive:  true,
 						}
 						if err = models.CreateUser(u); err != nil {
 							// FIXME: should I create a system notice?
@@ -127,23 +128,23 @@ func SignedInUser(ctx *macaron.Context, sess session.Store) (*models.User, bool)
 		}
 
 		// Check with basic auth.
-		// baHead := ctx.Req.Header.Get("Authorization")
-		// if len(baHead) > 0 {
-		// 	auths := strings.Fields(baHead)
-		// 	if len(auths) == 2 && auths[0] == "Basic" {
-		// 		uname, passwd, _ := util.BasicAuthDecode(auths[1])
+		baHead := ctx.Req.Header.Get("Authorization")
+		if len(baHead) > 0 {
+			auths := strings.Fields(baHead)
+			if len(auths) == 2 && auths[0] == "Basic" {
+				uname, passwd, _ := util.BasicAuthDecode(auths[1])
 
-		// 		u, err := models.UserLogin(uname, passwd, -1)
-		// 		if err != nil {
-		// 			if !errors.IsUserNotExist(err) {
-		// 				log.Error(4, "UserLogin: %v", err)
-		// 			}
-		// 			return nil, false
-		// 		}
+				u, err := models.UserLogin(uname, passwd, -1)
+				if err != nil {
+					if !errors.IsUserNotExist(err) {
+						log.Error(4, "UserLogin: %v", err)
+					}
+					return nil, false
+				}
 
-		// 		return u, true
-		// 	}
-		// }
+				return u, true
+			}
+		}
 		return nil, false
 	}
 
