@@ -22,26 +22,26 @@ const (
 
 // Basic LDAP authentication service
 type Source struct {
-	Host              string // LDAP host
-	Port              int    // port number
-	SecurityProtocol  SecurityProtocol
-	SkipVerify        bool
-	BindDN            string `ini:"bind_dn,omitempty"` // DN to bind with
-	BindPassword      string `ini:",omitempty"`        // Bind DN password
-	UserBase          string `ini:",omitempty"`        // Base search path for users
-	UserDN            string `ini:"user_dn,omitempty"` // Template for the DN of the user for simple auth
-	AttributeUsername string // Username attribute
-	AttributeName     string // First name attribute
-	AttributeSurname  string // Surname attribute
-	AttributeMail     string // E-mail attribute
-	AttributesInBind  bool   // fetch attributes in bind context (not user)
-	Filter            string // Query filter to validate entry
-	AdminFilter       string // Query filter to check if user is admin
-	GroupEnabled      bool   // if the group checking is enabled
-	GroupDN           string `ini:"group_dn"` // Group Search Base
-	GroupFilter       string // Group Name Filter
-	GroupMemberUID    string `ini:"group_member_uid"` // Group Attribute containing array of UserUID
-	UserUID           string `ini:"user_uid"`         // User Attribute listed in Group
+	Host              string           `ini:"HOST"`               // LDAP host
+	Port              int              `ini:"PORT"`               // port number
+	SecurityProtocol  SecurityProtocol `ini:"SECURITY_PROTOCOL"`  // Security protocol
+	SkipVerify        bool             `ini:"SKIP_VERIFY"`        // if security check is skipped
+	BindDN            string           `ini:"BIND_DN"`            // DN to bind with
+	BindPassword      string           `ini:"BIND_PASSWORD"`      // Bind DN password
+	UserBase          string           `ini:"USER_BASE"`          // Base search path for users
+	UserDN            string           `ini:"USER_DN"`            // Template for the DN of the user for simple auth
+	AttributeUsername string           `ini:"ATTRIBUTE_USERNAME"` // Username attribute
+	AttributeName     string           `ini:"ATTRIBUTE_NAME"`     // First name attribute
+	AttributeSurname  string           `ini:"ATTRIBUTE_SURNAME"`  // Surname attribute
+	AttributeMail     string           `ini:"ATTRIBUTE_MAIL"`     // E-mail attribute
+	AttributesInBind  bool             `ini:"ATTRIBUTE_IN_BIND"`  // fetch attributes in bind context (not user)
+	Filter            string           `ini:"FILTER"`             // Query filter to validate entry
+	AdminFilter       string           `ini:"ADMIN_FILTER"`       // Query filter to check if user is admin
+	GroupEnabled      bool             `ini:"GROUP_ENABLED"`      // if the group checking is enabled
+	GroupDN           string           `ini:"GROUP_DN"`           // Group Search Base
+	GroupFilter       string           `ini:"GROUP_FILTER"`       // Group Name Filter
+	GroupMemberUID    string           `ini:"GROUP_MEMBER_UID"`   // Group Attribute containing array of UserUID
+	UserUID           string           `ini:"USER_UID"`           // User Attribute listed in Group
 }
 
 func (ls *Source) sanitizedUserQuery(username string) (string, bool) {

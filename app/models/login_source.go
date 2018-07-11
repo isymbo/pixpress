@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"os"
-	"path"
 	"strings"
 	"sync"
 	"time"
@@ -12,13 +11,12 @@ import (
 	"github.com/go-macaron/binding"
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	log "gopkg.in/clog.v1"
 	"gopkg.in/ini.v1"
 
 	"github.com/isymbo/pixpress/app/controllers/auth/ldap"
 	"github.com/isymbo/pixpress/app/models/errors"
-	"github.com/isymbo/pixpress/setting"
 )
 
 type LoginType int
@@ -227,6 +225,7 @@ func GetLoginSourceByID(id int64) (*LoginSource, error) {
 func UpdateLoginSource(source *LoginSource) error {
 	if source.LocalFile == nil {
 		_, err := x.Id(source.ID).AllCols().Update(source)
+
 		return err
 	}
 
@@ -335,8 +334,8 @@ var localLoginSources = &LocalLoginSources{}
 
 // LoadAuthSources loads authentication sources from local files
 // and converts them into login sources.
-func LoadAuthSources() {
-	authdPath := path.Join(setting.AppWorkDir, "conf/auth.d")
+func LoadAuthSources(p string) {
+	authdPath := p
 	if !com.IsDir(authdPath) {
 		return
 	}

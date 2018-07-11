@@ -15,6 +15,7 @@ import (
 	"gopkg.in/ini.v1"
 	"gopkg.in/macaron.v1"
 
+	"github.com/isymbo/pixpress/app/controllers/auth/ldap"
 	"github.com/isymbo/pixpress/util/runtime"
 )
 
@@ -137,6 +138,15 @@ type LogXormType struct {
 	MaxDays     int64 `ini:"MAX_DAYS"`
 }
 
+// type LoginLDAPType ldap.Source
+
+type LoginType struct {
+	ID          int64  `ini:"ID"`
+	Type        string `ini:"TYPE"`
+	Name        string `ini:"NAME"`
+	IsActivated bool   `ini:"IS_ACTIVATED"`
+}
+
 type OtherType struct {
 	ShowFooterTemplateLoadTime bool `ini:"SHOW_FOOTER_TEMPLATE_LOAD_TIME"`
 	ShowFooterBranding         bool `ini:"SHOW_FOOTER_BRANDING"`
@@ -152,15 +162,16 @@ var (
 	Cfg *ini.File
 
 	// App settings
-	AppVer         string = APP_VER
-	AppName        string = APP_NAME
-	AppCfgPath     string = APP_CONFIG
-	AppURL         string
-	AppSubURL      string
-	AppSubURLDepth int // Number of slashes
-	AppPath        string
-	AppDataPath    string
-	AppWorkDir     string
+	AppVer          string = APP_VER
+	AppName         string = APP_NAME
+	AppCfgPath      string = APP_CONFIG
+	AppAuthdCfgPath string = APP_AUTHD_CONFIG_PATH
+	AppURL          string
+	AppSubURL       string
+	AppSubURLDepth  int // Number of slashes
+	AppPath         string
+	AppDataPath     string
+	AppWorkDir      string
 
 	ProdMode bool
 
@@ -176,21 +187,23 @@ var (
 
 	SessionConfig session.Options
 
-	Server     ServerType
-	Database   DatabaseType
-	Cache      CacheType
-	Session    SessionType
-	Ldap       LDAPType
-	Security   SecurityType
-	Time       TimeType
-	Service    ServiceType
-	Log        LogType
-	LogConsole LogConsoleType
-	LogFile    LogFileType
-	LogSlack   LogSlackType
-	LogDiscord LogDiscordType
-	LogXorm    LogXormType
-	Other      OtherType
+	Server       ServerType
+	Database     DatabaseType
+	Cache        CacheType
+	Session      SessionType
+	Ldap         LDAPType
+	Security     SecurityType
+	Time         TimeType
+	Service      ServiceType
+	Log          LogType
+	LogConsole   LogConsoleType
+	LogFile      LogFileType
+	LogSlack     LogSlackType
+	LogDiscord   LogDiscordType
+	LogXorm      LogXormType
+	LoginModes   []LoginType
+	LoginSources []ldap.Source
+	Other        OtherType
 )
 
 func loadAppConfig(c *cli.Context) error {
@@ -199,6 +212,8 @@ func loadAppConfig(c *cli.Context) error {
 	config := c.GlobalString("config")
 	if !path.IsAbs(config) {
 		AppCfgPath = path.Join(AppWorkDir, config)
+	} else {
+		AppCfgPath = config
 	}
 	log.Info("Use '%s' as the configuration file.", AppCfgPath)
 
@@ -283,6 +298,42 @@ func loadAppConfig(c *cli.Context) error {
 
 }
 
+func LoadAuthSources(c *cli.Context) error {
+	AppWorkDir = runtime.ExecDir()
+
+	config := c.GlobalString("config")
+
+	if !path.IsAbs(config) {
+		AppAuthdCfgPath = path.Join(AppWorkDir, path.Dir(config), "auth.d")
+	} else {
+		AppAuthdCfgPath = path.Join(path.Dir(config), "auth.d")
+	}
+	log.Info("Use '%s' as the authd configuration path.", AppAuthdCfgPath)
+
+	paths, err := com.GetFileListBySuffix(AppAuthdCfgPath, ".conf")
+	if err != nil {
+		log.Fatal(2, "Failed to list authentication sources: %v", err)
+	}
+
+	LoginModes = make([]LoginType, len(paths))
+	LoginSources = make([]ldap.Source, len(paths))
+
+	for i, p := range paths {
+		authSource, err := ini.Load(p)
+		if err != nil {
+			log.Fatal(2, "Failed to load authentication source: %v, %v", p, err)
+		}
+
+		if err = authSource.Section("config").MapTo(&LoginSources[i]); err != nil {
+			log.Fatal(2, "Fail to map authd config settings: %s", err)
+		} else if err = authSource.MapTo(&LoginModes[i]); err != nil {
+			log.Fatal(2, "Fail to map authd default settings: %s", err)
+		}
+	}
+
+	return nil
+}
+
 // LoadConfig load configuration settings
 func LoadConfig(c *cli.Context) error {
 	log.New(log.CONSOLE, log.ConsoleConfig{})
@@ -292,10 +343,11 @@ func LoadConfig(c *cli.Context) error {
 		return err
 	}
 
-	// LoadAuthSources()
+	if err = LoadAuthSources(c); err != nil {
+		return err
+	}
 
 	return nil
-
 }
 
 // ConfigInfo return application configuration info
@@ -314,7 +366,10 @@ func ConfigInfo(c *macaron.Context) {
 			"Security":        Security,
 			"Service":         Service,
 			"LDAP":            Ldap,
+			"LoginModes":      LoginModes,
+			"LoginSources":    LoginSources,
 			"Database":        Database,
+			"LogConfigs":      LogConfigs,
 			"Log":             Log,
 			"LogConsole":      LogConsole,
 			"LogFile":         LogFile,
@@ -432,7 +487,7 @@ func newCacheService() {
 	log.Info("Cache Service Enabled")
 }
 
-// Set session config variable
+// Set session config variables
 func newSessionService() {
 	SessionConfig.Provider = Session.Provider
 	SessionConfig.ProviderConfig = strings.Trim(Session.ProviderConfig, "\" ")
@@ -444,6 +499,12 @@ func newSessionService() {
 	// CSRFCookieName = Session.CSRFCookieName
 
 	log.Info("Session Service Enabled")
+}
+
+// Set auth related variables
+func NewAuthdService() {
+
+	log.Info("Authentication Service Enabled")
 }
 
 func NewServices() {

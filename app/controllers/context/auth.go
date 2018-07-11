@@ -16,6 +16,13 @@ type ToggleOptions struct {
 	DisableCSRF     bool
 }
 
+var (
+	ReqSignIn        = Toggle(&ToggleOptions{SignInRequired: true})
+	IgnSignIn        = Toggle(&ToggleOptions{SignInRequired: setting.Service.RequireSignInView})
+	IgnSignInAndCsrf = Toggle(&ToggleOptions{DisableCSRF: true})
+	ReqSignOut       = Toggle(&ToggleOptions{SignOutRequired: true})
+)
+
 func Toggle(options *ToggleOptions) macaron.Handler {
 	return func(c *Context) {
 		// Cannot view any page before installation.

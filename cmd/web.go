@@ -113,6 +113,48 @@ func GlobalInit() {
 
 }
 
+// Set authd cofigurations into database here
+func NewAuthdService() {
+	length := len(setting.LoginModes)
+
+	loginTypes := map[string]models.LoginType{
+		"ldap_simple_auth": models.LOGIN_LDAP,
+		"ldap_bind_dn":     models.LOGIN_DLDAP,
+	}
+
+	for i := 0; i < length; i++ {
+		// log.Info("LoginMode: %d (LoginType: %+v)", i, models.LoginType(setting.LoginModes[i].Type))
+
+		ls := models.LoginSource{
+			ID:        setting.LoginModes[i].ID,
+			Type:      loginTypes[setting.LoginModes[i].Type],
+			Name:      setting.LoginModes[i].Name,
+			IsActived: setting.LoginModes[i].IsActivated,
+			Cfg: &models.LDAPConfig{
+				Source: &setting.LoginSources[i],
+			},
+		}
+
+		if err := models.CreateLoginSource(&ls); err != nil {
+			if models.IsErrLoginSourceAlreadyExist(err) {
+				log.Info("LoginSource exists: %s", err)
+				if err = models.UpdateLoginSource(&ls); err != nil {
+					log.Error(2, "Update LoginSource Error: %+v, %s ", setting.LoginSources[i], err)
+				} else {
+					log.Trace("Update LoginSource successfully: %+v", setting.LoginSources[i])
+				}
+			} else {
+				log.Error(2, "Create LoginSource Error: %+v, %s ", setting.LoginSources[i], err)
+			}
+		} else {
+			log.Trace("Add new LoginSource successfully: %+v", setting.LoginSources[i])
+		}
+	}
+
+	log.Info("Authentication Service Started")
+
+}
+
 func runWeb(c *cli.Context) error {
 	// override HTTPPort if it is set by command run option -p / --port
 	if c.IsSet("port") {
@@ -124,6 +166,12 @@ func runWeb(c *cli.Context) error {
 
 	// Get backend database running
 	GlobalInit()
+
+	// TODO, FIXME
+	// During this initial development phase, use configuration files to set authd.
+	// As the authd configuration stores data in the database, so it has to be called after database service is ready.
+	// Later on, implementation of creating/updating/deleting authd service via admin web pages.
+	NewAuthdService()
 
 	m := newMacaron()
 	m.SetAutoHead(true)

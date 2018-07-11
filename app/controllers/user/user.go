@@ -1,17 +1,19 @@
 package user
 
 import (
-	"log"
+	"fmt"
 	"net/url"
 
 	"gopkg.in/macaron.v1"
 
 	"github.com/go-macaron/binding"
 	ldap "github.com/jtblin/go-ldap-client"
+	log "gopkg.in/clog.v1"
 
-	//"github.com/isymbo/pixpress/app/controllers/auth/ldap"
+	// "github.com/isymbo/pixpress/app/controllers/auth/ldap"
 	"github.com/isymbo/pixpress/app/controllers/context"
 	"github.com/isymbo/pixpress/app/models"
+	"github.com/isymbo/pixpress/app/models/errors"
 	"github.com/isymbo/pixpress/setting"
 )
 
@@ -30,14 +32,17 @@ type User struct {
 
 func InitRoutes(m *macaron.Macaron) {
 
+	reqSignIn := context.ReqSignIn
+	//reqSignOut := context.ReqSignOut
+
 	bindIgnErr := binding.BindIgnErr
 
 	m.Group("/user", func() {
-		m.Get("/:id", Home)
+		m.Get("/:id", reqSignIn, Home)
 		m.Combo("/login").
 			Get(Login).
 			Post(bindIgnErr(User{}), LoginPost)
-		m.Get("/logout", Logout)
+		m.Get("/logout", reqSignIn, Logout)
 	})
 
 	// m.Group("/user", func() {
@@ -55,8 +60,83 @@ func InitRoutes(m *macaron.Macaron) {
 	// }, reqSignOut)
 }
 
+// AutoLogin reads cookie and try to auto-login.
+func AutoLogin(c *context.Context) (bool, error) {
+	if !models.HasEngine {
+		return false, nil
+	}
+
+	uname := c.GetCookie(setting.Security.CookieUserName)
+	if len(uname) == 0 {
+		return false, nil
+	}
+
+	isSucceed := false
+	defer func() {
+		if !isSucceed {
+			log.Trace("auto-login cookie cleared: %s", uname)
+			c.SetCookie(setting.Security.CookieUserName, "", -1, setting.AppSubURL)
+			c.SetCookie(setting.Security.CookieRememberName, "", -1, setting.AppSubURL)
+			c.SetCookie(setting.Security.LoginStatusCookieName, "", -1, setting.AppSubURL)
+		}
+	}()
+
+	u, err := models.GetUserByName(uname)
+	if err != nil {
+		if !errors.IsUserNotExist(err) {
+			return false, fmt.Errorf("GetUserByName: %v", err)
+		}
+		return false, nil
+	}
+
+	if val, ok := c.GetSuperSecureCookie(u.Rands+u.Passwd, setting.Security.CookieRememberName); !ok || val != u.LoginName {
+		return false, nil
+	}
+
+	isSucceed = true
+	c.Session.Set("uid", u.ID)
+	c.Session.Set("uname", u.LoginName)
+	c.SetCookie(setting.Session.CSRFCookieName, "", -1, setting.AppSubURL)
+	if setting.Security.EnableLoginStatusCookie {
+		c.SetCookie(setting.Security.LoginStatusCookieName, "true", 0, setting.AppSubURL)
+	}
+	return true, nil
+}
+
 func Login(c *context.Context) {
 	c.Title("sign_in")
+
+	// Check auto-login
+	isSucceed, err := AutoLogin(c)
+	if err != nil {
+		c.ServerError("AutoLogin", err)
+		return
+	}
+
+	redirectTo := c.Query("redirect_to")
+	if len(redirectTo) > 0 {
+		c.SetCookie("redirect_to", redirectTo, 0, setting.AppSubURL)
+	} else {
+		redirectTo, _ = url.QueryUnescape(c.GetCookie("redirect_to"))
+	}
+
+	if isSucceed {
+		if isValidRedirect(redirectTo) {
+			c.Redirect(redirectTo)
+		} else {
+			c.SubURLRedirect("/")
+		}
+		c.SetCookie("redirect_to", "", -1, setting.AppSubURL)
+		return
+	}
+
+	// Display normal login page
+	loginSources, err := models.ActivatedLoginSources()
+	if err != nil {
+		c.ServerError("ActivatedLoginSources", err)
+		return
+	}
+	c.Data["LoginSources"] = loginSources
 
 	c.Success(LOGIN)
 	// c.HTML(http.StatusOK, LOGIN)
@@ -76,46 +156,6 @@ func Home(c *context.Context) {
 	models.GetUserProfile(id)
 
 	c.Success(HOME)
-}
-
-func LoginPost(c *context.Context, u User) {
-	c.Title("sign_in")
-
-	//return fmt.Sprintf("LoginName: %s\nPassword: %v", u.LoginName, u.Password)
-	client := &ldap.LDAPClient{
-		Base:         setting.Ldap.Base,
-		Host:         setting.Ldap.Host,
-		Port:         setting.Ldap.Port,
-		UseSSL:       false,
-		SkipTLS:      true,
-		BindDN:       setting.Ldap.BindDn,
-		BindPassword: setting.Ldap.Password,
-		UserFilter:   "(sAMAccountName=%s)",
-		Attributes:   []string{"displayName", "mail", "mobile", "sAMAccountName"},
-	}
-	// It is the responsibility of the caller to close the connection
-	defer client.Close()
-
-	ok, rmap, err := client.Authenticate(u.LoginName, u.Password)
-	if err != nil {
-		log.Printf("Error authenticating user %s: %+v", u.LoginName, err)
-	}
-	if ok {
-		newUser := &models.User{
-			LoginName:   rmap["sAMAccountName"],
-			DisplayName: rmap["displayName"],
-			Email:       rmap["mail"],
-			Mobile:      rmap["mobile"],
-		}
-		if err = models.CreateUser(newUser); err != nil {
-			if models.IsErrLoginNameAlreadyExist(err) {
-				c.Success(HOME)
-				return
-			}
-		}
-	}
-
-	c.Success(LOGIN)
 }
 
 func afterLogin(c *context.Context, u *models.User, remember bool) {
@@ -149,4 +189,44 @@ func afterLogin(c *context.Context, u *models.User, remember bool) {
 // True: /url
 func isValidRedirect(url string) bool {
 	return len(url) >= 2 && url[0] == '/' && url[1] != '/'
+}
+
+func LoginPost(c *context.Context, u User) {
+	c.Title("sign_in")
+
+	//return fmt.Sprintf("LoginName: %s\nPassword: %v", u.LoginName, u.Password)
+	client := &ldap.LDAPClient{
+		Base:         setting.Ldap.Base,
+		Host:         setting.Ldap.Host,
+		Port:         setting.Ldap.Port,
+		UseSSL:       false,
+		SkipTLS:      true,
+		BindDN:       setting.Ldap.BindDn,
+		BindPassword: setting.Ldap.Password,
+		UserFilter:   "(sAMAccountName=%s)",
+		Attributes:   []string{"displayName", "mail", "mobile", "sAMAccountName"},
+	}
+	// It is the responsibility of the caller to close the connection
+	defer client.Close()
+
+	ok, rmap, err := client.Authenticate(u.LoginName, u.Password)
+	if err != nil {
+		log.Trace("Error authenticating user %s: %+v", u.LoginName, err)
+	}
+	if ok {
+		newUser := &models.User{
+			LoginName:   rmap["sAMAccountName"],
+			DisplayName: rmap["displayName"],
+			Email:       rmap["mail"],
+			Mobile:      rmap["mobile"],
+		}
+		if err = models.CreateUser(newUser); err != nil {
+			if models.IsErrLoginNameAlreadyExist(err) {
+				c.Success(HOME)
+				return
+			}
+		}
+	}
+
+	c.Success(LOGIN)
 }

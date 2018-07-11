@@ -14,6 +14,7 @@ import (
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	_ "github.com/lib/pq"
+
 	// _ "github.com/mattn/go-sqlite3"
 	log "gopkg.in/clog.v1"
 
@@ -50,7 +51,7 @@ var (
 
 func init() {
 	tables = append(tables,
-		new(User))
+		new(User), new(LoginSource))
 
 	gonicNames := []string{"SSL"}
 	for _, name := range gonicNames {

@@ -58,6 +58,12 @@ func showConfig(c *cli.Context) error {
 	logxorm, _ := prettyjson.Marshal(setting.LogXorm)
 	fmt.Printf("LogXorm:\n%+v\n", string(logxorm))
 
+	loginmodes, _ := prettyjson.Marshal(setting.LoginModes)
+	fmt.Printf("LoginModes:\n%+v\n", string(loginmodes))
+
+	loginsources, _ := prettyjson.Marshal(setting.LoginSources)
+	fmt.Printf("LoginSources:\n%+v\n", string(loginsources))
+
 	other, _ := prettyjson.Marshal(setting.Other)
 	fmt.Printf("Other:\n%+v\n", string(other))
 

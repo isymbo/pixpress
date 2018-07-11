@@ -49,9 +49,9 @@ func NewFuncMap() []template.FuncMap {
 		},
 		// "AvatarLink":       tool.AvatarLink,
 		// "AppendAvatarSize": tool.AppendAvatarSize,
-		"Safe":     Safe,
-		"Sanitize": bluemonday.UGCPolicy().Sanitize,
-		//"Str2html": Str2html,
+		"Safe":         Safe,
+		"Sanitize":     bluemonday.UGCPolicy().Sanitize,
+		"Str2html":     Str2html,
 		"TimeSince":    util.TimeSince,
 		"RawTimeSince": util.RawTimeSince,
 		"FileSize":     util.FileSize,
@@ -95,9 +95,10 @@ func Safe(raw string) template.HTML {
 	return template.HTML(raw)
 }
 
-// func Str2html(raw string) template.HTML {
-// 	return template.HTML(markup.Sanitize(raw))
-// }
+func Str2html(raw string) template.HTML {
+	// return template.HTML(markup.Sanitize(raw))
+	return template.HTML(raw)
+}
 
 func List(l *list.List) chan interface{} {
 	e := l.Front()
