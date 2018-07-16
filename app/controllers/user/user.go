@@ -7,10 +7,9 @@ import (
 	"gopkg.in/macaron.v1"
 
 	"github.com/go-macaron/binding"
-	ldap "github.com/jtblin/go-ldap-client"
+	// ldap "github.com/jtblin/go-ldap-client"
 	log "gopkg.in/clog.v1"
 
-	// "github.com/isymbo/pixpress/app/controllers/auth/ldap"
 	"github.com/isymbo/pixpress/app/controllers/context"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/app/models/errors"
@@ -195,38 +194,73 @@ func LoginPost(c *context.Context, u User) {
 	c.Title("sign_in")
 
 	//return fmt.Sprintf("LoginName: %s\nPassword: %v", u.LoginName, u.Password)
-	client := &ldap.LDAPClient{
-		Base:         setting.Ldap.Base,
-		Host:         setting.Ldap.Host,
-		Port:         setting.Ldap.Port,
-		UseSSL:       false,
-		SkipTLS:      true,
-		BindDN:       setting.Ldap.BindDn,
-		BindPassword: setting.Ldap.Password,
-		UserFilter:   "(sAMAccountName=%s)",
-		Attributes:   []string{"displayName", "mail", "mobile", "sAMAccountName"},
-	}
-	// It is the responsibility of the caller to close the connection
-	defer client.Close()
 
-	ok, rmap, err := client.Authenticate(u.LoginName, u.Password)
-	if err != nil {
-		log.Trace("Error authenticating user %s: %+v", u.LoginName, err)
-	}
-	if ok {
-		newUser := &models.User{
-			LoginName:   rmap["sAMAccountName"],
-			DisplayName: rmap["displayName"],
-			Email:       rmap["mail"],
-			Mobile:      rmap["mobile"],
-		}
-		if err = models.CreateUser(newUser); err != nil {
-			if models.IsErrLoginNameAlreadyExist(err) {
-				c.Success(HOME)
-				return
-			}
-		}
-	}
+	// Comment out for development
+
+	// client := &ldap.LDAPClient{
+	// 	Base:         setting.Ldap.Base,
+	// 	Host:         setting.Ldap.Host,
+	// 	Port:         setting.Ldap.Port,
+	// 	UseSSL:       false,
+	// 	SkipTLS:      true,
+	// 	BindDN:       setting.Ldap.BindDn,
+	// 	BindPassword: setting.Ldap.Password,
+	// 	UserFilter:   "(sAMAccountName=%s)",
+	// 	Attributes:   []string{"displayName", "mail", "mobile", "sAMAccountName"},
+	// }
+	// // It is the responsibility of the caller to close the connection
+	// defer client.Close()
+
+	// ok, rmap, err := client.Authenticate(u.LoginName, u.Password)
+	// if err != nil {
+	// 	log.Trace("Error authenticating user %s: %+v", u.LoginName, err)
+	// }
+	// if ok {
+	// 	newUser := &models.User{
+	// 		LoginName:   rmap["sAMAccountName"],
+	// 		DisplayName: rmap["displayName"],
+	// 		Email:       rmap["mail"],
+	// 		Mobile:      rmap["mobile"],
+	// 	}
+	// 	if err = models.CreateUser(newUser); err != nil {
+	// 		if models.IsErrLoginNameAlreadyExist(err) {
+	// 			c.Success(HOME)
+	// 			return
+	// 		}
+	// 	}
+	// }
+
+	// loginSources, err := models.ActivatedLoginSources()
+	// if err != nil {
+	// 	c.ServerError("ActivatedLoginSources", err)
+	// 	return
+	// }
+	// c.Data["LoginSources"] = loginSources
+
+	// if c.HasError() {
+	// 	c.Success(LOGIN)
+	// 	return
+	// }
+
+	// u, err := models.UserLogin(u.LoginName, u.Password, f.LoginSource)
+	// if err != nil {
+	// 	switch err.(type) {
+	// 	// case errors.UserNotExist:
+	// 	// 	c.FormErr("UserName", "Password")
+	// 	// 	c.RenderWithErr(c.Tr("form.username_password_incorrect"), LOGIN, &f)
+	// 	// case errors.LoginSourceMismatch:
+	// 	// 	c.FormErr("LoginSource")
+	// 	// 	c.RenderWithErr(c.Tr("form.auth_source_mismatch"), LOGIN, &f)
+
+	// 	default:
+	// 		c.ServerError("UserLogin", err)
+	// 	}
+	// 	return
+	// }
+
+	user, _ := models.UserLogin(u.LoginName, u.Password, 101)
+
+	afterLogin(c, user, true)
 
 	c.Success(LOGIN)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/Unknwon/com"
 	"github.com/go-xorm/xorm"
 	"golang.org/x/crypto/pbkdf2"
+	log "gopkg.in/clog.v1"
 
 	"github.com/isymbo/pixpress/app/models/errors"
 	"github.com/isymbo/pixpress/setting"
@@ -34,6 +35,7 @@ type User struct {
 	Type        UserType
 	Rands       string `xorm:"VARCHAR(10)"`
 	Salt        string `xorm:"VARCHAR(10)"`
+	LDAPUID     string
 
 	Created     time.Time `xorm:"-" json:"-"`
 	CreatedUnix int64
@@ -119,6 +121,7 @@ func CreateUser(u *User) (err error) {
 		return err
 	}
 
+	log.Trace("New user %s is created", u.LoginName)
 	return sess.Commit()
 }
 

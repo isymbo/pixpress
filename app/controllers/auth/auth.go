@@ -25,8 +25,6 @@ func SignedInID(c *macaron.Context, sess session.Store) int64 {
 		return 0
 	}
 
-	log.Trace("auth is called.")
-
 	// Check access token.
 	if IsAPIPath(c.Req.URL.Path) {
 		tokenSHA := c.Query("token")
@@ -62,7 +60,7 @@ func SignedInID(c *macaron.Context, sess session.Store) int64 {
 	}
 
 	uid := sess.Get("uid")
-	log.Trace("sess.Get(uid) is %s", uid)
+
 	if uid == nil {
 		return 0
 	}

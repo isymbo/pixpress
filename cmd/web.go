@@ -151,6 +151,9 @@ func NewAuthdService() {
 		}
 	}
 
+	// comment out for now, added for debug only
+	// models.LoadAuthSources(path.Join(setting.AppWorkDir, "config", "auth.d"))
+
 	log.Info("Authentication Service Started")
 
 }

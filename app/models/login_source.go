@@ -30,8 +30,8 @@ const (
 )
 
 var LoginNames = map[LoginType]string{
-	LOGIN_LDAP:  "LDAP (via BindDN)",
-	LOGIN_DLDAP: "LDAP (simple auth)", // Via direct bind
+	LOGIN_LDAP:  "LDAP (via BindDN)",  // Direct Bind
+	LOGIN_DLDAP: "LDAP (simple auth)", // Simple Auth
 }
 
 var SecurityProtocolNames = map[ldap.SecurityProtocol]string{
@@ -352,14 +352,17 @@ func LoadAuthSources(p string) {
 		if err != nil {
 			log.Fatal(2, "Failed to load authentication source: %v", err)
 		}
-		authSource.NameMapper = ini.TitleUnderscore
+		//authSource.NameMapper = ini.TitleUnderscore
 
 		// Set general attributes
 		s := authSource.Section("")
 		loginSource := &LoginSource{
-			ID:        s.Key("id").MustInt64(),
-			Name:      s.Key("name").String(),
-			IsActived: s.Key("is_activated").MustBool(),
+			// ID:        s.Key("id").MustInt64(),
+			// Name:      s.Key("name").String(),
+			// IsActived: s.Key("is_activated").MustBool(),
+			ID:        s.Key("ID").MustInt64(),
+			Name:      s.Key("NAME").String(),
+			IsActived: s.Key("IS_ACTIVATED").MustBool(),
 			LocalFile: &AuthSourceFile{
 				abspath: fpath,
 				file:    authSource,
@@ -373,7 +376,8 @@ func LoadAuthSources(p string) {
 		loginSource.Updated = fi.ModTime()
 
 		// Parse authentication source file
-		authType := s.Key("type").String()
+		// authType := s.Key("type").String()
+		authType := s.Key("TYPE").String()
 		switch authType {
 		case "ldap_bind_dn":
 			loginSource.Type = LOGIN_LDAP
@@ -416,7 +420,7 @@ func composeFullName(firstname, surname, username string) string {
 // LoginViaLDAP queries if login/password is valid against the LDAP directory pool,
 // and create a local user if success when enabled.
 func LoginViaLDAP(user *User, login, password string, source *LoginSource, autoRegister bool) (*User, error) {
-	username, _, _, mail, isAdmin, succeed := source.Cfg.(*LDAPConfig).SearchEntry(login, password, source.Type == LOGIN_DLDAP)
+	displayname, mobile, mail, uid, isAdmin, succeed := source.Cfg.(*LDAPConfig).SearchEntry(login, password, source.Type == LOGIN_LDAP)
 	if !succeed {
 		// User not in LDAP, do nothing
 		return nil, errors.UserNotExist{0, login}
@@ -426,10 +430,14 @@ func LoginViaLDAP(user *User, login, password string, source *LoginSource, autoR
 		return user, nil
 	}
 
-	// Fallback.
-	if len(username) == 0 {
-		username = login
-	}
+	// // Fallback.
+	// if len(username) == 0 {
+	// 	username = login
+	// }
+
+	// Force Fallback
+	username := login
+
 	// Validate username make sure it satisfies requirement.
 	if binding.AlphaDashDotPattern.MatchString(username) {
 		return nil, fmt.Errorf("Invalid pattern for attribute 'username' [%s]: must be valid alpha or numeric or dash(-_) or dot characters", username)
@@ -441,11 +449,14 @@ func LoginViaLDAP(user *User, login, password string, source *LoginSource, autoR
 
 	user = &User{
 		Email:       mail,
+		Mobile:      mobile,
+		DisplayName: displayname,
 		LoginType:   source.Type,
 		LoginSource: source.ID,
 		LoginName:   login,
 		IsActive:    true,
 		IsAdmin:     isAdmin,
+		LDAPUID:     uid,
 	}
 
 	ok, err := IsUserExist(0, user.LoginName)
@@ -492,6 +503,7 @@ func UserLogin(username, password string, loginSourceID int64) (*User, error) {
 		// Note: This check is unnecessary but to reduce user confusion at login page
 		// and make it more consistent at user's perspective.
 		if loginSourceID >= 0 && user.LoginSource != loginSourceID {
+
 			return nil, errors.LoginSourceMismatch{loginSourceID, user.LoginSource}
 		}
 

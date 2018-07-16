@@ -22,26 +22,25 @@ const (
 
 // Basic LDAP authentication service
 type Source struct {
-	Host              string           `ini:"HOST"`               // LDAP host
-	Port              int              `ini:"PORT"`               // port number
-	SecurityProtocol  SecurityProtocol `ini:"SECURITY_PROTOCOL"`  // Security protocol
-	SkipVerify        bool             `ini:"SKIP_VERIFY"`        // if security check is skipped
-	BindDN            string           `ini:"BIND_DN"`            // DN to bind with
-	BindPassword      string           `ini:"BIND_PASSWORD"`      // Bind DN password
-	UserBase          string           `ini:"USER_BASE"`          // Base search path for users
-	UserDN            string           `ini:"USER_DN"`            // Template for the DN of the user for simple auth
-	AttributeUsername string           `ini:"ATTRIBUTE_USERNAME"` // Username attribute
-	AttributeName     string           `ini:"ATTRIBUTE_NAME"`     // First name attribute
-	AttributeSurname  string           `ini:"ATTRIBUTE_SURNAME"`  // Surname attribute
-	AttributeMail     string           `ini:"ATTRIBUTE_MAIL"`     // E-mail attribute
-	AttributesInBind  bool             `ini:"ATTRIBUTE_IN_BIND"`  // fetch attributes in bind context (not user)
-	Filter            string           `ini:"FILTER"`             // Query filter to validate entry
-	AdminFilter       string           `ini:"ADMIN_FILTER"`       // Query filter to check if user is admin
-	GroupEnabled      bool             `ini:"GROUP_ENABLED"`      // if the group checking is enabled
-	GroupDN           string           `ini:"GROUP_DN"`           // Group Search Base
-	GroupFilter       string           `ini:"GROUP_FILTER"`       // Group Name Filter
-	GroupMemberUID    string           `ini:"GROUP_MEMBER_UID"`   // Group Attribute containing array of UserUID
-	UserUID           string           `ini:"USER_UID"`           // User Attribute listed in Group
+	Host                 string           `ini:"HOST"`                  // LDAP host
+	Port                 int              `ini:"PORT"`                  // port number
+	SecurityProtocol     SecurityProtocol `ini:"SECURITY_PROTOCOL"`     // Security protocol
+	SkipVerify           bool             `ini:"SKIP_VERIFY"`           // if security check is skipped
+	BindDN               string           `ini:"BIND_DN"`               // DN to bind with
+	BindPassword         string           `ini:"BIND_PASSWORD"`         // Bind DN password
+	UserBase             string           `ini:"USER_BASE"`             // Base search path for users
+	UserDN               string           `ini:"USER_DN"`               // Template for the DN of the user for simple auth
+	AttributeDisplayName string           `ini:"ATTRIBUTE_DISPLAYNAME"` // DisplayName attribute (in Chinese)
+	AttributeMobile      string           `ini:"ATTRIBUTE_MOBILE"`      // Mobile attribute
+	AttributeMail        string           `ini:"ATTRIBUTE_MAIL"`        // E-mail attribute
+	AttributesInBind     bool             `ini:"ATTRIBUTE_IN_BIND"`     // fetch attributes in bind context (not user)
+	Filter               string           `ini:"FILTER"`                // Query filter to validate entry
+	AdminFilter          string           `ini:"ADMIN_FILTER"`          // Query filter to check if user is admin
+	GroupEnabled         bool             `ini:"GROUP_ENABLED"`         // if the group checking is enabled
+	GroupDN              string           `ini:"GROUP_DN"`              // Group Search Base
+	GroupFilter          string           `ini:"GROUP_FILTER"`          // Group Name Filter
+	GroupMemberUID       string           `ini:"GROUP_MEMBER_UID"`      // Group Attribute containing array of UserUID
+	UserUID              string           `ini:"USER_UID"`              // User Attribute listed in Group
 }
 
 func (ls *Source) sanitizedUserQuery(username string) (string, bool) {
@@ -216,11 +215,11 @@ func (ls *Source) SearchEntry(name, passwd string, directBind bool) (string, str
 		return "", "", "", "", false, false
 	}
 
-	log.Trace("Fetching attributes '%v', '%v', '%v', '%v', '%v' with filter '%s' and base '%s'",
-		ls.AttributeUsername, ls.AttributeName, ls.AttributeSurname, ls.AttributeMail, ls.UserUID, userFilter, userDN)
+	log.Trace("Fetching attributes '%v', '%v', '%v', '%v' with filter '%s' and base '%s'",
+		ls.AttributeDisplayName, ls.AttributeMobile, ls.AttributeMail, ls.UserUID, userFilter, userDN)
 	search := ldap.NewSearchRequest(
 		userDN, ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false, userFilter,
-		[]string{ls.AttributeUsername, ls.AttributeName, ls.AttributeSurname, ls.AttributeMail, ls.UserUID},
+		[]string{ls.AttributeDisplayName, ls.AttributeMobile, ls.AttributeMail, ls.UserUID},
 		nil)
 
 	sr, err := l.Search(search)
@@ -237,9 +236,8 @@ func (ls *Source) SearchEntry(name, passwd string, directBind bool) (string, str
 		return "", "", "", "", false, false
 	}
 
-	username := sr.Entries[0].GetAttributeValue(ls.AttributeUsername)
-	firstname := sr.Entries[0].GetAttributeValue(ls.AttributeName)
-	surname := sr.Entries[0].GetAttributeValue(ls.AttributeSurname)
+	displayname := sr.Entries[0].GetAttributeValue(ls.AttributeDisplayName)
+	mobile := sr.Entries[0].GetAttributeValue(ls.AttributeMobile)
 	mail := sr.Entries[0].GetAttributeValue(ls.AttributeMail)
 	uid := sr.Entries[0].GetAttributeValue(ls.UserUID)
 
@@ -278,8 +276,9 @@ func (ls *Source) SearchEntry(name, passwd string, directBind bool) (string, str
 			}
 		}
 
+		// FIXME, if group filter is enabled, this has to be fixed
 		if !isMember {
-			log.Trace("LDAP: Group membership test failed [username: %s, group_member_uid: %s, user_uid: %s", username, ls.GroupMemberUID, uid)
+			log.Trace("LDAP: Group membership test failed [username: %s, group_member_uid: %s, user_uid: %s", displayname, ls.GroupMemberUID, uid)
 			return "", "", "", "", false, false
 		}
 	}
@@ -289,7 +288,7 @@ func (ls *Source) SearchEntry(name, passwd string, directBind bool) (string, str
 		log.Trace("Checking admin with filter '%s' and base '%s'", ls.AdminFilter, userDN)
 		search = ldap.NewSearchRequest(
 			userDN, ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false, ls.AdminFilter,
-			[]string{ls.AttributeName},
+			[]string{ls.AttributeDisplayName},
 			nil)
 
 		sr, err = l.Search(search)
@@ -310,5 +309,5 @@ func (ls *Source) SearchEntry(name, passwd string, directBind bool) (string, str
 		}
 	}
 
-	return username, firstname, surname, mail, isAdmin, true
+	return displayname, mobile, mail, uid, isAdmin, true
 }
