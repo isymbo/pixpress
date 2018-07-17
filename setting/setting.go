@@ -255,6 +255,14 @@ func loadAppConfig(c *cli.Context) error {
 		log.Fatal(2, "Fail to map other settings: %s", err)
 	}
 
+	// Adapt to the configured LandingPageURL
+	switch Server.LandingPageURL {
+	case "explore":
+		Server.LandingPageURL = LANDING_PAGE_EXPLORE
+	default:
+		Server.LandingPageURL = LANDING_PAGE_HOME
+	}
+
 	AppURL = Server.RootURL
 	if AppURL[len(AppURL)-1] != '/' {
 		AppURL += "/"

@@ -15,6 +15,7 @@ import (
 	"gopkg.in/macaron.v1"
 
 	"github.com/isymbo/pixpress/app/controllers/context"
+	"github.com/isymbo/pixpress/app/controllers/routes"
 	"github.com/isymbo/pixpress/app/controllers/template"
 	"github.com/isymbo/pixpress/app/controllers/user"
 	"github.com/isymbo/pixpress/app/models"
@@ -179,12 +180,26 @@ func runWeb(c *cli.Context) error {
 	m := newMacaron()
 	m.SetAutoHead(true)
 	initRoutes(m)
+
 	m.Run(setting.Server.HTTPPort)
 
 	return nil
 }
 
 func initRoutes(m *macaron.Macaron) {
+
+	// Not found handler.
+	m.NotFound(routes.NotFound)
+
+	m.Get("/", context.IgnSignIn, routes.Home)
+	// m.Group("/explore", func() {
+	// 	m.Get("", func(c *context.Context) {
+	// 		c.Redirect(setting.AppSubURL + "/explore/repos")
+	// 	})
+	// 	m.Get("/repos", routes.ExploreRepos)
+	// 	m.Get("/users", routes.ExploreUsers)
+	// 	m.Get("/organizations", routes.ExploreOrganizations)
+	// }, ignSignIn)
 
 	setting.InitRoutes(m)
 	user.InitRoutes(m)

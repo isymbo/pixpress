@@ -88,9 +88,10 @@ func AutoLogin(c *context.Context) (bool, error) {
 		return false, nil
 	}
 
-	if val, ok := c.GetSuperSecureCookie(u.Rands+u.Passwd, setting.Security.CookieRememberName); !ok || val != u.LoginName {
-		return false, nil
-	}
+	// TODO, Uncommment for now since not use it.
+	// if val, ok := c.GetSuperSecureCookie(u.Rands+u.Passwd, setting.Security.CookieRememberName); !ok || val != u.LoginName {
+	// 	return false, nil
+	// }
 
 	isSucceed = true
 	c.Session.Set("uid", u.ID)
@@ -107,6 +108,7 @@ func Login(c *context.Context) {
 
 	// Check auto-login
 	isSucceed, err := AutoLogin(c)
+	log.Trace("AutoLogin Succeed: %+v", isSucceed)
 	if err != nil {
 		c.ServerError("AutoLogin", err)
 		return
@@ -193,43 +195,6 @@ func isValidRedirect(url string) bool {
 func LoginPost(c *context.Context, u User) {
 	c.Title("sign_in")
 
-	//return fmt.Sprintf("LoginName: %s\nPassword: %v", u.LoginName, u.Password)
-
-	// Comment out for development
-
-	// client := &ldap.LDAPClient{
-	// 	Base:         setting.Ldap.Base,
-	// 	Host:         setting.Ldap.Host,
-	// 	Port:         setting.Ldap.Port,
-	// 	UseSSL:       false,
-	// 	SkipTLS:      true,
-	// 	BindDN:       setting.Ldap.BindDn,
-	// 	BindPassword: setting.Ldap.Password,
-	// 	UserFilter:   "(sAMAccountName=%s)",
-	// 	Attributes:   []string{"displayName", "mail", "mobile", "sAMAccountName"},
-	// }
-	// // It is the responsibility of the caller to close the connection
-	// defer client.Close()
-
-	// ok, rmap, err := client.Authenticate(u.LoginName, u.Password)
-	// if err != nil {
-	// 	log.Trace("Error authenticating user %s: %+v", u.LoginName, err)
-	// }
-	// if ok {
-	// 	newUser := &models.User{
-	// 		LoginName:   rmap["sAMAccountName"],
-	// 		DisplayName: rmap["displayName"],
-	// 		Email:       rmap["mail"],
-	// 		Mobile:      rmap["mobile"],
-	// 	}
-	// 	if err = models.CreateUser(newUser); err != nil {
-	// 		if models.IsErrLoginNameAlreadyExist(err) {
-	// 			c.Success(HOME)
-	// 			return
-	// 		}
-	// 	}
-	// }
-
 	// loginSources, err := models.ActivatedLoginSources()
 	// if err != nil {
 	// 	c.ServerError("ActivatedLoginSources", err)
@@ -262,5 +227,5 @@ func LoginPost(c *context.Context, u User) {
 
 	afterLogin(c, user, true)
 
-	c.Success(LOGIN)
+	c.Success(HOME)
 }

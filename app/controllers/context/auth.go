@@ -3,6 +3,7 @@ package context
 import (
 	"net/url"
 
+	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 
 	"github.com/isymbo/pixpress/app/controllers/auth"
@@ -41,6 +42,7 @@ func Toggle(options *ToggleOptions) macaron.Handler {
 		// Check non-logged users landing page.
 		if !c.IsLogged && c.Req.RequestURI == "/" && setting.Server.LandingPageURL != setting.LANDING_PAGE_HOME {
 			c.Redirect(setting.AppSubURL + string(setting.Server.LandingPageURL))
+			log.Trace(setting.AppSubURL + string(setting.Server.LandingPageURL))
 			return
 		}
 
