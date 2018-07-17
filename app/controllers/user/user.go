@@ -41,7 +41,8 @@ func InitRoutes(m *macaron.Macaron) {
 		m.Combo("/login").
 			Get(Login).
 			Post(bindIgnErr(User{}), LoginPost)
-		m.Get("/logout", reqSignIn, Logout)
+		//m.Get("/logout", reqSignIn, Signout)
+		m.Get("/logout", Signout)
 	})
 
 	// m.Group("/user", func() {
@@ -143,10 +144,20 @@ func Login(c *context.Context) {
 	// c.HTML(http.StatusOK, LOGIN)
 }
 
-func Logout(c *context.Context) {
+func Signout(c *context.Context) {
 	c.Title("sign_out")
 
-	c.Success(LOGOUT)
+	c.Session.Delete("uid")
+	c.Session.Delete("uname")
+
+	c.SetCookie(setting.Security.CookieUserName, "", -1, setting.AppSubURL)
+	c.SetCookie(setting.Security.CookieRememberName, "", -1, setting.AppSubURL)
+	c.SetCookie(setting.Session.CSRFCookieName, "", -1, setting.AppSubURL)
+
+	// debug
+	// c.SetCookie(setting.Security.LoginStatusCookieName, "", -1, setting.AppSubURL)
+
+	c.SubURLRedirect("/")
 }
 
 func Home(c *context.Context) {
