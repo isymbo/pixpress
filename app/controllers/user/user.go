@@ -17,9 +17,10 @@ import (
 )
 
 const (
-	LOGIN  = "user/login"
-	LOGOUT = "user/logout"
-	HOME   = "user/home"
+	LOGIN   = "user/login"
+	LOGOUT  = "user/logout"
+	HOME    = "user/home"
+	PROFILE = "user/profile"
 )
 
 type User struct {
@@ -37,12 +38,13 @@ func InitRoutes(m *macaron.Macaron) {
 	bindIgnErr := binding.BindIgnErr
 
 	m.Group("/user", func() {
-		m.Get("/:id", reqSignIn, Home)
+		m.Get("/:loginname", reqSignIn, Profile)
 		m.Combo("/login").
 			Get(Login).
 			Post(bindIgnErr(User{}), LoginPost)
 		//m.Get("/logout", reqSignIn, Signout)
 		m.Get("/logout", Signout)
+		m.Get("/home", reqSignIn, Home)
 	})
 
 	// m.Group("/user", func() {

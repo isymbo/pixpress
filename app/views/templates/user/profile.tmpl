@@ -1,0 +1,52 @@
+{{template "base/header" .}}
+
+<!--Main layout-->
+<main>
+
+    <div class="container mt-5">
+        <div class="card card-login mx-auto my-5" style="width: 600px;">
+            <div class="card-header text-center">基本信息</div>
+            <form class="card-body">
+                <div class="form-group row mx-auto my-auto">
+                    <label for="LoginName" class="col-md-3 col-form-label">登录用户</label>
+                    <div class="col-md-6">
+                        <input type="text" readonly class="form-control-plaintext" id="LoginName" value="{{.LoggedUserName}}">
+                    </div>
+                </div>
+                <div class="form-group row mx-auto my-auto">
+                    <label for="UID" class="col-md-3 col-form-label">用户ID</label>
+                    <div class="col-md-6">
+                        <input type="text" readonly class="form-control-plaintext" id="UID" value="{{.LoggedUserID}}">
+                    </div>
+                </div>
+                <div class="form-group row mx-auto my-auto">
+                    <label for="DisplayName" class="col-md-3 col-form-label">姓名</label>
+                    <div class="col-md-6">
+                        <input type="text" readonly class="form-control-plaintext" id="DisplayName" value="{{.LoggedUser.DisplayName}}">
+                    </div>
+                </div>
+								<div class="form-group row mx-auto my-auto">
+                    <label for="Email" class="col-md-3 col-form-label">电子邮件</label>
+                    <div class="col-md-6">
+                        <input type="text" readonly class="form-control-plaintext" id="Email" value="{{.LoggedUser.Email}}">
+                    </div>
+                </div>
+								<div class="form-group row mx-auto my-auto">
+                    <label for="Mobile" class="col-md-3 col-form-label">手机号码</label>
+                    <div class="col-md-6">
+                        <input type="text" readonly class="form-control-plaintext" id="Mobile" value="{{.LoggedUser.Mobile}}">
+                    </div>
+                </div>
+                <div class="form-group row mx-auto my-auto">
+                    <label for="LDAPUID" class="col-md-3 col-form-label">LDAP UID</label>
+                    <div class="col-md-9">
+                        <textarea type="text" readonly class="form-control-plaintext text-left" id="LDAPUID" rows="2">{{.LoggedUser.LDAPUID}}</textarea>
+                    </div>
+            </form>
+        </div>
+    </div>
+
+</main>
+<!--Main layout-->
+
+{{template "base/footer" .}}
