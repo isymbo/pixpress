@@ -9,4 +9,4 @@ ADD app/views/templates /pixpress/app/views/
 
 # Expose a docker interface to our binary.
 EXPOSE 7611
-ENTRYPOINT ["/pixpress/pixpress", "web"]
+#ENTRYPOINT ["/pixpress/pixpress", "web"]
