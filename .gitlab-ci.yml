@@ -2,13 +2,11 @@ variables:
   PROJECT_NAME: "pixpress"
   GLIDE_VENDOR_DIR: "vendor"
   TARGET_PATH: "pixpress public app/views/templates"
-  # CONFIG_FILENAME: "chihaya.yaml"
-  # CONFIG_PATH: "example_config.yaml"
   DOCKER_CACHE_PATH: "/cache"
   CACHE_PATH: "/data/cache"
   IMAGE_NAME: "dregistry:5000/bestv/products/citadel/pixpress"
   VERSION: "latest"
-  #CHIHAYA_DCOMPOSE_PATH : "/data/docker-compose/chihaya"
+  PIXPRESS_DCOMPOSE_PATH : "/data/docker-compose/pixpress"
 
   PEM_FILE : "/home/bestadmin/.ssh/ott-bestadmin.pem"
   PROD_HOST : "10.201.196.200"
@@ -19,7 +17,7 @@ stages:
   - binary_build
   #- unit_test
   - image_build
-  #- testenv_deploy
+  - testenv_deploy
 
   #- release_build
   #- production_copy
@@ -27,7 +25,8 @@ stages:
 
 build_docker_binary_job:
   tags:
-    - docker, pixpress
+    - docker
+    - pixpress
   image: dregistry:5000/bestv/otttest/common/glide:v0.13.1
   script:
     - source /root/.polipo
@@ -44,7 +43,7 @@ build_docker_binary_job:
     # - glide install
     - if [ -d $GLIDE_VENDOR_DIR ]; then cp -pr $GLIDE_VENDOR_DIR /builds; fi
 
-    - go build github.com/isymbo/pixpress
+    - make build
     - mkdir $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}
     - for item in $TARGET_PATH; do
     -   cp -pr $CI_PROJECT_DIR/${item} $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}
@@ -99,21 +98,21 @@ build_image_job:
   only:
     - master
 
-# deploy_testenv_job:
-#   tags:
-#     - ssh
-#     - testdeploy
-#   script:
-#     - cd $CHIHAYA_DCOMPOSE_PATH
-#     - docker-compose stop
-#     - docker pull ${IMAGE_NAME}:${VERSION}
-#     - docker-compose up -d
-#   environment:
-#     name: test_stage
-#     url: http://10.201.51.154:6880/metrics
-#   stage: testenv_deploy
-#   only:
-#     - bestv
+deploy_testenv_job:
+  tags:
+    - ssh
+    - testdeploy
+  script:
+    - cd $PIXPRESS_DCOMPOSE_PATH
+    - docker-compose stop
+    - docker pull ${IMAGE_NAME}:${VERSION}
+    - docker-compose up -d
+  environment:
+    name: pixpress_test_stage
+    url: http://10.201.51.154:7611/
+  stage: testenv_deploy
+  only:
+    - master
 
 # prodenv_copy_job:
 #   tags:
