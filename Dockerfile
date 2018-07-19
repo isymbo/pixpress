@@ -4,10 +4,7 @@ LABEL maintainer "wang.min@bestv.com.cn"
 # Copy our source code into the container.
 WORKDIR /pixpress
 ADD pixpress /pixpress
-ADD public /pixpress
-
-#RUN mv app/views/templates /pixpress/app/views/
 
 # Expose a docker interface to our binary.
 EXPOSE 7611
-#ENTRYPOINT ["/pixpress/pixpress", "web"]
+ENTRYPOINT ["/pixpress/pixpress", "web"]

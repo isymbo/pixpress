@@ -48,6 +48,10 @@ build_docker_binary_job:
     - for item in $TARGET_PATH; do
     -   cp -pr $CI_PROJECT_DIR/${item} $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}
     - done
+
+    # special for templates directory, use app/
+    - mkdir -p $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/app/views
+    - mv -f $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/templates $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/app/views
   stage: binary_build
   only:
     - master
