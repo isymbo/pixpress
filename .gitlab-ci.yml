@@ -87,35 +87,17 @@ build_docker_binary_job:
 #   only:
 #     - tags
 
-# unittest_job:
-#   tags:
-#     - docker
-#   image: dregistry:5000/bestv/otttest/common/glide:v0.13.1
-#   script:
-#     - source /root/.polipo
-#     - mkdir -p $GOPATH/src/github.com/chihaya
-#     - ln -s $PWD $GOPATH/src/github.com/chihaya/chihaya
-#     - cd $GOPATH/src/github.com/chihaya/chihaya
-#     - if [ -d /builds/$GLIDE_VENDOR_DIR ]; then cp -pr /builds/$GLIDE_VENDOR_DIR .; fi
-#     # only run glide install when needed
-#     - if [ ! -d /builds/$GLIDE_VENDOR_DIR ]; then glide install; fi
-#     - go test -v $(glide novendor | grep -v contrib)
-#   stage: unit_test
-#   only:
-#     - bestv
-
-# build_image_job:
-#   tags:
-#     - ssh
-#     - buildimage
-#   script:
-#     - cp $CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8} $PROJECT_NAME
-#     - cp $CACHE_PATH/${CONFIG_FILENAME}_${CI_COMMIT_SHA:0:8} $CONFIG_FILENAME
-#     - docker build -f Dockerfile.bestv . -t ${IMAGE_NAME}:${VERSION}
-#     - docker push ${IMAGE_NAME}:${VERSION}
-#   stage: image_build
-#   only:
-#     - bestv
+build_image_job:
+  tags:
+    - ssh
+    - buildimage
+  script:
+    - cp -pr $CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8} $PROJECT_NAME
+    - docker build -f Dockerfile . -t ${IMAGE_NAME}:${VERSION}
+    - docker push ${IMAGE_NAME}:${VERSION}
+  stage: image_build
+  only:
+    - master
 
 # deploy_testenv_job:
 #   tags:
