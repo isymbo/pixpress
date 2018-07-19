@@ -1,7 +1,7 @@
 variables:
   PROJECT_NAME: "pixpress"
   GLIDE_VENDOR_DIR: "vendor"
-  TARGET_PATH: "pixpress"
+  TARGET_PATH: "pixpress public app/views/templates"
   # CONFIG_FILENAME: "chihaya.yaml"
   # CONFIG_PATH: "example_config.yaml"
   DOCKER_CACHE_PATH: "/cache"
@@ -39,13 +39,16 @@ build_docker_binary_job:
 
     - if [ -d /builds/$GLIDE_VENDOR_DIR ]; then cp -pr /builds/$GLIDE_VENDOR_DIR .; fi
     # only run glide install when needed
-    # - if [ ! -d /builds/$GLIDE_VENDOR_DIR ]; then glide install; fi
-    - glide install
+    - if [ ! -d /builds/$GLIDE_VENDOR_DIR ]; then glide install; fi
+    # always run glide install
+    # - glide install
     - if [ -d $GLIDE_VENDOR_DIR ]; then cp -pr $GLIDE_VENDOR_DIR /builds; fi
 
     - go build github.com/isymbo/pixpress
-    - cp $CI_PROJECT_DIR/$TARGET_PATH $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}
-    - cp $CI_PROJECT_DIR/$CONFIG_PATH $DOCKER_CACHE_PATH/${CONFIG_FILENAME}_${CI_COMMIT_SHA:0:8}
+    - mkdir $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}
+    - for item in $TARGET_PATH; do
+    -   cp -pr $CI_PROJECT_DIR/${item} $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}
+    - done
   stage: binary_build
   only:
     - master
