@@ -18,7 +18,7 @@ variables:
 stages:
   - binary_build
   #- unit_test
-  #- image_build
+  - image_build
   #- testenv_deploy
 
   #- release_build
