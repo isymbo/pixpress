@@ -5,7 +5,7 @@ LABEL maintainer "wang.min@bestv.com.cn"
 WORKDIR /pixpress
 ADD pixpress /pixpress/pixpress
 ADD public /pixpress
-ADD templates /pixpress/app/views/
+ADD app/views/templates /pixpress/app/views/
 
 # Expose a docker interface to our binary.
 EXPOSE 7611
