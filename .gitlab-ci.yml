@@ -50,117 +50,117 @@ build_docker_binary_job:
   only:
     - master
 
-build_ubuntu_binary_job:
-  tags:
-    - ssh
-    - build_ubuntu_binary
-  script:
-    - source ~/.polipo
-    - gvm use go1.10.3
-    - go version
-    - glide -v
-    - mkdir -p $GOPATH/src/github.com/chihaya
-    - mkdir -p ~/cache
-    - ln -s $PWD $GOPATH/src/github.com/chihaya/chihaya
-    - cd $GOPATH/src/github.com/chihaya/chihaya
+# build_ubuntu_binary_job:
+#   tags:
+#     - ssh
+#     - build_ubuntu_binary
+#   script:
+#     - source ~/.polipo
+#     - gvm use go1.10.3
+#     - go version
+#     - glide -v
+#     - mkdir -p $GOPATH/src/github.com/chihaya
+#     - mkdir -p ~/cache
+#     - ln -s $PWD $GOPATH/src/github.com/chihaya/chihaya
+#     - cd $GOPATH/src/github.com/chihaya/chihaya
 
-    - echo $PWD $CI_PROJECT_DIR
-    - if [ -d /home/bestadmin/cache/$GLIDE_VENDOR_DIR ]; then
-        cp -pr /home/bestadmin/cache/$GLIDE_VENDOR_DIR .;
-      fi
-    - if [ -d ~/cache/$GLIDE_VENDOR_DIR ]; then
-        cp -pr ~/cache/$GLIDE_VENDOR_DIR .;
-      fi
-    # only run glide install when needed
-    - if [ ! -d /home/bestadmin/cache/$GLIDE_VENDOR_DIR ]; then
-        glide install;
-      fi
-    - if [ -d $GLIDE_VENDOR_DIR ]; then cp -pr $GLIDE_VENDOR_DIR ~/cache; fi
+#     - echo $PWD $CI_PROJECT_DIR
+#     - if [ -d /home/bestadmin/cache/$GLIDE_VENDOR_DIR ]; then
+#         cp -pr /home/bestadmin/cache/$GLIDE_VENDOR_DIR .;
+#       fi
+#     - if [ -d ~/cache/$GLIDE_VENDOR_DIR ]; then
+#         cp -pr ~/cache/$GLIDE_VENDOR_DIR .;
+#       fi
+#     # only run glide install when needed
+#     - if [ ! -d /home/bestadmin/cache/$GLIDE_VENDOR_DIR ]; then
+#         glide install;
+#       fi
+#     - if [ -d $GLIDE_VENDOR_DIR ]; then cp -pr $GLIDE_VENDOR_DIR ~/cache; fi
 
-    - go build github.com/chihaya/chihaya/cmd/chihaya
-    - cp $TARGET_PATH ~/cache/${PROJECT_NAME}_ubuntu_${CI_COMMIT_SHA:0:8}
-    - cp $CONFIG_PATH ~/cache/${CONFIG_FILENAME}_ubuntu_${CI_COMMIT_SHA:0:8}
-  stage: release_build
-  only:
-    - tags
+#     - go build github.com/chihaya/chihaya/cmd/chihaya
+#     - cp $TARGET_PATH ~/cache/${PROJECT_NAME}_ubuntu_${CI_COMMIT_SHA:0:8}
+#     - cp $CONFIG_PATH ~/cache/${CONFIG_FILENAME}_ubuntu_${CI_COMMIT_SHA:0:8}
+#   stage: release_build
+#   only:
+#     - tags
 
-unittest_job:
-  tags:
-    - docker
-  image: dregistry:5000/bestv/otttest/common/glide:v0.13.1
-  script:
-    - source /root/.polipo
-    - mkdir -p $GOPATH/src/github.com/chihaya
-    - ln -s $PWD $GOPATH/src/github.com/chihaya/chihaya
-    - cd $GOPATH/src/github.com/chihaya/chihaya
-    - if [ -d /builds/$GLIDE_VENDOR_DIR ]; then cp -pr /builds/$GLIDE_VENDOR_DIR .; fi
-    # only run glide install when needed
-    - if [ ! -d /builds/$GLIDE_VENDOR_DIR ]; then glide install; fi
-    - go test -v $(glide novendor | grep -v contrib)
-  stage: unit_test
-  only:
-    - bestv
+# unittest_job:
+#   tags:
+#     - docker
+#   image: dregistry:5000/bestv/otttest/common/glide:v0.13.1
+#   script:
+#     - source /root/.polipo
+#     - mkdir -p $GOPATH/src/github.com/chihaya
+#     - ln -s $PWD $GOPATH/src/github.com/chihaya/chihaya
+#     - cd $GOPATH/src/github.com/chihaya/chihaya
+#     - if [ -d /builds/$GLIDE_VENDOR_DIR ]; then cp -pr /builds/$GLIDE_VENDOR_DIR .; fi
+#     # only run glide install when needed
+#     - if [ ! -d /builds/$GLIDE_VENDOR_DIR ]; then glide install; fi
+#     - go test -v $(glide novendor | grep -v contrib)
+#   stage: unit_test
+#   only:
+#     - bestv
 
-build_image_job:
-  tags:
-    - ssh
-    - buildimage
-  script:
-    - cp $CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8} $PROJECT_NAME
-    - cp $CACHE_PATH/${CONFIG_FILENAME}_${CI_COMMIT_SHA:0:8} $CONFIG_FILENAME
-    - docker build -f Dockerfile.bestv . -t ${IMAGE_NAME}:${VERSION}
-    - docker push ${IMAGE_NAME}:${VERSION}
-  stage: image_build
-  only:
-    - bestv
+# build_image_job:
+#   tags:
+#     - ssh
+#     - buildimage
+#   script:
+#     - cp $CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8} $PROJECT_NAME
+#     - cp $CACHE_PATH/${CONFIG_FILENAME}_${CI_COMMIT_SHA:0:8} $CONFIG_FILENAME
+#     - docker build -f Dockerfile.bestv . -t ${IMAGE_NAME}:${VERSION}
+#     - docker push ${IMAGE_NAME}:${VERSION}
+#   stage: image_build
+#   only:
+#     - bestv
 
-deploy_testenv_job:
-  tags:
-    - ssh
-    - testdeploy
-  script:
-    - cd $CHIHAYA_DCOMPOSE_PATH
-    - docker-compose stop
-    - docker pull ${IMAGE_NAME}:${VERSION}
-    - docker-compose up -d
-  environment:
-    name: test_stage
-    url: http://10.201.51.154:6880/metrics
-  stage: testenv_deploy
-  only:
-    - bestv
+# deploy_testenv_job:
+#   tags:
+#     - ssh
+#     - testdeploy
+#   script:
+#     - cd $CHIHAYA_DCOMPOSE_PATH
+#     - docker-compose stop
+#     - docker pull ${IMAGE_NAME}:${VERSION}
+#     - docker-compose up -d
+#   environment:
+#     name: test_stage
+#     url: http://10.201.51.154:6880/metrics
+#   stage: testenv_deploy
+#   only:
+#     - bestv
 
-prodenv_copy_job:
-  tags:
-    - ssh
-    - copy_production
-  script:
-    - ssh -i $PEM_FILE ${PROD_HOST} mkdir -p ${INVENTORY}
-    - scp -i $PEM_FILE ~/cache/${PROJECT_NAME}_ubuntu_${CI_COMMIT_SHA:0:8} ${PROD_HOST}:${INVENTORY}/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}
-    - scp -i $PEM_FILE ~/cache/${CONFIG_FILENAME}_ubuntu_${CI_COMMIT_SHA:0:8} ${PROD_HOST}:${INVENTORY}/${CONFIG_FILENAME}_${CI_COMMIT_SHA:0:8}
-  stage: production_copy
-  only:
-    - tags
+# prodenv_copy_job:
+#   tags:
+#     - ssh
+#     - copy_production
+#   script:
+#     - ssh -i $PEM_FILE ${PROD_HOST} mkdir -p ${INVENTORY}
+#     - scp -i $PEM_FILE ~/cache/${PROJECT_NAME}_ubuntu_${CI_COMMIT_SHA:0:8} ${PROD_HOST}:${INVENTORY}/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}
+#     - scp -i $PEM_FILE ~/cache/${CONFIG_FILENAME}_ubuntu_${CI_COMMIT_SHA:0:8} ${PROD_HOST}:${INVENTORY}/${CONFIG_FILENAME}_${CI_COMMIT_SHA:0:8}
+#   stage: production_copy
+#   only:
+#     - tags
 
-prodenv_run_job:
-  variables:
-    GIT_STRATEGY: none
-  tags:
-    - ssh
-    - production
-  script:
-    - mkdir -p $PROD_WORKDIR
-    - cd $PROD_WORKDIR
-    - cp -f ${INVENTORY}/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8} $PROD_WORKDIR/${PROJECT_NAME}_${CI_COMMIT_TAG}
-    - cp -f ${INVENTORY}/${CONFIG_FILENAME}_${CI_COMMIT_SHA:0:8} $PROD_WORKDIR/${CONFIG_FILENAME}_${CI_COMMIT_TAG}
-    - ln -fs $PROD_WORKDIR/${PROJECT_NAME}_${CI_COMMIT_TAG} $PROD_WORKDIR/${PROJECT_NAME}
-    - ln -fs $PROD_WORKDIR/${CONFIG_FILENAME}_${CI_COMMIT_TAG} $PROD_WORKDIR/${CONFIG_FILENAME}
+# prodenv_run_job:
+#   variables:
+#     GIT_STRATEGY: none
+#   tags:
+#     - ssh
+#     - production
+#   script:
+#     - mkdir -p $PROD_WORKDIR
+#     - cd $PROD_WORKDIR
+#     - cp -f ${INVENTORY}/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8} $PROD_WORKDIR/${PROJECT_NAME}_${CI_COMMIT_TAG}
+#     - cp -f ${INVENTORY}/${CONFIG_FILENAME}_${CI_COMMIT_SHA:0:8} $PROD_WORKDIR/${CONFIG_FILENAME}_${CI_COMMIT_TAG}
+#     - ln -fs $PROD_WORKDIR/${PROJECT_NAME}_${CI_COMMIT_TAG} $PROD_WORKDIR/${PROJECT_NAME}
+#     - ln -fs $PROD_WORKDIR/${CONFIG_FILENAME}_${CI_COMMIT_TAG} $PROD_WORKDIR/${CONFIG_FILENAME}
 
-    # sudo won't work via non interactive ssh session
-    # give up
-    #- sudo -p chihaya supervisor stop chihaya
-    #- sudo -p chihaya supervisor start chihaya
-    - kill -9 $(pgrep chihaya)
-  stage: production_deploy
-  only:
-    - tags
+#     # sudo won't work via non interactive ssh session
+#     # give up
+#     #- sudo -p chihaya supervisor stop chihaya
+#     #- sudo -p chihaya supervisor start chihaya
+#     - kill -9 $(pgrep chihaya)
+#   stage: production_deploy
+#   only:
+#     - tags
