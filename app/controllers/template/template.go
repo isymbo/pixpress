@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Unknwon/com"
 	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/isymbo/pixpress/setting"
@@ -65,6 +66,9 @@ func NewFuncMap() []template.FuncMap {
 		},
 		"DateFmtShort": func(t time.Time) string {
 			return t.Format("Jan 02, 2006")
+		},
+		"DateFmt": func(ut int64) string {
+			return com.Date(ut, "YYYY-MM-DD HH:mm:ss")
 		},
 		"List": List,
 		"SubStr": func(str string, start, length int) string {
