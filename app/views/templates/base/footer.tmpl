@@ -2,10 +2,22 @@
     <footer>
 
 			<!-- <div class="page-footer footer-light pt-4 mt-4"> -->
-					<div class="footer-copyright text-center py-3">© 2018
-							<a href="#"> Citadel </a>
+				<div class="footer-copyright text-center py-3">© 2018
+						<a href="mailto:ott-citadel@opg.cn"> Citadel </a>
+				</div>
+
+			<div class="container md small font-weight-light">
+				<div class="row">
+					<div class="col">
+						{{AppName}} {{AppVer}}  页面载入时间: {{LoadTimes .PageStartTime}}
 					</div>
-			<!-- </div> -->
+					<div class="col-4">
+						Commit ID: {{BuildGitHash}}
+					</div>
+					<div class="col text-right">
+						{{GoVer}} 构建时间:{{BuildTime}}
+				</div>
+  		</div>
 
     </footer>
     <!--Footer-->

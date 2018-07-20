@@ -30,6 +30,12 @@ func NewFuncMap() []template.FuncMap {
 		// "UseHTTPS": func() bool {
 		// 	return strings.HasPrefix(setting.AppURL, "https")
 		// },
+		"BuildGitHash": func() string {
+			return setting.BuildGitHash
+		},
+		"BuildTime": func() string {
+			return setting.BuildTime
+		},
 		"AppName": func() string {
 			return setting.AppName
 		},
