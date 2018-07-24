@@ -1,36 +1,40 @@
-    <!--Footer-->
-    <footer>
 
-			<!-- <div class="page-footer footer-light pt-4 mt-4"> -->
-				<div class="footer-copyright text-center py-3">© 2018
-						<a href="mailto:ott-citadel@opg.cn"> Citadel </a>
-				</div>
+	</div>
 
-			<div class="container md small font-weight-light">
-				<div class="row">
-					<div class="col">
-						{{AppName}} {{AppVer}}  页面载入时间: {{LoadTimes .PageStartTime}}
-					</div>
-					<div class="col-4">
-						Commit ID: {{BuildGitHash}}
-					</div>
-					<div class="col text-right">
-						{{GoVer}} 构建时间:{{BuildTime}}
-				</div>
-  		</div>
+	<!--Footer-->
+	<footer class="app-footer">
+	<div class="container-fluid row text-center">
+		<div class="col-2">
+		  <span>&copy; 2018</span>
+			<a href="mailto:ott-citadel@opg.cn"> Citadel </a>
+		</div>
+		<div class="col-3">
+			{{AppName}} {{AppVer}}  页面载入时间: {{LoadTimes .PageStartTime}}
+		</div>
+		<div class="col">
+			Commit ID: {{BuildGitHash}}
+		</div>
+		<div class="col-4">
+			{{GoVer}} 构建时间:{{BuildTime}}
+		</div>
 
-    </footer>
-    <!--Footer-->
+	</div>
+	</footer>
+	<!--Footer-->
 
-    <!-- SCRIPTS -->
-    <!-- JQuery -->
-    <script type="text/javascript" src="{{AppSubURL}}/js/jquery-3.3.1.min.js"></script>
-    <!-- Bootstrap tooltips -->
-    <script type="text/javascript" src="{{AppSubURL}}/js/popper.min.js"></script>
-    <!-- Bootstrap core JavaScript -->
-    <script type="text/javascript" src="{{AppSubURL}}/js/bootstrap.min.js"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="{{AppSubURL}}/js/mdb.min.js"></script>
+	<!-- SCRIPTS -->
+	<!-- CoreUI and necessary plugins-->
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/popper.js/dist/umd/popper.min.js"></script>
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/pace-progress/pace.min.js"></script>
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/@coreui/coreui/dist/js/coreui.min.js"></script>
+
+	<!-- Plugins and scripts required by this view-->
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/chart.js/dist/Chart.min.js"></script>
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/@coreui/coreui-plugin-chartjs-custom-tooltips/dist/js/custom-tooltips.min.js"></script>
+	<script type="text/javascript" src="{{AppSubURL}}/js/main.js"></script>
+
 </body>
-
 </html>

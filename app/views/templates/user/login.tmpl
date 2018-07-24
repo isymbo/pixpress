@@ -1,38 +1,55 @@
 {{template "base/header" .}}
 
 <!--Main layout-->
-<main>
+<main class="main">
 
-	<div class="container mt-5">
-		<div class="card card-login mx-auto my-5" style="width: 25rem;">
-			<div class="card-header">登录</div>
-				<div class="card-body">
-					<form action="{{.Link}}" method="post">
-						<div class="form-group">
-								<label for="InputLoginName">帐号</label>
-								<input class="form-control" id="InputLoginName" name="LoginName" type="text" aria-describedby="LoginHelp" placeholder="输入帐号">
-						</div>
-						<div class="form-group">
-								<label for="InputPassword">密码</label>
-								<input class="form-control" id="InputPassword" name="Password" type="password" placeholder="输入密码">
-						</div>
-						<div class="form-group">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card-group">
+            <div class="card p-4">
+              <div class="card-body">
+                <h1>登入</h1>
+								<p class="text-muted"></p>
+								<form action="{{.Link}}" method="post">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="icon-user"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="text" name="LoginName" placeholder="帐号">
+                </div>
+                <div class="input-group mb-4">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="icon-lock"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="password" name="Password" placeholder="密码">
+                </div>
 								<div class="form-check">
-								<label class="CheckRememberPassword">
-										<input class="form-check-input" type="checkbox">记住密码</label>
+									<label class="CheckRememberPassword">
+									<input class="form-check-input" type="checkbox">记住密码</label>
 								</div>
-						</div>
-						<button type= "submit" class="btn btn-lg btn-primary btn-block mt-4 font-weight-bold">登录</button>
-					</form>
-					<!--
-					<div class="text-center">
-					<a class="d-block small mt-3" href="register.html">Register an Account</a>
-					<a class="d-block small" href="forgot-password.html">Forgot Password?</a>
-					-->
-				</div>
-			</div>
-		</div>
-	</div>
+								<p class="text-muted"></p>
+                <div class="row">
+                  <div class="col-6">
+                    <button class="btn btn-primary px-4" type="submit">登录</button>
+                  </div>
+                  <div class="col-6 text-right">
+                    <button class="btn btn-link px-0" type="button">忘记密码?</button>
+                  </div>
+                </div>
+								</form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
 
 </main>
 <!--Main layout-->
