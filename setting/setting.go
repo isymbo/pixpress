@@ -395,6 +395,8 @@ func InitRoutes(m *macaron.Macaron) {
 
 // Set Log configurations
 func newLogService() {
+	LogRootPath = Log.RootPath
+
 	if len(BuildTime) > 0 {
 		log.Trace("Build Time: %s", BuildTime)
 		log.Trace("Build Git Hash: %s", BuildGitHash)
@@ -434,7 +436,7 @@ func newLogService() {
 			}
 
 		case log.FILE:
-			logPath := path.Join(LogRootPath, "pixpress.log")
+			logPath := path.Join(LogRootPath, strings.ToLower(APP_NAME)+".log")
 			if err := os.MkdirAll(path.Dir(logPath), os.ModePerm); err != nil {
 				log.Fatal(2, "Fail to create log directory '%s': %v", path.Dir(logPath), err)
 			}
