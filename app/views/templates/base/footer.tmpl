@@ -4,18 +4,17 @@
 	<!--Footer-->
 	<footer class="app-footer">
 	<div class="container-fluid row text-center">
-		<div class="col-2">
-		  <span>&copy; 2018</span>
-			<a href="mailto:ott-citadel@opg.cn"> Citadel </a>
-		</div>
-		<div class="col-3">
-			{{AppName}} {{AppVer}}  页面载入时间: {{LoadTimes .PageStartTime}}
-		</div>
-		<div class="col">
-			Commit ID: {{BuildGitHash}}
+	  <div class="col-4">
+			<span>页面载入时间: {{LoadTimes .PageStartTime}},</span>
+		  <span>{{AppName}} {{AppVer}}</span>
+			<span>&copy; 2018, by</span>
+			 <a href="mailto:ott-citadel@opg.cn"> Citadel </a>
 		</div>
 		<div class="col-4">
-			{{GoVer}} 构建时间:{{BuildTime}}
+			<span>Commit ID: {{BuildGitHash}}</span>
+		</div>
+		<div class="col-4">
+			<span>构建时间:{{BuildTime}} via {{GoVer}}</span>
 		</div>
 
 	</div>
