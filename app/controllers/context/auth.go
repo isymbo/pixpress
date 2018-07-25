@@ -22,6 +22,7 @@ var (
 	IgnSignIn        = Toggle(&ToggleOptions{SignInRequired: setting.Service.RequireSignInView})
 	IgnSignInAndCsrf = Toggle(&ToggleOptions{DisableCSRF: true})
 	ReqSignOut       = Toggle(&ToggleOptions{SignOutRequired: true})
+	AdminReq         = Toggle(&ToggleOptions{SignInRequired: true, AdminRequired: true})
 )
 
 func Toggle(options *ToggleOptions) macaron.Handler {

@@ -14,6 +14,7 @@ import (
 	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 
+	"github.com/isymbo/pixpress/app/controllers/admin"
 	"github.com/isymbo/pixpress/app/controllers/context"
 	"github.com/isymbo/pixpress/app/controllers/routes"
 	"github.com/isymbo/pixpress/app/controllers/template"
@@ -202,6 +203,7 @@ func initRoutes(m *macaron.Macaron) {
 	// }, ignSignIn)
 
 	setting.InitRoutes(m)
+	admin.InitRoutes(m)
 	user.InitRoutes(m)
 
 }
