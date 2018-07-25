@@ -31,7 +31,7 @@ func NewFuncMap() []template.FuncMap {
 		// 	return strings.HasPrefix(setting.AppURL, "https")
 		// },
 		"BuildGitHash": func() string {
-			return setting.BuildGitHash
+			return setting.BuildGitHash[0:7]
 		},
 		"BuildTime": func() string {
 			return setting.BuildTime
