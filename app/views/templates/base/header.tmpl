@@ -55,27 +55,24 @@
 		</ul>
 
 		<ul class="nav navbar-nav ml-auto">
-			<li class="nav-item d-md-down-none">
-				<a class="nav-link" href="#">
-					<i class="icon-bell"></i>
-					<span class="badge badge-pill badge-danger">5</span>
+			<li class="nav-item dropdown px-3">
+				<a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+					<i class="fa fa-plus-circle fa-md"></i> 新建
 				</a>
-			</li>
-			<li class="nav-item d-md-down-none">
-				<a class="nav-link" href="#">
-					<i class="icon-list"></i>
-				</a>
-			</li>
-			<li class="nav-item d-md-down-none">
-				<a class="nav-link" href="#">
-					<i class="icon-location-pin"></i>
-				</a>
+				<div class="dropdown-menu dropdown-menu-right">
+					<a class="dropdown-item" href="#">
+						<i class="fa fa-file-image-o fa-md"></i> 作品
+					</a>
+					<a class="dropdown-item" href="#">
+						<i class="fa fa-object-group fa-md"></i> 作品集
+					</a>
+				</div>
 			</li>
 
 			{{if .IsLogged}}
 			<li class="nav-item dropdown">
 				<a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-					<img class="img-avatar" src="img/avatars/6.jpg" alt="admin@bootstrapmaster.com">
+					<img class="img-avatar" src="img/avatars/boy.png" alt="TODO">
 				</a>
 				<div class="dropdown-menu dropdown-menu-right">
 					<div class="dropdown-header text-center">
