@@ -1,15 +1,20 @@
+v0.0.2
+* 使用coreui替换前端的material bootstrap
+* 增加管理员可见的菜单
+* 添加用户管理列表部分
+
 v0.0.1
 * 完成基本的web app框架
-  - Auth
+   - Auth
   - Session
   - Cache
   - CSRF
   - Database
   - Log
+  - Configuration
 * 支持LDAP BindDN模式进行认证
-* 完成数据的支持
+* 完成数据库的支持
 * 用户登入登出，以及信息页面
-
 ~
 ~
 ~
