@@ -1,5 +1,5 @@
-hash: f5194f71065703878e975f489ed7d904ea310e59f897cd2a36a0d7b7fb60d6e7
-updated: 2018-07-04T12:19:24.385412+08:00
+hash: aa9b0d8cf84bc0ba0ea1eb1881cc9ae7e01530fa9cd18955eee9f4be313b20db
+updated: 2018-07-26T10:59:31.079965+08:00
 imports:
 - name: cloud.google.com/go
   version: c23afc06f11560eb1e93425b849aee2581c6dcfa
@@ -66,6 +66,8 @@ imports:
   version: da59b551951d50441ca26b7a8cd81317f34df87f
 - name: github.com/Unknwon/i18n
   version: b64d336589669d317928070e70ba0ae558f16633
+- name: github.com/Unknwon/paginater
+  version: 45e5d631308ea359946e761484147982c978d0df
 - name: github.com/urfave/cli
   version: 8e01ec4cd3e2d84ab2fe90d8210528ffbb06d8ff
 - name: golang.org/x/crypto

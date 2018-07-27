@@ -9,3 +9,4 @@ import:
 - package: gopkg.in/clog.v1
 - package: gopkg.in/ini.v1
 - package: gopkg.in/macaron.v1
+- package: github.com/Unknwon/paginater
