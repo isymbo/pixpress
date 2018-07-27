@@ -67,7 +67,7 @@ func InitRoutes(m *macaron.Macaron) {
 		// m.Get("/monitor", admin.Monitor)
 
 		m.Group("/users", func() {
-			m.Get("", Users)
+			m.Get("", context.AdminReq, Users)
 			// m.Combo("/new").Get(admin.NewUser).Post(bindIgnErr(form.AdminCrateUser{}), admin.NewUserPost)
 			// m.Combo("/:userid").Get(admin.EditUser).Post(bindIgnErr(form.AdminEditUser{}), admin.EditUserPost)
 			// m.Post("/:userid/delete", admin.DeleteUser)

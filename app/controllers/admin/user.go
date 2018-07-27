@@ -2,7 +2,9 @@ package admin
 
 import (
 	"github.com/isymbo/pixpress/app/controllers/context"
+	"github.com/isymbo/pixpress/app/controllers/routes"
 	"github.com/isymbo/pixpress/app/models"
+	"github.com/isymbo/pixpress/setting"
 )
 
 const (
@@ -16,15 +18,14 @@ func Users(c *context.Context) {
 	c.Data["PageIsAdmin"] = true
 	c.Data["PageIsAdminUsers"] = true
 
-	// routes.RenderUserSearch(c, &routes.UserSearchOptions{
-	// 	Type:     models.USER_TYPE_INDIVIDUAL,
-	// 	Counter:  models.CountUsers,
-	// 	Ranger:   models.Users,
-	// 	PageSize: setting.UI.Admin.UserPagingNum,
-	// 	OrderBy:  "id ASC",
-	// 	TplName:  USERS,
-	// })
-	c.HTML(200, USERS)
+	routes.RenderUserSearch(c, &routes.UserSearchOptions{
+		Type:     models.USER_TYPE_INDIVIDUAL,
+		Counter:  models.CountUsers,
+		Ranger:   models.Users,
+		PageSize: setting.UI.Admin.UserPagingNum,
+		OrderBy:  "id ASC",
+		TplName:  USERS,
+	})
 }
 
 // func NewUser(c *context.Context) {

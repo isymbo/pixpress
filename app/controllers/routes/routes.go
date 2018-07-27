@@ -1,9 +1,11 @@
 package routes
 
 import (
+	"github.com/Unknwon/paginater"
 	log "gopkg.in/clog.v1"
 
 	"github.com/isymbo/pixpress/app/controllers/context"
+	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
 )
 
@@ -80,53 +82,53 @@ func ExploreRepos(c *context.Context) {
 }
 
 type UserSearchOptions struct {
-	// Type     models.UserType
-	// Counter  func() int64
-	// Ranger   func(int, int) ([]*models.User, error)
-	// PageSize int
-	// OrderBy  string
-	// TplName  string
+	Type     models.UserType
+	Counter  func() int64
+	Ranger   func(int, int) ([]*models.User, error)
+	PageSize int
+	OrderBy  string
+	TplName  string
 }
 
 func RenderUserSearch(c *context.Context, opts *UserSearchOptions) {
-	// page := c.QueryInt("page")
-	// if page <= 1 {
-	// 	page = 1
-	// }
+	page := c.QueryInt("page")
+	if page <= 1 {
+		page = 1
+	}
 
-	// var (
-	// 	users []*models.User
-	// 	count int64
-	// 	err   error
-	// )
+	var (
+		users []*models.User
+		count int64
+		err   error
+	)
 
-	// keyword := c.Query("q")
-	// if len(keyword) == 0 {
-	// 	users, err = opts.Ranger(page, opts.PageSize)
-	// 	if err != nil {
-	// 		c.ServerError("Ranger", err)
-	// 		return
-	// 	}
-	// 	count = opts.Counter()
-	// } else {
-	// 	users, count, err = models.SearchUserByName(&models.SearchUserOptions{
-	// 		Keyword:  keyword,
-	// 		Type:     opts.Type,
-	// 		OrderBy:  opts.OrderBy,
-	// 		Page:     page,
-	// 		PageSize: opts.PageSize,
-	// 	})
-	// 	if err != nil {
-	// 		c.ServerError("SearchUserByName", err)
-	// 		return
-	// 	}
-	// }
-	// c.Data["Keyword"] = keyword
-	// c.Data["Total"] = count
-	// c.Data["Page"] = paginater.New(int(count), opts.PageSize, page, 5)
-	// c.Data["Users"] = users
+	keyword := c.Query("q")
+	if len(keyword) == 0 {
+		users, err = opts.Ranger(page, opts.PageSize)
+		if err != nil {
+			c.ServerError("Ranger", err)
+			return
+		}
+		count = opts.Counter()
+	} else {
+		users, count, err = models.SearchUserByName(&models.SearchUserOptions{
+			Keyword:  keyword,
+			Type:     opts.Type,
+			OrderBy:  opts.OrderBy,
+			Page:     page,
+			PageSize: opts.PageSize,
+		})
+		if err != nil {
+			c.ServerError("SearchUserByName", err)
+			return
+		}
+	}
+	c.Data["Keyword"] = keyword
+	c.Data["Total"] = count
+	c.Data["Page"] = paginater.New(int(count), opts.PageSize, page, 5)
+	c.Data["Users"] = users
 
-	// c.Success(opts.TplName)
+	c.Success(opts.TplName)
 }
 
 func ExploreUsers(c *context.Context) {

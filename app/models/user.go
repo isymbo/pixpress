@@ -578,21 +578,21 @@ func IsUserExist(uid int64, name string) (bool, error) {
 // 	return sess.Commit()
 // }
 
-// func countUsers(e Engine) int64 {
-// 	count, _ := e.Where("type=0").Count(new(User))
-// 	return count
-// }
+func countUsers(e Engine) int64 {
+	count, _ := e.Where("type=0").Count(new(User))
+	return count
+}
 
-// // CountUsers returns number of users.
-// func CountUsers() int64 {
-// 	return countUsers(x)
-// }
+// CountUsers returns number of users.
+func CountUsers() int64 {
+	return countUsers(x)
+}
 
-// // Users returns number of users in given page.
-// func Users(page, pageSize int) ([]*User, error) {
-// 	users := make([]*User, 0, pageSize)
-// 	return users, x.Limit(pageSize, (page-1)*pageSize).Where("type=0").Asc("id").Find(&users)
-// }
+// Users returns number of users in given page.
+func Users(page, pageSize int) ([]*User, error) {
+	users := make([]*User, 0, pageSize)
+	return users, x.Limit(pageSize, (page-1)*pageSize).Where("type=0").Asc("id").Find(&users)
+}
 
 // // parseUserFromCode returns user by username encoded in code.
 // // It returns nil if code or username is invalid.
@@ -1019,48 +1019,48 @@ func GetUserByName(name string) (*User, error) {
 // 	return nil, errors.UserNotExist{0, email}
 // }
 
-// type SearchUserOptions struct {
-// 	Keyword  string
-// 	Type     UserType
-// 	OrderBy  string
-// 	Page     int
-// 	PageSize int // Can be smaller than or equal to setting.UI.ExplorePagingNum
-// }
+type SearchUserOptions struct {
+	Keyword  string
+	Type     UserType
+	OrderBy  string
+	Page     int
+	PageSize int // Can be smaller than or equal to setting.UI.ExplorePagingNum
+}
 
-// // SearchUserByName takes keyword and part of user name to search,
-// // it returns results in given range and number of total results.
-// func SearchUserByName(opts *SearchUserOptions) (users []*User, _ int64, _ error) {
-// 	if len(opts.Keyword) == 0 {
-// 		return users, 0, nil
-// 	}
-// 	opts.Keyword = strings.ToLower(opts.Keyword)
+// SearchUserByName takes keyword and part of user name to search,
+// it returns results in given range and number of total results.
+func SearchUserByName(opts *SearchUserOptions) (users []*User, _ int64, _ error) {
+	if len(opts.Keyword) == 0 {
+		return users, 0, nil
+	}
+	opts.Keyword = strings.ToLower(opts.Keyword)
 
-// 	if opts.PageSize <= 0 || opts.PageSize > setting.UI.ExplorePagingNum {
-// 		opts.PageSize = setting.UI.ExplorePagingNum
-// 	}
-// 	if opts.Page <= 0 {
-// 		opts.Page = 1
-// 	}
+	if opts.PageSize <= 0 || opts.PageSize > setting.UI.ExplorePagingNum {
+		opts.PageSize = setting.UI.ExplorePagingNum
+	}
+	if opts.Page <= 0 {
+		opts.Page = 1
+	}
 
-// 	searchQuery := "%" + opts.Keyword + "%"
-// 	users = make([]*User, 0, opts.PageSize)
-// 	// Append conditions
-// 	sess := x.Where("LOWER(lower_name) LIKE ?", searchQuery).
-// 		Or("LOWER(full_name) LIKE ?", searchQuery).
-// 		And("type = ?", opts.Type)
+	searchQuery := "%" + opts.Keyword + "%"
+	users = make([]*User, 0, opts.PageSize)
+	// Append conditions
+	sess := x.Where("LOWER(lower_name) LIKE ?", searchQuery).
+		Or("LOWER(full_name) LIKE ?", searchQuery).
+		And("type = ?", opts.Type)
 
-// 	var countSess xorm.Session
-// 	countSess = *sess
-// 	count, err := countSess.Count(new(User))
-// 	if err != nil {
-// 		return nil, 0, fmt.Errorf("Count: %v", err)
-// 	}
+	var countSess xorm.Session
+	countSess = *sess
+	count, err := countSess.Count(new(User))
+	if err != nil {
+		return nil, 0, fmt.Errorf("Count: %v", err)
+	}
 
-// 	if len(opts.OrderBy) > 0 {
-// 		sess.OrderBy(opts.OrderBy)
-// 	}
-// 	return users, count, sess.Limit(opts.PageSize, (opts.Page-1)*opts.PageSize).Find(&users)
-// }
+	if len(opts.OrderBy) > 0 {
+		sess.OrderBy(opts.OrderBy)
+	}
+	return users, count, sess.Limit(opts.PageSize, (opts.Page-1)*opts.PageSize).Find(&users)
+}
 
 // // ___________    .__  .__
 // // \_   _____/___ |  | |  |   ______  _  __

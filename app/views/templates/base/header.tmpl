@@ -19,9 +19,11 @@
   <link href="{{AppSubURL}}/vendors/pace-progress/css/pace.min.css" rel="stylesheet">
 </head>
 
-
-<!-- <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show"> -->
+{{if .IsAdmin}}
+<body class="app header-fixed aside-menu-fixed sidebar-md-show">
+{{else}}
 <body class="app header-fixed aside-menu-fixed">
+{{end}}
 
   <!-- APP HEADER -->
 	<header class="app-header navbar">
@@ -37,11 +39,11 @@
 		</a>
 
 		{{if .IsAdmin}}
-		<button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
-			<span class="navbar-toggler-icon"></span>
+		<button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-md-show">
+			<!-- <span class="navbar-toggler-icon"></span> -->
+			<span class="icon-settings">
 		</button>
 		{{end}}
-
 
 		<ul class="nav navbar-nav d-md-down-none">
 			<li class="nav-item px-3">
