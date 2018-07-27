@@ -147,6 +147,42 @@ type LoginType struct {
 	IsActivated bool   `ini:"IS_ACTIVATED"`
 }
 
+// [ui]
+// ; Number of repositories that are showed in one explore page
+// EXPLORE_PAGING_NUM = 20
+// ; Number of issues that are showed in one page
+// ISSUE_PAGING_NUM = 10
+// ; Number of maximum commits showed in one activity feed
+// FEED_MAX_COMMIT_NUM = 5
+// ; Value of "theme-color" meta tag, used by Android >= 5.0
+// ; An invalid color like "none" or "disable" will have the default style
+// ; More info: https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android
+// THEME_COLOR_META_TAG = `#ff5343`
+// ; Max size in bytes of files to be displayed (default is 8MB)
+// MAX_DISPLAY_FILE_SIZE = 8388608
+
+// UI settings
+type UIType struct {
+	ExplorePagingNum   int    `ini:"EXPLORE_PAGING_NUM"`
+	IssuePagingNum     int    `ini:"ISSUE_PAGING_NUM"`
+	FeedMaxCommitNum   int    `ini:"FEED_MAX_COMMIT_NUM"`
+	ThemeColorMetaTag  string `ini:"THEME_COLOR_META_TAG"`
+	MaxDisplayFileSize int64  `ini:"MAX_DISPLAY_FILE_SIZE"`
+
+	Admin struct {
+		UserPagingNum   int
+		RepoPagingNum   int
+		NoticePagingNum int
+		OrgPagingNum    int
+	} `ini:"ui.admin"`
+
+	User struct {
+		RepoPagingNum     int
+		NewsFeedPagingNum int
+		CommitsPagingNum  int
+	} `ini:"ui.user"`
+}
+
 type OtherType struct {
 	ShowFooterTemplateLoadTime bool `ini:"SHOW_FOOTER_TEMPLATE_LOAD_TIME"`
 	ShowFooterBranding         bool `ini:"SHOW_FOOTER_BRANDING"`
@@ -203,6 +239,7 @@ var (
 	LogXorm      LogXormType
 	LoginModes   []LoginType
 	LoginSources []ldap.Source
+	UI           UIType
 	Other        OtherType
 )
 
@@ -251,6 +288,8 @@ func loadAppConfig(c *cli.Context) error {
 		log.Fatal(2, "Fail to map log.discord settings: %s", err)
 	} else if err = Cfg.Section("log.xorm").MapTo(&LogXorm); err != nil {
 		log.Fatal(2, "Fail to map log.xorm settings: %s", err)
+	} else if err = Cfg.Section("ui").MapTo(&UI); err != nil {
+		log.Fatal(2, "Fail to map ui settings: %s", err)
 	} else if err = Cfg.Section("other").MapTo(&Other); err != nil {
 		log.Fatal(2, "Fail to map other settings: %s", err)
 	}

@@ -64,6 +64,9 @@ func showConfig(c *cli.Context) error {
 	loginsources, _ := prettyjson.Marshal(setting.LoginSources)
 	fmt.Printf("LoginSources:\n%+v\n", string(loginsources))
 
+	ui, _ := prettyjson.Marshal(setting.UI)
+	fmt.Printf("UI:\n%+v\n", string(ui))
+
 	other, _ := prettyjson.Marshal(setting.Other)
 	fmt.Printf("Other:\n%+v\n", string(other))
 
