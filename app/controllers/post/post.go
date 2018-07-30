@@ -28,7 +28,7 @@ func InitRoutes(m *macaron.Macaron) {
 	m.Group("/pix", func() {
 		m.Get("/:pixid", reqSignIn, Show)
 		m.Combo("/new").
-			Get(NewPix).
+			Get(reqSignIn, NewPix).
 			Post(bindIgnErr(Post{}), NewPixPost)
 	})
 }
