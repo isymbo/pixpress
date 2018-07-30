@@ -16,6 +16,7 @@ import (
 
 	"github.com/isymbo/pixpress/app/controllers/admin"
 	"github.com/isymbo/pixpress/app/controllers/context"
+	"github.com/isymbo/pixpress/app/controllers/post"
 	"github.com/isymbo/pixpress/app/controllers/routes"
 	"github.com/isymbo/pixpress/app/controllers/template"
 	"github.com/isymbo/pixpress/app/controllers/user"
@@ -205,6 +206,7 @@ func initRoutes(m *macaron.Macaron) {
 	setting.InitRoutes(m)
 	admin.InitRoutes(m)
 	user.InitRoutes(m)
+	post.InitRoutes(m)
 
 }
 
