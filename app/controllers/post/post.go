@@ -109,7 +109,7 @@ func ListPix(c *context.Context) {
 		Type:     models.POST_TYPE_PIX,
 		Counter:  models.CountPosts,
 		Ranger:   models.Posts,
-		PageSize: setting.UI.Admin.UserPagingNum,
+		PageSize: setting.UI.User.PostPagingNum,
 		OrderBy:  "updated_unix DESC",
 		TplName:  PIXES,
 	})

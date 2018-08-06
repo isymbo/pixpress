@@ -170,16 +170,17 @@ type UIType struct {
 	MaxDisplayFileSize int64  `ini:"MAX_DISPLAY_FILE_SIZE"`
 
 	Admin struct {
-		UserPagingNum   int
-		RepoPagingNum   int
-		NoticePagingNum int
-		OrgPagingNum    int
+		UserPagingNum   int `ini:"USER_PAGING_NUM"`
+		RepoPagingNum   int `ini:"REPO_PAGING_NUM"`
+		NoticePagingNum int `ini:"NOTICE_PAGING_NUM"`
+		OrgPagingNum    int `ini:"ORG_PAGING_NUM"`
 	} `ini:"ui.admin"`
 
 	User struct {
-		RepoPagingNum     int
-		NewsFeedPagingNum int
-		CommitsPagingNum  int
+		RepoPagingNum     int `ini:"REPO_PAGING_NUM"`
+		NewsFeedPagingNum int `ini:"NEWS_FEED_PAGING_NUM"`
+		CommitsPagingNum  int `ini:"COMMITS_PAGING_NUM"`
+		PostPagingNum     int `ini:"POST_PAGING_NUM"`
 	} `ini:"ui.user"`
 }
 

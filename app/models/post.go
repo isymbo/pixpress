@@ -122,8 +122,8 @@ func SearchPostByName(opts *SearchPostOptions) (posts []*Post, _ int64, _ error)
 
 	opts.Keyword = strings.ToLower(opts.Keyword)
 
-	if opts.PageSize <= 0 || opts.PageSize > setting.UI.ExplorePagingNum {
-		opts.PageSize = setting.UI.ExplorePagingNum
+	if opts.PageSize <= 0 || opts.PageSize > setting.UI.User.PostPagingNum {
+		opts.PageSize = setting.UI.User.PostPagingNum
 	}
 	if opts.Page <= 0 {
 		opts.Page = 1
@@ -150,7 +150,7 @@ func SearchPostByName(opts *SearchPostOptions) (posts []*Post, _ int64, _ error)
 }
 
 func countPosts(e Engine) int64 {
-	count, _ := e.Where("type=0").Count(new(Post))
+	count, _ := e.Where("post_type=0").Count(new(Post))
 	return count
 }
 
@@ -162,7 +162,7 @@ func CountPosts() int64 {
 // Posts returns number of posts in given page.
 func Posts(page, pageSize int) ([]*Post, error) {
 	posts := make([]*Post, 0, pageSize)
-	return posts, x.Limit(pageSize, (page-1)*pageSize).Where("post_type=0").Asc("id").Find(&posts)
+	return posts, x.Limit(pageSize, (page-1)*pageSize).Where("post_type=0").Desc("id").Find(&posts)
 }
 
 func getRawPostByID(e Engine, id int64) (*Post, error) {

@@ -14,82 +14,53 @@
 	<div class="container-fluid">
 		<div class="animated fadeIn">
 			<div class="row">
-				<div class="col-lg-12">
-          <div class="card">
-            <div class="card-body">
-							<table class="table table-responsive-sm table-bordered table-striped table-sm">
-								<thead>
-									<tr>
-										<th>创作ID</th>
-										<th>标题</th>
-										<th>上传日期</th>
-										<th>更新日期</th>
-									</tr>
-								</thead>
-								<tbody>
-									{{range .Posts}}
-									<tr>
-										<td>{{ .ID}}</td>
-										<td>{{ .Title}}</td>
-										<td><span title="{{DateFmtLong .Created}}">{{DateFmtShort .Created }}</span></td>
-										<td><span title="{{DateFmtLong .Updated}}">{{DateFmtShort .Updated }}</span></td>
-									</tr>
-									{{end}}
-								</tbody>
-							</table>
-							<ul class="pagination justify-content-center">
-								<li class="page-item">
-									<a class="page-link" href="#">Prev</a>
-								</li>
-								<li class="page-item active">
-									<a class="page-link" href="#">1</a>
-								</li>
-								<li class="page-item">
-									<a class="page-link" href="#">2</a>
-								</li>
-								<li class="page-item">
-									<a class="page-link" href="#">3</a>
-								</li>
-								<li class="page-item">
-									<a class="page-link" href="#">4</a>
-								</li>
-								<li class="page-item">
-									<a class="page-link" href="#">Next</a>
-								</li>
-							</ul>
-							{{with .Page}}
-							  {{if gt .TotalPages 1}}
-							<ul class="pagination justify-content-center">
-								<li class="page-item">
-									<a class="page-link" href="#">Prev</a>
-								</li>
-								<li class="page-item active">
-									<a class="page-link" href="#">1</a>
-								</li>
-								<li class="page-item">
-									<a class="page-link" href="#">2</a>
-								</li>
-								<li class="page-item">
-									<a class="page-link" href="#">3</a>
-								</li>
-								<li class="page-item">
-									<a class="page-link" href="#">4</a>
-								</li>
-								<li class="page-item">
-									<a class="page-link" href="#">Next</a>
-								</li>
-							</ul>
-							  {{end}}
-							{{end}}
+				{{range .Posts}}
+				<div class="col-md-3">
+					<div class="card">
+						<img class="card-img-top" src="img/test.jpg" alt="card image cap">
+						<div class="card-body">
+							<h6 class="card-title">{{ .Title}}</h6>
+							<p class="card-text">{{ .AuthorID}}</p>
 						</div>
 					</div>
 				</div>
-				<!-- /.col-->
-				<!-- /.row-->
+				{{end}}
 			</div>
-		</div>
-	</main>
 
+			{{with .Page}}
+			{{if gt .TotalPages 1}}
+			<div class="row">
+				<ul class="pagination align-items-center">
+					<li class="page-item {{if .IsFirst}}disabled{{end}}">
+						<a class="page-link" href="{{$.Link}}?q={{$.Keyword}}">首页</a>
+					</li>
+					<li class="page-item {{if not .HasPrevious}}disabled{{end}}">
+						<a class="page-link" href="{{$.Link}}?page={{.Previous}}&q={{$.Keyword}}"><i class="fa fa-backward"></i></a>
+					</li>
+					{{ range .Pages}}
+						{{if eq .Num -1}}
+						<li class="page-item disabled"> ...
+						</li>
+						{{else}}
+						<li class="page-item {{if .IsCurrent}}active{{end}}">
+							<a class="page-link" {{if not .IsCurrent}}href="{{$.Link}}?page={{.Num}}&q={{$.Keyword}}"{{end}}>{{.Num}}</a>
+						</li>
+						{{end}}
+					{{end}}
+					<li class="page-item {{if not .HasNext}}disabled{{end}}">
+						<a class="page-link" href="{{$.Link}}?page={{.Next}}&q={{$.Keyword}}"><i class="fa fa-forward"></i></a>
+					</li>
+					<li class="page-item {{if .IsLast}}disabled{{end}}">
+						<a class="page-link" href="{{$.Link}}?page={{.TotalPages}}&q={{$.Keyword}}">末页</a>
+					</li>
+				</ul>
+			</div>
+			{{end}}
+			{{end}}
+
+
+		</div>
+	</div>
 </main>
 
 {{template "base/footer" .}}
