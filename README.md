@@ -3,7 +3,6 @@
 # Code Directory Structure
 
 <pre>
-
 .
 ├── app
 │   ├── controllers     控制器
@@ -15,9 +14,11 @@
 ├── docs
 ├── log                 应用日志目录
 ├── public
-│   ├── assets
 │   ├── css
-│   └── img
+│   ├── img
+│   ├── js
+│   ├── node_modules
+│   └── vendors
 ├── setting             程序配置处理包
 └── util                程序工具包
     └── runtime
