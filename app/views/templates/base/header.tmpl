@@ -79,9 +79,10 @@
 				</a>
 				<div class="dropdown-menu dropdown-menu-right">
 					<div class="dropdown-header text-center">
-						<strong>{{.LoggedUserName}}</strong>
+					  <div>{{.LoggedUser.DisplayName}}</div>
+						<div><strong><span>@{{.LoggedUserName}}</span></strong></div>
 					</div>
-					<a class="dropdown-item" href="#">
+					<a class="dropdown-item" href="pix">
 						<i class="fa fa-file-image-o"></i> 我的创作
 						<span class="badge badge-info">开发中</span>
 					</a>
@@ -102,7 +103,7 @@
 						<span class="badge badge-warning">开发中</span>
 					</a>
 					<div class="dropdown-header text-center">
-						<strong>Settings</strong>
+						<strong>设置</strong>
 					</div>
 					<a class="dropdown-item" href="/user/{{.LoggedUserName}}">
 						<i class="fa fa-user"></i> 我的资料</a>

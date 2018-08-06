@@ -125,3 +125,23 @@ func IsErrLoginSourceInUse(err error) bool {
 func (err ErrLoginSourceInUse) Error() string {
 	return fmt.Sprintf("login source is still used by some users [id: %d]", err.ID)
 }
+
+// __________               __
+// \______   \____  _______/  |_
+//  |     ___/  _ \/  ___/\   __\
+//  |    |  (  <_> )___ \  |  |
+//  |____|   \____/____  > |__|
+//                     \/
+
+type ErrPostNotExist struct {
+	ID string
+}
+
+func IsErrPostNotExist(err error) bool {
+	_, ok := err.(ErrPostNotExist)
+	return ok
+}
+
+func (err ErrPostNotExist) Error() string {
+	return fmt.Sprintf("post does not exist [id: %s]", err.ID)
+}

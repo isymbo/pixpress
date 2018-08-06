@@ -165,3 +165,68 @@ func NotFound(c *context.Context) {
 	c.Data["Title"] = "Page Not Found"
 	c.NotFound()
 }
+
+type PostSearchOptions struct {
+	Type     models.PostType
+	Counter  func() int64
+	Ranger   func(int, int) ([]*models.Post, error)
+	PageSize int
+	OrderBy  string
+	TplName  string
+}
+
+func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
+	page := c.QueryInt("page")
+	if page <= 1 {
+		page = 1
+	}
+
+	var (
+		posts []*models.Post
+		count int64
+		err   error
+	)
+
+	keyword := c.Query("q")
+	if len(keyword) == 0 {
+		posts, err = opts.Ranger(page, opts.PageSize)
+		if err != nil {
+			c.ServerError("Ranger", err)
+			return
+		}
+		count = opts.Counter()
+	} else {
+		posts, count, err = models.SearchPostByName(&models.SearchPostOptions{
+			Keyword:  keyword,
+			Type:     opts.Type,
+			OrderBy:  opts.OrderBy,
+			Page:     page,
+			PageSize: opts.PageSize,
+		})
+		if err != nil {
+			c.ServerError("SearchPostByName", err)
+			return
+		}
+	}
+	c.Data["Keyword"] = keyword
+	c.Data["Total"] = count
+	c.Data["Page"] = paginater.New(int(count), opts.PageSize, page, 5)
+	c.Data["Posts"] = posts
+
+	c.Success(opts.TplName)
+}
+
+// func ExplorePixes(c *context.Context) {
+// 	c.Data["Title"] = "作品列表"
+// 	c.Data["PageIsExplore"] = true
+// 	c.Data["PageIsExplorePixes"] = true
+
+// 	RenderPostSearch(c, &PostSearchOptions{
+// 		Type:     models.POST_TYPE_PIX,
+// 		Counter:  models.CountPixes,
+// 		Ranger:   models.Pixes,
+// 		PageSize: setting.UI.ExplorePagingNum,
+// 		OrderBy:  "updated_unix DESC",
+// 		TplName:  EXPLORE_PIXES,
+// 	})
+// }

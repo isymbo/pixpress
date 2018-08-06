@@ -45,12 +45,12 @@
 							<div class="card-body was-validated">
 								<div class="form-group row">
 									<div class="col-sm-12">
-										<input class="form-control is-invalid" type="text" name="Title" placeholder="请输入作品名称" required="">
+										<input class="form-control is-invalid" type="text" name="Title" placeholder="请输入作品名称" required="" value="{{.title}}">
 									</div>
 								</div>
 								<div class="form-group row">
 									<div class="col-md-12">
-										<textarea class="form-control is-invalid" name="Content" rows="12" placeholder="作品说明" required=""></textarea>
+										<textarea class="form-control is-invalid" name="Content" rows="12" placeholder="作品说明" required="">{{.content}}</textarea>
 									</div>
 								</div>
 							</div>
@@ -78,10 +78,10 @@
 								<div class="row align-items-center">
 										<div class="col-md-6 text-center">
 											<button class="btn btn-primary btn-block" type="submit">
-												<i class="fa fa-dot-circle-o"></i> 发布</button>
+												<i class="fa fa-dot-circle-o"></i> 保存</button>
 										</div>
 										<div class="col-md-6 text-center">
-											<button class="btn btn-danger btn-block" type="reset">
+											<button class="btn btn-warning btn-block" type="reset">
 												<i class="fa fa-ban"></i> 重置</button>
 										</div>
 								</div>

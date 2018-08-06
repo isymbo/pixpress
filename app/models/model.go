@@ -51,7 +51,7 @@ var (
 
 func init() {
 	tables = append(tables,
-		new(User), new(LoginSource))
+		new(User), new(LoginSource), new(Post))
 
 	gonicNames := []string{"SSL"}
 	for _, name := range gonicNames {

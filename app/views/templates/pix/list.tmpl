@@ -4,10 +4,10 @@
 	<!-- Breadcrumb-->
 	<ol class="breadcrumb">
 		<li class="breadcrumb-item">
-		  <a href="admin/">管理</a>
+		  <a href="user/home">我的</a>
 		</li>
 		<li class="breadcrumb-item active" aria-current="page">
-			用户列表
+			创作
 		</li>
 	</ol>
 
@@ -15,32 +15,24 @@
 		<div class="animated fadeIn">
 			<div class="row">
 				<div class="col-lg-12">
-
           <div class="card">
-
             <div class="card-body">
 							<table class="table table-responsive-sm table-bordered table-striped table-sm">
 								<thead>
 									<tr>
-										<th>用户ID</th>
-										<th>用户名</th>
-										<th>中文名</th>
-										<th>注册日期</th>
-										<th>管理员状态</th>
-										<th>激活状态</th>
-										<th>允许登录</th>
+										<th>创作ID</th>
+										<th>标题</th>
+										<th>上传日期</th>
+										<th>更新日期</th>
 									</tr>
 								</thead>
 								<tbody>
-									{{range .Users}}
+									{{range .Posts}}
 									<tr>
 										<td>{{ .ID}}</td>
-										<td>{{ .LoginName}}</td>
-										<td>{{ .DisplayName}}</td>
+										<td>{{ .Title}}</td>
 										<td><span title="{{DateFmtLong .Created}}">{{DateFmtShort .Created }}</span></td>
-										<td><i class="fa fa{{if .IsAdmin}}-check{{end}}-square-o"></i></td>
-										<td><i class="fa fa{{if .IsActive}}-check{{end}}-square-o"></i></td>
-										<td><i class="fa fa{{if not .ProhibitLogin}}-check{{end}}-square-o"></i></td>
+										<td><span title="{{DateFmtLong .Updated}}">{{DateFmtShort .Updated }}</span></td>
 									</tr>
 									{{end}}
 								</tbody>
@@ -90,9 +82,7 @@
 							  {{end}}
 							{{end}}
 						</div>
-
 					</div>
-
 				</div>
 				<!-- /.col-->
 				<!-- /.row-->
