@@ -21,11 +21,13 @@
 						<div class="card-body">
 							<h6 class="card-title">{{ .Title}}</h6>
 							<p class="card-text">{{ .AuthorID}}</p>
+							<p class="card-text">{{ .Author.DisplayName}}</p>
 						</div>
 					</div>
 				</div>
 				{{end}}
 			</div>
+
 
 			<div class="row">
 				{{with .Page}}
@@ -33,7 +35,7 @@
 				<div class="col-md-12">
 					<ul class="pagination justify-content-center">
 						<li class="page-item {{if .IsFirst}}disabled{{end}}">
-							<a class="page-link" href="{{$.Link}}?q={{$.Keyword}}">首页</a>
+							<a class="page-link" href="{{$.Link}}?q={{$.Keyword}}"><i class="fa fa-fast-backward"></i> 首页</a>
 						</li>
 						<li class="page-item {{if not .HasPrevious}}disabled{{end}}">
 							<a class="page-link" href="{{$.Link}}?page={{.Previous}}&q={{$.Keyword}}"><i class="fa fa-backward"></i></a>
@@ -52,7 +54,7 @@
 							<a class="page-link" href="{{$.Link}}?page={{.Next}}&q={{$.Keyword}}"><i class="fa fa-forward"></i></a>
 						</li>
 						<li class="page-item {{if .IsLast}}disabled{{end}}">
-							<a class="page-link" href="{{$.Link}}?page={{.TotalPages}}&q={{$.Keyword}}">末页</a>
+							<a class="page-link" href="{{$.Link}}?page={{.TotalPages}}&q={{$.Keyword}}">末页 <i class="fa fa-fast-forward"></i></a>
 						</li>
 					</ul>
 				</div>

@@ -208,6 +208,12 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 			return
 		}
 	}
+
+	for _, p := range posts {
+		u, _ := models.GetUserByID(p.AuthorID)
+		p.Author = u
+	}
+
 	c.Data["Keyword"] = keyword
 	c.Data["Total"] = count
 	c.Data["Page"] = paginater.New(int(count), opts.PageSize, page, 5)
