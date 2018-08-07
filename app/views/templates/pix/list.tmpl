@@ -14,13 +14,15 @@
 	<div class="container-fluid">
 		<div class="animated fadeIn">
 			<div class="row">
+			  {{$Link := .Link}}
 				{{range .Posts}}
 				<div class="col-md-3">
 					<div class="card">
-						<img class="card-img-top" src="img/test.jpg" alt="card image cap">
+						<a href="{{ $Link}}/{{ .ID}}">
+							<img class="card-img-top" src="img/test.jpg" alt="card image cap">
+						</a>
 						<div class="card-body">
 							<h6 class="card-title">{{ .Title}}</h6>
-							<p class="card-text">{{ .AuthorID}}</p>
 							<p class="card-text">{{ .Author.DisplayName}}</p>
 						</div>
 					</div>
