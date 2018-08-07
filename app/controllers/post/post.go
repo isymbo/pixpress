@@ -50,7 +50,7 @@ func NewPix(c *context.Context) {
 }
 
 func EditPix(c *context.Context) {
-	c.Data["Title"] = "作品列表"
+	c.Data["Title"] = "作品信息"
 	c.Data["PageIsPixes"] = true
 	c.Data["PageIsEditPix"] = true
 
@@ -71,7 +71,7 @@ func EditPix(c *context.Context) {
 }
 
 func EditPixPost(c *context.Context, f Post) {
-	c.Data["Title"] = "作品列表"
+	c.Data["Title"] = "作品信息"
 	c.Data["PageIsPixes"] = true
 	c.Data["PageIsEditPixPost"] = true
 

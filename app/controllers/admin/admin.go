@@ -66,11 +66,16 @@ func InitRoutes(m *macaron.Macaron) {
 		// m.Post("/config/test_mail", admin.SendTestMail)
 		// m.Get("/monitor", admin.Monitor)
 
-		m.Group("/users", func() {
+		m.Group("/user", func() {
 			m.Get("", context.AdminReq, Users)
 			// m.Combo("/new").Get(admin.NewUser).Post(bindIgnErr(form.AdminCrateUser{}), admin.NewUserPost)
 			// m.Combo("/:userid").Get(admin.EditUser).Post(bindIgnErr(form.AdminEditUser{}), admin.EditUserPost)
 			// m.Post("/:userid/delete", admin.DeleteUser)
+		})
+
+		m.Group("/pix", func() {
+			m.Get("", context.AdminReq, Pixes)
+			m.Get("/:pixid", context.AdminReq, ShowPix)
 		})
 	})
 }
