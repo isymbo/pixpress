@@ -27,36 +27,38 @@
 				{{end}}
 			</div>
 
-			{{with .Page}}
-			{{if gt .TotalPages 1}}
 			<div class="row">
-				<ul class="pagination align-items-center">
-					<li class="page-item {{if .IsFirst}}disabled{{end}}">
-						<a class="page-link" href="{{$.Link}}?q={{$.Keyword}}">首页</a>
-					</li>
-					<li class="page-item {{if not .HasPrevious}}disabled{{end}}">
-						<a class="page-link" href="{{$.Link}}?page={{.Previous}}&q={{$.Keyword}}"><i class="fa fa-backward"></i></a>
-					</li>
-					{{ range .Pages}}
-						{{if eq .Num -1}}
-						<li class="page-item disabled"> ...
+				{{with .Page}}
+				{{if gt .TotalPages 1}}
+				<div class="col-md-12">
+					<ul class="pagination justify-content-center">
+						<li class="page-item {{if .IsFirst}}disabled{{end}}">
+							<a class="page-link" href="{{$.Link}}?q={{$.Keyword}}">首页</a>
 						</li>
-						{{else}}
-						<li class="page-item {{if .IsCurrent}}active{{end}}">
-							<a class="page-link" {{if not .IsCurrent}}href="{{$.Link}}?page={{.Num}}&q={{$.Keyword}}"{{end}}>{{.Num}}</a>
+						<li class="page-item {{if not .HasPrevious}}disabled{{end}}">
+							<a class="page-link" href="{{$.Link}}?page={{.Previous}}&q={{$.Keyword}}"><i class="fa fa-backward"></i></a>
 						</li>
+						{{ range .Pages}}
+							{{if eq .Num -1}}
+							<li class="page-item disabled"> ...
+							</li>
+							{{else}}
+							<li class="page-item {{if .IsCurrent}}active{{end}}">
+								<a class="page-link" {{if not .IsCurrent}}href="{{$.Link}}?page={{.Num}}&q={{$.Keyword}}"{{end}}>{{.Num}}</a>
+							</li>
+							{{end}}
 						{{end}}
-					{{end}}
-					<li class="page-item {{if not .HasNext}}disabled{{end}}">
-						<a class="page-link" href="{{$.Link}}?page={{.Next}}&q={{$.Keyword}}"><i class="fa fa-forward"></i></a>
-					</li>
-					<li class="page-item {{if .IsLast}}disabled{{end}}">
-						<a class="page-link" href="{{$.Link}}?page={{.TotalPages}}&q={{$.Keyword}}">末页</a>
-					</li>
-				</ul>
+						<li class="page-item {{if not .HasNext}}disabled{{end}}">
+							<a class="page-link" href="{{$.Link}}?page={{.Next}}&q={{$.Keyword}}"><i class="fa fa-forward"></i></a>
+						</li>
+						<li class="page-item {{if .IsLast}}disabled{{end}}">
+							<a class="page-link" href="{{$.Link}}?page={{.TotalPages}}&q={{$.Keyword}}">末页</a>
+						</li>
+					</ul>
+				</div>
+				{{end}}
+				{{end}}
 			</div>
-			{{end}}
-			{{end}}
 
 
 		</div>
