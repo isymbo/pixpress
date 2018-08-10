@@ -164,10 +164,10 @@ func DeletePix(c *context.Context) {
 	c.SubURLRedirect(PIXHOME)
 }
 
-func renderAttachmentSettings(c *context.Context) {
-	c.Data["RequireDropzone"] = true
-	c.Data["IsAttachmentEnabled"] = setting.Attachment.Enabled
-	c.Data["AttachmentAllowedTypes"] = setting.Attachment.AllowedTypes
-	c.Data["AttachmentMaxSize"] = setting.Attachment.MaxSize
-	c.Data["AttachmentMaxFiles"] = setting.Attachment.MaxFiles
-}
+// func renderAttachmentSettings(c *context.Context) {
+// 	c.Data["RequireDropzone"] = true
+// 	c.Data["IsAttachmentEnabled"] = setting.Attachment.Enabled
+// 	c.Data["AttachmentAllowedTypes"] = setting.Attachment.AllowedTypes
+// 	c.Data["AttachmentMaxSize"] = setting.Attachment.MaxSize
+// 	c.Data["AttachmentMaxFiles"] = setting.Attachment.MaxFiles
+// }
