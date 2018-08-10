@@ -6,9 +6,8 @@ import (
 )
 
 type CreatePost struct {
-	Title   string `binding:"Required;MaxSize(100)"`
-	Content string `binding:"Required;MaxSize(255)"`
-	// Content string `binding:"Required;MaxSize( 1 << 16 - 4)"`
+	Title   string `form:"Title" binding:"Required;MaxSize(100)"`
+	Content string `binding:"Required;MaxSize( 1 << 16 - 4)"`
 }
 
 func (f *CreatePost) Validate(ctx *macaron.Context, errs binding.Errors) binding.Errors {

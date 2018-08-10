@@ -1,20 +1,32 @@
 {{if .Flash.ErrorMsg}}
-	<div class="alert alert-danger" role="alert">
-		<p>{{.Flash.ErrorMsg | Str2html}}</p>
+	<div class="alert alert-danger alert-dismissible fade show" role="alert">
+		{{.Flash.ErrorMsg | Str2html}}
+		<button class="close" type="button" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">×</span>
+		</button>
 	</div>
 {{end}}
 {{if .Flash.WarningMsg}}
-	<div class="alert alert-warning" role="alert">
-		<p>{{.Flash.WarningMsg | Str2html}}</p>
+	<div class="alert alert-warning alert-dismissible fade show" role="alert">
+		{{.Flash.WarningMsg | Str2html}}
+		<button class="close" type="button" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">×</span>
+		</button>
 	</div>
 {{end}}
 {{if .Flash.SuccessMsg}}
-	<div class="alert alert-success" role="alert">
-		<p>{{.Flash.SuccessMsg | Str2html}}</p>
+	<div class="alert alert-success alert-dismissible fade show" role="alert">
+		{{.Flash.SuccessMsg | Str2html}}
+		<button class="close" type="button" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">×</span>
+		</button>
 	</div>
 {{end}}
 {{if .Flash.InfoMsg}}
-	<div class="alert alert-info" role="alert">
-		<p>{{.Flash.InfoMsg | Str2html}}</p>
+	<div class="alert alert-info alert-dismissible fade show" role="alert">
+		{{.Flash.InfoMsg | Str2html}}
+		<button class="close" type="button" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">×</span>
+		</button>
 	</div>
 {{end}}

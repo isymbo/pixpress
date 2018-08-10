@@ -5,6 +5,7 @@ import (
 	"gopkg.in/macaron.v1"
 
 	"github.com/isymbo/pixpress/app/controllers/context"
+	"github.com/isymbo/pixpress/app/controllers/form"
 	"github.com/isymbo/pixpress/app/controllers/routes"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
@@ -18,26 +19,20 @@ const (
 	PIXHOME   = "/pix"
 )
 
-type Post struct {
-	Title    string `form:"Title" binding:"Required"`
-	Content  string `form:"Content" binding:"Required"`
-	CoverImg string
-}
-
 func InitRoutes(m *macaron.Macaron) {
 
 	reqSignIn := context.ReqSignIn
-	// bindIgnErr := binding.BindIgnErr
+	bindIgnErr := binding.BindIgnErr
 
 	m.Group("/pix", func() {
 		m.Get("", reqSignIn, ListPix)
 		m.Combo("/:pixid").
 			Get(reqSignIn, EditPix).
-			Post(binding.Bind(Post{}), EditPixPost)
+			Post(bindIgnErr(form.CreatePost{}), EditPixPost)
 		m.Get("/:pixid/delete", reqSignIn, DeletePix)
 		m.Combo("/new").
 			Get(reqSignIn, NewPix).
-			Post(binding.Bind(Post{}), NewPixPost)
+			Post(bindIgnErr(form.CreatePost{}), NewPixPost)
 	})
 }
 
@@ -45,6 +40,11 @@ func NewPix(c *context.Context) {
 	c.Data["Title"] = "新建作品"
 	c.Data["PageIsPixes"] = true
 	c.Data["PageIsNewPix"] = true
+	renderAttachmentSettings(c)
+
+	if c.Written() {
+		return
+	}
 
 	c.Success(PIXNEW)
 }
@@ -53,6 +53,7 @@ func EditPix(c *context.Context) {
 	c.Data["Title"] = "作品信息"
 	c.Data["PageIsPixes"] = true
 	c.Data["PageIsEditPix"] = true
+	renderAttachmentSettings(c)
 
 	post, err := models.GetPostByID(c.ParamsInt64(":pixid"))
 	if err != nil {
@@ -70,12 +71,13 @@ func EditPix(c *context.Context) {
 	c.Success(PIXEDIT)
 }
 
-func EditPixPost(c *context.Context, f Post) {
+func EditPixPost(c *context.Context, f form.CreatePost) {
 	c.Data["Title"] = "作品信息"
 	c.Data["PageIsPixes"] = true
 	c.Data["PageIsEditPixPost"] = true
 
 	if c.HasError() {
+		c.Flash.Error(c.Data["ErrorMsg"].(string))
 		c.HTML(200, PIXEDIT)
 		return
 	}
@@ -103,6 +105,7 @@ func EditPixPost(c *context.Context, f Post) {
 
 func ListPix(c *context.Context) {
 	c.Data["Title"] = "作品列表"
+	c.Data["PageIsPixes"] = true
 	c.Data["PageIsListPix"] = true
 
 	routes.RenderPostSearch(c, &routes.PostSearchOptions{
@@ -115,7 +118,17 @@ func ListPix(c *context.Context) {
 	})
 }
 
-func NewPixPost(c *context.Context, f Post) {
+func NewPixPost(c *context.Context, f form.CreatePost) {
+	c.Data["Title"] = "新建作品"
+	c.Data["PageIsPixes"] = true
+	c.Data["PageIsNewPix"] = true
+	renderAttachmentSettings(c)
+
+	if c.HasError() {
+		c.Success(PIXNEW)
+		return
+	}
+
 	post := &models.Post{
 		AuthorID: c.User.ID,
 		Author:   c.User,
@@ -149,4 +162,12 @@ func DeletePix(c *context.Context) {
 	}
 
 	c.SubURLRedirect(PIXHOME)
+}
+
+func renderAttachmentSettings(c *context.Context) {
+	c.Data["RequireDropzone"] = true
+	c.Data["IsAttachmentEnabled"] = setting.Attachment.Enabled
+	c.Data["AttachmentAllowedTypes"] = setting.Attachment.AllowedTypes
+	c.Data["AttachmentMaxSize"] = setting.Attachment.MaxSize
+	c.Data["AttachmentMaxFiles"] = setting.Attachment.MaxFiles
 }
