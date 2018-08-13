@@ -51,6 +51,7 @@ build_docker_binary_job:
 
     # special for templates directory, use app/
     - mkdir -p $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/app/views
+    - rm -rf $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/app/views/templates
     - mv -f $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/templates $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/app/views
   stage: binary_build
   only:
