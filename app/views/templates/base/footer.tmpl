@@ -35,5 +35,11 @@
 	<script type="text/javascript" src="{{AppSubURL}}/node_modules/@coreui/coreui-plugin-chartjs-custom-tooltips/dist/js/custom-tooltips.min.js"></script>
 	<script type="text/javascript" src="{{AppSubURL}}/js/main.js"></script>
 
+	{{if .RequireDropzone}}
+		<link rel="stylesheet" href="{{AppSubURL}}/plugins/dropzone-5.5.0/dist/dropzone.css">
+		<script src="{{AppSubURL}}/plugins/dropzone-5.5.0/dist/dropzone.js"></script>
+	{{end}}
+	<script src="{{AppSubURL}}/plugins/clipboard.js-2.0.1/dist/clipboard.min.js"></script>
+
 </body>
 </html>
