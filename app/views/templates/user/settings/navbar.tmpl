@@ -1,0 +1,23 @@
+<div class="col-sm-12 col-md-2">
+	<div class="card">
+		<div class="card-header">
+			<i class="fa fa-align-justify"></i> 设置
+		</div>
+		<div class="card-body">
+			<nav class="nav nav-pills nav-fill flex-column">
+				<a class="{{if .PageIsSettingsProfile}}active{{end}} nav-link" href="{{AppSubURL}}/user/settings">
+					驻地信息
+				</a>
+				<a class="{{if .PageIsSettingsAvatar}}active{{end}} nav-link" href="{{AppSubURL}}/user/settings/avatar">
+					头像
+				</a>
+				<a class="{{if .PageIsSettingsOrganizations}}active{{end}} nav-link" href="{{AppSubURL}}/user/settings/organizations">
+					群组
+				</a>
+				<a class="{{if .PageIsSettingsDelete}}active{{end}} nav-link disabled" href="{{AppSubURL}}/user/settings/delete">
+					删除
+				</a>
+			</nav>
+		</div>
+	</div>
+</div>

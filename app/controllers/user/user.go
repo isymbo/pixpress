@@ -17,10 +17,11 @@ import (
 )
 
 const (
-	LOGIN   = "user/login"
-	LOGOUT  = "user/logout"
-	HOME    = "user/home"
-	PROFILE = "user/profile"
+	LOGIN           = "user/login"
+	LOGOUT          = "user/logout"
+	HOME            = "user/home"
+	PROFILE         = "user/profile"
+	SETTINGS_AVATAR = "user/settings/avatar"
 )
 
 type User struct {
@@ -45,6 +46,10 @@ func InitRoutes(m *macaron.Macaron) {
 		//m.Get("/logout", reqSignIn, Signout)
 		m.Get("/logout", Signout)
 		m.Get("/home", reqSignIn, Home)
+	})
+
+	m.Group("/user/settings", func() {
+		m.Get("", Settings)
 	})
 
 	// m.Group("/user", func() {
