@@ -1,5 +1,5 @@
-hash: 86f69354ba3de657aa07a764fdfe687b3242c2c2c90db4450c5dbc968658e540
-updated: 2018-08-14T12:11:11.289733+08:00
+hash: c482f49fd3dd9bc3c27175e50dd16105900b0c8559cabe11b1f0e9c79ddc3ed9
+updated: 2018-08-16T11:46:32.153012+08:00
 imports:
 - name: cloud.google.com/go
   version: c23afc06f11560eb1e93425b849aee2581c6dcfa
@@ -35,6 +35,8 @@ imports:
   version: f16ce722ec150ade2c2e5a08a6fed64706c79465
 - name: github.com/hokaccha/go-prettyjson
   version: d229c224a219dcf41e9d2af4684b9782f33f5eb7
+- name: github.com/issue9/identicon
+  version: 8429c510bf36001982acd5a284a3304fe8a18f77
 - name: github.com/json-iterator/go
   version: ab8a2e0c74be9d3be70b3184d9acc634935ded82
 - name: github.com/klauspost/compress

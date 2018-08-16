@@ -10,3 +10,4 @@ import:
 - package: gopkg.in/macaron.v1
 - package: github.com/Unknwon/paginater
 - package: github.com/nfnt/resize
+- package: github.com/issue9/identicon
