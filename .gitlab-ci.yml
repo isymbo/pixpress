@@ -38,9 +38,9 @@ build_docker_binary_job:
 
     - if [ -d /builds/$GLIDE_VENDOR_DIR ]; then cp -pr /builds/$GLIDE_VENDOR_DIR .; fi
     # only run glide install when needed
-    - if [ ! -d /builds/$GLIDE_VENDOR_DIR ]; then glide install; fi
+    #- if [ ! -d /builds/$GLIDE_VENDOR_DIR ]; then glide install; fi
     # always run glide install
-    #- glide install
+    - glide install
     - if [ -d $GLIDE_VENDOR_DIR ]; then cp -pr $GLIDE_VENDOR_DIR /builds; fi
 
     - make build
