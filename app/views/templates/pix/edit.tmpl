@@ -19,7 +19,6 @@
   	<div class="animated fadeIn">
 			<div class="row justify-content-center">
 				<div class="col-md-8">
-					<form class="form-horizontal" action="{{.Link}}" method="post" enctype="multipart/form-data">
 						<div class="card">
 							<!-- Breadcrumb-->
 							<ol class="breadcrumb">
@@ -34,8 +33,17 @@
 										<input id="file-input" type="file" name="file-input">
 									</div>
 								</div>
+								<hr class="my-4">
+								<div class="row align-items-center">
+										<div class="col-md-4 text-center">
+											<button class="btn btn-primary btn-block" type="submit">
+												<i class="fa fa-dot-circle-o"></i> 上传</button>
+										</div>
+								</div>
 							</div>
 						</div>
+
+					<form class="form-horizontal" action="{{.Link}}" method="post" enctype="multipart/form-data">
 
 						<div class="card">
 							<!-- Breadcrumb-->

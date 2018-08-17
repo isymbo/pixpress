@@ -14,6 +14,7 @@ import (
 	log "gopkg.in/clog.v1"
 	"gopkg.in/ini.v1"
 	"gopkg.in/macaron.v1"
+	libravatar "strk.kbt.io/projects/go/libravatar"
 
 	"github.com/isymbo/pixpress/app/controllers/auth/ldap"
 	"github.com/isymbo/pixpress/util/runtime"
@@ -147,20 +148,6 @@ type LoginType struct {
 	IsActivated bool   `ini:"IS_ACTIVATED"`
 }
 
-// [ui]
-// ; Number of repositories that are showed in one explore page
-// EXPLORE_PAGING_NUM = 20
-// ; Number of issues that are showed in one page
-// ISSUE_PAGING_NUM = 10
-// ; Number of maximum commits showed in one activity feed
-// FEED_MAX_COMMIT_NUM = 5
-// ; Value of "theme-color" meta tag, used by Android >= 5.0
-// ; An invalid color like "none" or "disable" will have the default style
-// ; More info: https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android
-// THEME_COLOR_META_TAG = `#ff5343`
-// ; Max size in bytes of files to be displayed (default is 8MB)
-// MAX_DISPLAY_FILE_SIZE = 8388608
-
 // UI settings
 type UIType struct {
 	ExplorePagingNum   int    `ini:"EXPLORE_PAGING_NUM"`
@@ -182,6 +169,30 @@ type UIType struct {
 		CommitsPagingNum  int `ini:"COMMITS_PAGING_NUM"`
 		PostPagingNum     int `ini:"POST_PAGING_NUM"`
 	} `ini:"ui.user"`
+}
+
+type AvatarType struct {
+	AvatarUploadPath      string `ini:"AVATAR_UPLOAD_PATH"`
+	GravatarSource        string `ini:"GRAVATAR_SOURCE"`
+	DisableGravatar       bool   `ini:"DISABLE_GRAVATAR"`
+	EnableFederatedAvatar bool   `ini:"ENABLE_FEDERATED_AVATAR"`
+	// LibravatarService     *libravatar.Libravatar
+}
+
+type CoverType struct {
+	Enabled      bool   `ini:"ENABLED"`
+	Path         string `ini:"PATH"`
+	AllowedTypes string `ini:"ALLOWED_TYPES"`
+	MaxSize      int64  `ini:"MAX_SIZE"`
+	MaxFiles     int    `ini:"MAX_FILES"`
+}
+
+type AttachmentType struct {
+	Enabled      bool   `ini:"ENABLED"`
+	Path         string `ini:"PATH"`
+	AllowedTypes string `ini:"ALLOWED_TYPES"`
+	MaxSize      int64  `ini:"MAX_SIZE"`
+	MaxFiles     int    `ini:"MAX_FILES"`
 }
 
 type OtherType struct {
@@ -222,7 +233,8 @@ var (
 	UsePostgreSQL bool
 	UseMSSQL      bool
 
-	SessionConfig session.Options
+	SessionConfig     session.Options
+	LibravatarService *libravatar.Libravatar
 
 	Server       ServerType
 	Database     DatabaseType
@@ -241,6 +253,9 @@ var (
 	LoginModes   []LoginType
 	LoginSources []ldap.Source
 	UI           UIType
+	Avatar       AvatarType
+	Cover        CoverType
+	Attachment   AttachmentType
 	Other        OtherType
 )
 
@@ -291,6 +306,12 @@ func loadAppConfig(c *cli.Context) error {
 		log.Fatal(2, "Fail to map log.xorm settings: %s", err)
 	} else if err = Cfg.Section("ui").MapTo(&UI); err != nil {
 		log.Fatal(2, "Fail to map ui settings: %s", err)
+	} else if err = Cfg.Section("avatar").MapTo(&Avatar); err != nil {
+		log.Fatal(2, "Fail to map avatar settings: %s", err)
+	} else if err = Cfg.Section("cover").MapTo(&Cover); err != nil {
+		log.Fatal(2, "Fail to map cover settings: %s", err)
+	} else if err = Cfg.Section("attachment").MapTo(&Attachment); err != nil {
+		log.Fatal(2, "Fail to map attachment settings: %s", err)
 	} else if err = Cfg.Section("other").MapTo(&Other); err != nil {
 		log.Fatal(2, "Fail to map other settings: %s", err)
 	}

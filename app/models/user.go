@@ -1,19 +1,27 @@
 package models
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"crypto/subtle"
 	"fmt"
+	"image"
+	"image/png"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/Unknwon/com"
 	"github.com/go-xorm/xorm"
+	"github.com/nfnt/resize"
 	"golang.org/x/crypto/pbkdf2"
 	log "gopkg.in/clog.v1"
 
+	"github.com/isymbo/pixpress/app/controllers/avatar"
 	"github.com/isymbo/pixpress/app/models/errors"
 	"github.com/isymbo/pixpress/setting"
+	"github.com/isymbo/pixpress/util"
 )
 
 type UserType int
@@ -42,9 +50,32 @@ type User struct {
 	Updated     time.Time `xorm:"-" json:"-"`
 	UpdatedUnix int64
 
+	// Maximum collection creation limit, -1 means use gloabl default
+	MaxCollectionCreation int `xorm:"NOT NULL DEFAULT -1"`
+
+	// Permission
 	IsActive      bool
 	IsAdmin       bool
 	ProhibitLogin bool
+
+	// Avatar
+	//	AvatarEmail     string `xorm:"NOT NULL"`
+	Avatar          string `xorm:"VARCHAR(2048) NOT NULL"`
+	UseCustomAvatar bool
+
+	// Counters
+	NumFollowers int
+	NumFollowing int `xorm:"NOT NULL DEFAULT 0"`
+	// NumStars       int
+	NumPixes       int
+	NumCollections int
+
+	// // For user groups
+	// Description string
+	// // NumTeams    int
+	// NumMembers int
+	// // Teams       []*Team `xorm:"-" json:"-"`
+	// Members []*User `xorm:"-" json:"-"`
 }
 
 func (u *User) BeforeInsert() {
@@ -200,10 +231,10 @@ func GetUserProfile(id int64) {
 // 	return u.GenerateEmailActivateCode(u.Email)
 // }
 
-// // CustomAvatarPath returns user custom avatar file path.
-// func (u *User) CustomAvatarPath() string {
-// 	return filepath.Join(setting.AvatarUploadPath, com.ToStr(u.ID))
-// }
+// CustomAvatarPath returns user custom avatar file path.
+func (u *User) CustomAvatarPath() string {
+	return filepath.Join(setting.Avatar.AvatarUploadPath, com.ToStr(u.ID))
+}
 
 // // GenerateRandomAvatar generates a random avatar for user.
 // func (u *User) GenerateRandomAvatar() error {
@@ -233,41 +264,42 @@ func GetUserProfile(id int64) {
 // 	return nil
 // }
 
-// // RelAvatarLink returns relative avatar link to the site domain,
-// // which includes app sub-url as prefix. However, it is possible
-// // to return full URL if user enables Gravatar-like service.
-// func (u *User) RelAvatarLink() string {
-// 	defaultImgUrl := setting.AppSubURL + "/img/avatar_default.png"
-// 	if u.ID == -1 {
-// 		return defaultImgUrl
-// 	}
+// RelAvatarLink returns relative avatar link to the site domain,
+// which includes app sub-url as prefix. However, it is possible
+// to return full URL if user enables Gravatar-like service.
+func (u *User) RelAvatarLink() string {
+	defaultImgUrl := setting.AppSubURL + "/img/avatars/avatar_default.png"
+	if u.ID == -1 {
+		return defaultImgUrl
+	}
 
-// 	switch {
-// 	case u.UseCustomAvatar:
-// 		if !com.IsExist(u.CustomAvatarPath()) {
-// 			return defaultImgUrl
-// 		}
-// 		return setting.AppSubURL + "/avatars/" + com.ToStr(u.ID)
-// 	case setting.DisableGravatar, setting.OfflineMode:
-// 		if !com.IsExist(u.CustomAvatarPath()) {
-// 			if err := u.GenerateRandomAvatar(); err != nil {
-// 				log.Error(3, "GenerateRandomAvatar: %v", err)
-// 			}
-// 		}
+	switch {
+	case u.UseCustomAvatar:
+		if !com.IsExist(u.CustomAvatarPath()) {
+			return defaultImgUrl
+		}
+		return setting.AppSubURL + "/avatars/" + com.ToStr(u.ID)
+	//case setting.Avatar.DisableGravatar, setting.OfflineMode:
+	case setting.Avatar.DisableGravatar:
+		if !com.IsExist(u.CustomAvatarPath()) {
+			// if err := u.GenerateRandomAvatar(); err != nil {
+			// 	log.Error(3, "GenerateRandomAvatar: %v", err)
+			// }
+		}
 
-// 		return setting.AppSubURL + "/avatars/" + com.ToStr(u.ID)
-// 	}
-// 	return tool.AvatarLink(u.AvatarEmail)
-// }
+		return setting.AppSubURL + "/avatars/" + com.ToStr(u.ID)
+	}
+	return util.AvatarLink(u.Email)
+}
 
-// // AvatarLink returns user avatar absolute link.
-// func (u *User) AvatarLink() string {
-// 	link := u.RelAvatarLink()
-// 	if link[0] == '/' && link[1] != '/' {
-// 		return setting.AppURL + strings.TrimPrefix(link, setting.AppSubURL)[1:]
-// 	}
-// 	return link
-// }
+// AvatarLink returns user avatar absolute link.
+func (u *User) AvatarLink() string {
+	link := u.RelAvatarLink()
+	if link[0] == '/' && link[1] != '/' {
+		return setting.AppURL + strings.TrimPrefix(link, setting.AppSubURL)[1:]
+	}
+	return link
+}
 
 // // User.GetFollwoers returns range of user's followers.
 // func (u *User) GetFollowers(page int) ([]*User, error) {
@@ -319,52 +351,52 @@ func (u *User) ValidatePassword(passwd string) bool {
 	return subtle.ConstantTimeCompare([]byte(u.Passwd), []byte(newUser.Passwd)) == 1
 }
 
-// // UploadAvatar saves custom avatar for user.
-// // FIXME: split uploads to different subdirs in case we have massive users.
-// func (u *User) UploadAvatar(data []byte) error {
-// 	img, _, err := image.Decode(bytes.NewReader(data))
-// 	if err != nil {
-// 		return fmt.Errorf("Decode: %v", err)
-// 	}
+// UploadAvatar saves custom avatar for user.
+// FIXME: split uploads to different subdirs in case we have massive users.
+func (u *User) UploadAvatar(data []byte) error {
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("Decode: %v", err)
+	}
 
-// 	m := resize.Resize(avatar.AVATAR_SIZE, avatar.AVATAR_SIZE, img, resize.NearestNeighbor)
+	m := resize.Resize(avatar.AVATAR_SIZE, avatar.AVATAR_SIZE, img, resize.NearestNeighbor)
 
-// 	sess := x.NewSession()
-// 	defer sess.Close()
-// 	if err = sess.Begin(); err != nil {
-// 		return err
-// 	}
+	sess := x.NewSession()
+	defer sess.Close()
+	if err = sess.Begin(); err != nil {
+		return err
+	}
 
-// 	u.UseCustomAvatar = true
-// 	if err = updateUser(sess, u); err != nil {
-// 		return fmt.Errorf("updateUser: %v", err)
-// 	}
+	u.UseCustomAvatar = true
+	if err = updateUser(sess, u); err != nil {
+		return fmt.Errorf("updateUser: %v", err)
+	}
 
-// 	os.MkdirAll(setting.AvatarUploadPath, os.ModePerm)
-// 	fw, err := os.Create(u.CustomAvatarPath())
-// 	if err != nil {
-// 		return fmt.Errorf("Create: %v", err)
-// 	}
-// 	defer fw.Close()
+	os.MkdirAll(setting.Avatar.AvatarUploadPath, os.ModePerm)
+	fw, err := os.Create(u.CustomAvatarPath())
+	if err != nil {
+		return fmt.Errorf("Create: %v", err)
+	}
+	defer fw.Close()
 
-// 	if err = png.Encode(fw, m); err != nil {
-// 		return fmt.Errorf("Encode: %v", err)
-// 	}
+	if err = png.Encode(fw, m); err != nil {
+		return fmt.Errorf("Encode: %v", err)
+	}
 
-// 	return sess.Commit()
-// }
+	return sess.Commit()
+}
 
-// // DeleteAvatar deletes the user's custom avatar.
-// func (u *User) DeleteAvatar() error {
-// 	log.Trace("DeleteAvatar [%d]: %s", u.ID, u.CustomAvatarPath())
-// 	os.Remove(u.CustomAvatarPath())
+// DeleteAvatar deletes the user's custom avatar.
+func (u *User) DeleteAvatar() error {
+	log.Trace("DeleteAvatar [%d]: %s", u.ID, u.CustomAvatarPath())
+	os.Remove(u.CustomAvatarPath())
 
-// 	u.UseCustomAvatar = false
-// 	if err := UpdateUser(u); err != nil {
-// 		return fmt.Errorf("UpdateUser: %v", err)
-// 	}
-// 	return nil
-// }
+	u.UseCustomAvatar = false
+	if err := UpdateUser(u); err != nil {
+		return fmt.Errorf("UpdateUser: %v", err)
+	}
+	return nil
+}
 
 // // IsAdminOfRepo returns true if user has admin or higher access of repository.
 // func (u *User) IsAdminOfRepo(repo *Repository) bool {

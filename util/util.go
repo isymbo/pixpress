@@ -15,6 +15,7 @@ import (
 
 	"github.com/Unknwon/com"
 	"github.com/Unknwon/i18n"
+	log "gopkg.in/clog.v1"
 
 	"github.com/isymbo/pixpress/setting"
 )
@@ -164,23 +165,24 @@ func HashEmail(email string) string {
 // AvatarLink returns relative avatar link to the site domain by given email,
 // which includes app sub-url as prefix. However, it is possible
 // to return full URL if user enables Gravatar-like service.
-// func AvatarLink(email string) (url string) {
-// 	if setting.EnableFederatedAvatar && setting.LibravatarService != nil &&
-// 		strings.Contains(email, "@") {
-// 		var err error
-// 		url, err = setting.LibravatarService.FromEmail(email)
-// 		if err != nil {
-// 			log.Warn("AvatarLink.LibravatarService.FromEmail [%s]: %v", email, err)
-// 		}
-// 	}
-// 	if len(url) == 0 && !setting.DisableGravatar {
-// 		url = setting.GravatarSource + HashEmail(email) + "?d=identicon"
-// 	}
-// 	if len(url) == 0 {
-// 		url = setting.AppSubURL + "/img/avatar_default.png"
-// 	}
-// 	return url
-// }
+func AvatarLink(email string) (url string) {
+	if setting.Avatar.EnableFederatedAvatar && setting.LibravatarService != nil &&
+		strings.Contains(email, "@") {
+		var err error
+		url, err = setting.LibravatarService.FromEmail(email)
+		if err != nil {
+			log.Warn("AvatarLink.LibravatarService.FromEmail [%s]: %v", email, err)
+		}
+	}
+	if len(url) == 0 && !setting.Avatar.DisableGravatar {
+		url = setting.Avatar.GravatarSource + HashEmail(email) + "?d=identicon"
+	}
+	if len(url) == 0 {
+		log.Trace("####default image is called!####")
+		url = setting.AppSubURL + "/img/avatars/avatar_default.png"
+	}
+	return url
+}
 
 // AppendAvatarSize appends avatar size query parameter to the URL in the correct format.
 func AppendAvatarSize(url string, size int) string {

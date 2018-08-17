@@ -53,13 +53,13 @@ func newMacaron() *macaron.Macaron {
 		},
 	))
 
-	// m.Use(macaron.Static(
-	// 	setting.AvatarUploadPath,
-	// 	macaron.StaticOptions{
-	// 		Prefix:      "avatars",
-	// 		SkipLogging: setting.DisableRouterLog,
-	// 	},
-	// ))
+	m.Use(macaron.Static(
+		setting.Avatar.AvatarUploadPath,
+		macaron.StaticOptions{
+			Prefix:      "avatars",
+			SkipLogging: setting.Server.DisableRouterLog,
+		},
+	))
 
 	funcMap := template.NewFuncMap()
 	m.Use(macaron.Renderer(macaron.RenderOptions{

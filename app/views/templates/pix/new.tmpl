@@ -18,7 +18,8 @@
 				<div class="col-md-8">
 					{{template "base/alert" .}}
 
-					<form class="form-horizontal" action="{{.Link}}" method="post" enctype="multipart/form-data">
+
+					<form class="form-horizontal" action="{{.Link}}/cover" method="post" enctype="multipart/form-data">
 						<div class="card">
 							<!-- Breadcrumb-->
 							<ol class="breadcrumb">
@@ -30,12 +31,21 @@
 								<div class="form-group row">
 									<label class="col-md-3 col-form-label" for="file-input">上传封面图片</label>
 									<div class="col-md-9">
-										<input id="file-input" type="file" name="file-input">
+										<input id="file-input" type="file" name="CoverImg">
 									</div>
+								</div>
+								<hr class="my-4">
+								<div class="row align-items-center">
+										<div class="col-md-4 text-center">
+											<button class="btn btn-primary btn-block" type="submit">
+												<i class="fa fa-dot-circle-o"></i> 上传</button>
+										</div>
 								</div>
 							</div>
 						</div>
+					</form>
 
+					<form class="form-horizontal" action="{{.Link}}" method="post" enctype="multipart/form-data">
 						<div class="card">
 							<!-- Breadcrumb-->
 							<ol class="breadcrumb">

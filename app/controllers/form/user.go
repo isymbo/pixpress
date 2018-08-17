@@ -105,9 +105,9 @@ const (
 )
 
 type Avatar struct {
-	Source      string
-	Avatar      *multipart.FileHeader
-	Gravatar    string `binding:"OmitEmpty;Email;MaxSize(254)"`
+	Source      string                `form:"Source"`
+	Avatar      *multipart.FileHeader `form:"Avatar"`
+	Gravatar    string                `form:"Gravatar" binding:"OmitEmpty;Email;MaxSize(254)"`
 	Federavatar bool
 }
 

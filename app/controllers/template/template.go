@@ -58,15 +58,15 @@ func NewFuncMap() []template.FuncMap {
 		"LoadTimes": func(startTime time.Time) string {
 			return fmt.Sprint(time.Since(startTime).Nanoseconds()/1e6) + "ms"
 		},
-		// "AvatarLink":       tool.AvatarLink,
-		// "AppendAvatarSize": tool.AppendAvatarSize,
-		"Safe":         Safe,
-		"Sanitize":     bluemonday.UGCPolicy().Sanitize,
-		"Str2html":     Str2html,
-		"TimeSince":    util.TimeSince,
-		"RawTimeSince": util.RawTimeSince,
-		"FileSize":     util.FileSize,
-		"Subtract":     util.Subtract,
+		"AvatarLink":       util.AvatarLink,
+		"AppendAvatarSize": util.AppendAvatarSize,
+		"Safe":             Safe,
+		"Sanitize":         bluemonday.UGCPolicy().Sanitize,
+		"Str2html":         Str2html,
+		"TimeSince":        util.TimeSince,
+		"RawTimeSince":     util.RawTimeSince,
+		"FileSize":         util.FileSize,
+		"Subtract":         util.Subtract,
 		"Add": func(a, b int) int {
 			return a + b
 		},

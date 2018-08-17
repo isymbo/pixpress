@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/go-macaron/binding"
+	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 
-	"github.com/go-macaron/binding"
-	// ldap "github.com/jtblin/go-ldap-client"
-	log "gopkg.in/clog.v1"
-
 	"github.com/isymbo/pixpress/app/controllers/context"
+	"github.com/isymbo/pixpress/app/controllers/form"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/app/models/errors"
 	"github.com/isymbo/pixpress/setting"
@@ -49,7 +48,12 @@ func InitRoutes(m *macaron.Macaron) {
 	})
 
 	m.Group("/user/settings", func() {
-		m.Get("", Settings)
+		m.Combo("").
+			Get(reqSignIn, Settings).
+			Post(bindIgnErr(form.Avatar{}), SettingsAvatarPost)
+		m.Combo("/avatar").
+			Get(reqSignIn, SettingsAvatar).
+			Post(bindIgnErr(form.Avatar{}), SettingsAvatarPost)
 	})
 
 	// m.Group("/user", func() {

@@ -67,6 +67,15 @@ func showConfig(c *cli.Context) error {
 	ui, _ := prettyjson.Marshal(setting.UI)
 	fmt.Printf("UI:\n%+v\n", string(ui))
 
+	avatar, _ := prettyjson.Marshal(setting.Avatar)
+	fmt.Printf("Avatar:\n%+v\n", string(avatar))
+
+	cover, _ := prettyjson.Marshal(setting.Cover)
+	fmt.Printf("Cover:\n%+v\n", string(cover))
+
+	attachment, _ := prettyjson.Marshal(setting.Attachment)
+	fmt.Printf("Attachment:\n%+v\n", string(attachment))
+
 	other, _ := prettyjson.Marshal(setting.Other)
 	fmt.Printf("Other:\n%+v\n", string(other))
 

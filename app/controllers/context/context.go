@@ -34,7 +34,7 @@ type Context struct {
 	IsLogged bool
 	// IsBasicAuth bool
 
-	// Repo *Repository
+	Post *Post
 	// Org  *Organization
 }
 
@@ -208,6 +208,9 @@ func Contexter() macaron.Handler {
 			Flash:   f,
 			Session: sess,
 			Link:    setting.AppSubURL + strings.TrimSuffix(ctx.Req.URL.Path, "/"),
+			Post: &Post{
+				Post: &models.Post{},
+			},
 		}
 		// 	return func(ctx *macaron.Context, l i18n.Locale, cache cache.Cache, sess session.Store, f *session.Flash, x csrf.CSRF) {
 		// 		c := &Context{
@@ -292,13 +295,13 @@ func Contexter() macaron.Handler {
 			log.Trace("User is not logged in yet.")
 		}
 
-		// // If request sends files, parse them here otherwise the Query() can't be parsed and the CsrfToken will be invalid.
-		// if c.Req.Method == "POST" && strings.Contains(c.Req.Header.Get("Content-Type"), "multipart/form-data") {
-		// 	if err := c.Req.ParseMultipartForm(setting.AttachmentMaxSize << 20); err != nil && !strings.Contains(err.Error(), "EOF") { // 32MB max size
-		// 		c.Handle(500, "ParseMultipartForm", err)
-		// 		return
-		// 	}
-		// }
+		// If request sends files, parse them here otherwise the Query() can't be parsed and the CsrfToken will be invalid.
+		if c.Req.Method == "POST" && strings.Contains(c.Req.Header.Get("Content-Type"), "multipart/form-data") {
+			if err := c.Req.ParseMultipartForm(setting.Attachment.MaxSize << 20); err != nil && !strings.Contains(err.Error(), "EOF") { // 32MB max size
+				c.Handle(500, "ParseMultipartForm", err)
+				return
+			}
+		}
 
 		c.Data["CSRFToken"] = x.GetToken()
 		c.Data["CSRFTokenHTML"] = template.HTML(`<input type="hidden" name="_csrf" value="` + x.GetToken() + `">`)
