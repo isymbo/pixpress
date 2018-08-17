@@ -11,16 +11,18 @@
 ├── cmd                 命令行处理
 ├── config              程序配置
 │   └── auth.d          auth配置
+├── data                应用生成数据
 ├── docs
-├── log                 应用日志目录
+├── log                 应用日志
 ├── public
 │   ├── css
 │   ├── img
 │   ├── js
 │   ├── node_modules
+│   ├── plugins
 │   └── vendors
-├── setting             程序配置处理包
-└── util                程序工具包
+├── setting             应用配置处理
+└── util                应用工具库
     └── runtime
 
 </pre>
