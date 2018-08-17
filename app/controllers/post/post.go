@@ -1,6 +1,11 @@
 package post
 
 import (
+	"errors"
+	"fmt"
+	"io/ioutil"
+
+	"github.com/Unknwon/com"
 	"github.com/go-macaron/binding"
 	"gopkg.in/macaron.v1"
 
@@ -9,6 +14,7 @@ import (
 	"github.com/isymbo/pixpress/app/controllers/routes"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
+	"github.com/isymbo/pixpress/util"
 )
 
 const (
@@ -33,6 +39,7 @@ func InitRoutes(m *macaron.Macaron) {
 		m.Combo("/new").
 			Get(reqSignIn, NewPix).
 			Post(bindIgnErr(form.CreatePost{}), NewPixPost)
+		// m.Post("/new/cover", reqSignIn, binding.MultipartForm(form.CoverImg{}), PixCoverImgPost)
 	})
 }
 
@@ -166,8 +173,58 @@ func DeletePix(c *context.Context) {
 
 func renderAttachmentSettings(c *context.Context) {
 	c.Data["RequireDropzone"] = true
-	// c.Data["IsAttachmentEnabled"] = setting.Attachment.Enabled
-	// c.Data["AttachmentAllowedTypes"] = setting.Attachment.AllowedTypes
-	// c.Data["AttachmentMaxSize"] = setting.Attachment.MaxSize
-	// c.Data["AttachmentMaxFiles"] = setting.Attachment.MaxFiles
+
+	c.Data["CoverAllowedTypes"] = setting.Cover.AllowedTypes
+	c.Data["CoverMaxSize"] = setting.Cover.MaxSize
+	c.Data["CoverMaxFiles"] = setting.Cover.MaxFiles
+
+	c.Data["IsAttachmentEnabled"] = setting.Attachment.Enabled
+	c.Data["AttachmentAllowedTypes"] = setting.Attachment.AllowedTypes
+	c.Data["AttachmentMaxSize"] = setting.Attachment.MaxSize
+	c.Data["AttachmentMaxFiles"] = setting.Attachment.MaxFiles
+}
+
+// func PixCoverImgPost(c *context.Context, f form.CoverImg) {
+// 	f.Source = form.COVERIMG_LOCAL
+// 	if err := UpdatePixCoverImg(c, f, c.Post.Post); err != nil {
+// 		c.Flash.Error(err.Error())
+// 	} else {
+// 		c.Flash.Success("封面图像上传成功！")
+// 	}
+// 	c.SubURLRedirect(c.Repo.RepoLink + "/settings")
+
+// 	c.SubURLRedirect(PIXEDIT)
+// }
+
+// FIXME: limit upload size
+func UpdatePixCoverImg(c *context.Context, f form.CoverImg, ctxPost *models.Post) error {
+	if f.CoverImg != nil {
+		r, err := f.CoverImg.Open()
+		if err != nil {
+			return fmt.Errorf("open coverimg reader: %v", err)
+		}
+		defer r.Close()
+
+		data, err := ioutil.ReadAll(r)
+		if err != nil {
+			return fmt.Errorf("read coverimg content: %v", err)
+		}
+		if !util.IsImageFile(data) {
+			return errors.New("上传的文件不是一张图片！")
+		}
+		if err = ctxPost.UploadCoverImg(data); err != nil {
+			return fmt.Errorf("upload avatar: %v", err)
+		}
+	} else {
+		// No avatar is uploaded and reset setting back.
+		if !com.IsFile(ctxPost.CoverImgPath()) {
+			// ctxRepo.UseCustomAvatar = false
+		}
+	}
+
+	if err := models.UpdatePost(ctxPost); err != nil {
+		return fmt.Errorf("update post: %v", err)
+	}
+
+	return nil
 }
