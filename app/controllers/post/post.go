@@ -184,17 +184,17 @@ func renderAttachmentSettings(c *context.Context) {
 	c.Data["AttachmentMaxFiles"] = setting.Attachment.MaxFiles
 }
 
-// func PixCoverImgPost(c *context.Context, f form.CoverImg) {
-// 	f.Source = form.COVERIMG_LOCAL
-// 	if err := UpdatePixCoverImg(c, f, c.Post.Post); err != nil {
-// 		c.Flash.Error(err.Error())
-// 	} else {
-// 		c.Flash.Success("封面图像上传成功！")
-// 	}
-// 	c.SubURLRedirect(c.Repo.RepoLink + "/settings")
+func PixCoverImgPost(c *context.Context, f form.CoverImg) {
+	f.Source = form.COVERIMG_LOCAL
+	if err := UpdatePixCoverImg(c, f, c.Post.Post); err != nil {
+		c.Flash.Error(err.Error())
+	} else {
+		c.Flash.Success("封面图像上传成功！")
+	}
+	// c.SubURLRedirect(c.Repo.RepoLink + "/settings")
 
-// 	c.SubURLRedirect(PIXEDIT)
-// }
+	c.SubURLRedirect(PIXEDIT)
+}
 
 // FIXME: limit upload size
 func UpdatePixCoverImg(c *context.Context, f form.CoverImg, ctxPost *models.Post) error {

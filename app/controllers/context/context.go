@@ -34,7 +34,7 @@ type Context struct {
 	IsLogged bool
 	// IsBasicAuth bool
 
-	// Post *Post
+	Post *Post
 	// Org  *Organization
 }
 
@@ -208,9 +208,9 @@ func Contexter() macaron.Handler {
 			Flash:   f,
 			Session: sess,
 			Link:    setting.AppSubURL + strings.TrimSuffix(ctx.Req.URL.Path, "/"),
-			// Post: &Post{
-			// 	Post: &models.Post{},
-			// },
+			Post: &Post{
+				Post: &models.Post{},
+			},
 		}
 		// 	return func(ctx *macaron.Context, l i18n.Locale, cache cache.Cache, sess session.Store, f *session.Flash, x csrf.CSRF) {
 		// 		c := &Context{

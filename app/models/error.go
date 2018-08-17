@@ -145,3 +145,24 @@ func IsErrPostNotExist(err error) bool {
 func (err ErrPostNotExist) Error() string {
 	return fmt.Sprintf("post does not exist [id: %s]", err.ID)
 }
+
+//    _____   __    __                .__                           __
+//   /  _  \_/  |__/  |______    ____ |  |__   _____   ____   _____/  |_
+//  /  /_\  \   __\   __\__  \ _/ ___\|  |  \ /     \_/ __ \ /    \   __\
+// /    |    \  |  |  |  / __ \\  \___|   Y  \  Y Y  \  ___/|   |  \  |
+// \____|__  /__|  |__| (____  /\___  >___|  /__|_|  /\___  >___|  /__|
+//         \/                \/     \/     \/      \/     \/     \/
+
+type ErrAttachmentNotExist struct {
+	ID   int64
+	UUID string
+}
+
+func IsErrAttachmentNotExist(err error) bool {
+	_, ok := err.(ErrAttachmentNotExist)
+	return ok
+}
+
+func (err ErrAttachmentNotExist) Error() string {
+	return fmt.Sprintf("attachment does not exist [id: %d, uuid: %s]", err.ID, err.UUID)
+}

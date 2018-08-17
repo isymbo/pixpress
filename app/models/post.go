@@ -1,18 +1,24 @@
 package models
 
 import (
+	"bytes"
 	"fmt"
+	"image"
+	"image/png"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/Unknwon/com"
 	"github.com/go-xorm/xorm"
+	"github.com/nfnt/resize"
 	log "gopkg.in/clog.v1"
 
 	"github.com/isymbo/pixpress/app/models/errors"
 	"github.com/isymbo/pixpress/setting"
 )
 
-//
 type PostType int
 
 const (
@@ -199,4 +205,43 @@ func deletePost(e Engine, p *Post) error {
 // DeletePost deletes information of given post.
 func DeletePost(p *Post) error {
 	return deletePost(x, p)
+}
+
+// UploadCoverImg saves cover image for post.
+// FIXME: split uploads to different subdirs in case we have massive number of posts.
+func (post *Post) UploadCoverImg(data []byte) error {
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("decode image: %v", err)
+	}
+
+	os.MkdirAll(setting.Cover.Path, os.ModePerm)
+	fw, err := os.Create(post.CoverImgPath())
+	if err != nil {
+		return fmt.Errorf("create post cover image directory: %v", err)
+	}
+	defer fw.Close()
+
+	// m := resize.Resize(avatar.AVATAR_SIZE, avatar.AVATAR_SIZE, img, resize.NearestNeighbor)
+	m := resize.Resize(300, 300, img, resize.NearestNeighbor)
+	if err = png.Encode(fw, m); err != nil {
+		return fmt.Errorf("encode image: %v", err)
+	}
+
+	return nil
+}
+
+// DeleteCoverImg deletes the post cover image.
+func (post *Post) DeleteCoverImg() error {
+	log.Trace("DeleteCoverImg [%d]: %s", post.ID, post.CoverImgPath())
+	if err := os.Remove(post.CoverImgPath()); err != nil {
+		return err
+	}
+
+	return UpdatePost(post)
+}
+
+// CoverImgPath returns post cover image file path.
+func (post *Post) CoverImgPath() string {
+	return filepath.Join(setting.Cover.Path, com.ToStr(post.ID))
 }
