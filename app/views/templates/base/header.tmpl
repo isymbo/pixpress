@@ -69,7 +69,7 @@
 				<span class="badge badge-secondary">开发中</span>
 			</li>
 			<li class="nav-item px-3">
-				<a class="nav-link" href="#">发现</a>
+				<a class="nav-link" href="/">发现</a>
 				<span class="badge badge-secondary">开发中</span>
 			</li>
 		</ul>
@@ -83,7 +83,7 @@
 					<a class="dropdown-item" href="pix/new">
 						<i class="fa fa-file-image-o fa-md"></i> 作品
 					</a>
-					<a class="dropdown-item" href="#">
+					<a class="dropdown-item" href="/">
 						<i class="fa fa-object-group fa-md"></i> 作品集
 						<span class="badge badge-secondary">开发中</span>
 					</a>
@@ -103,19 +103,19 @@
 					<a class="dropdown-item" href="pix">
 						<i class="fa fa-file-image-o"></i> 我的作品
 					</a>
-					<a class="dropdown-item" href="#">
+					<a class="dropdown-item" href="/">
 						<i class="fa fa-object-group"></i> 我的创作集
 						<span class="badge badge-success">开发中</span>
 					</a>
-					<a class="dropdown-item" href="#">
+					<a class="dropdown-item" href="/">
 						<i class="fa fa-heart-o"></i> 我的收藏
 						<span class="badge badge-danger">开发中</span>
 					</a>
-					<a class="dropdown-item" href="#">
+					<a class="dropdown-item" href="/">
 						<i class="fa fa-eye"></i> 我的关注
 						<span class="badge badge-warning">开发中</span>
 					</a>
-					<a class="dropdown-item" href="#">
+					<a class="dropdown-item" href="/">
 						<i class="fa fa-comments"></i> 我的评论
 						<span class="badge badge-warning">开发中</span>
 					</a>
@@ -127,11 +127,11 @@
 					<a class="dropdown-item" href="/user/settings">
 						<i class="fa fa-wrench"></i> 我的设置
 					</a>
-					<a class="dropdown-item" href="#">
+					<a class="dropdown-item" href="/">
 						<i class="fa fa-usd"></i> 我的积分
 						<span class="badge badge-secondary">开发中</span>
 					</a>
-					<a class="dropdown-item" href="#">
+					<a class="dropdown-item" href="/">
 						<i class="fa fa-file"></i> 我的团队
 						<span class="badge badge-primary">开发中</span>
 					</a>
@@ -164,7 +164,11 @@
     -->
 	</header>
 
+{{if .IsAdmin}}
 	<div class="app-body">
+{{else}}
+	<div class="app-body flex-row align-items-center">
+{{end}}
 
     {{if .IsAdmin}}
     <!-- SIDEBAR -->
@@ -181,7 +185,7 @@
 									<i class="nav-icon icon-user"></i> 用户</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="#">
+								<a class="nav-link" href="/admin">
 									<i class="nav-icon icon-people"></i> 群组
 									<span class="badge badge-secondary">开发中</span></a>
 							</li>
@@ -190,12 +194,12 @@
 									<i class="nav-icon icon-picture"></i> 作品</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="#">
+								<a class="nav-link" href="/admin">
 									<i class="nav-icon icon-grid"></i> 类别
 									<span class="badge badge-secondary">开发中</span></a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="#">
+								<a class="nav-link" href="/admin">
 									<i class="nav-icon icon-tag"></i> 标签
 									<span class="badge badge-secondary">开发中</span></a>
 							</li>
@@ -203,11 +207,11 @@
 					</li>
 					<!-- <li class="nav-title"><h6>系统管理</h6></li> -->
 					<li class="nav-item nav-dropdown">
-						<a class="nav-link nav-dropdown-toggle" href="#">
+						<a class="nav-link nav-dropdown-toggle" href="/admin">
 							<i class="nav-icon icon-settings"></i> 系统管理</a>
 						<ul class="nav-dropdown-items">
 							<li class="nav-item">
-								<a class="nav-link" href="base/breadcrumb.html">
+								<a class="nav-link" href="/admin">
 									<i class="nav-icon icon-puzzle"></i> 开发中</a>
 							</li>
 						</ul>
