@@ -19,7 +19,13 @@
 				<div class="col-md-3">
 					<div class="card">
 						<a href="{{ $Link}}/{{ .ID}}">
-							<img class="card-img-top" src="img/test.jpg" alt="card image cap">
+							{{if .CoverImg}}
+							{{range .CoverImg}}
+							<img class="card-img-top" src="{{AppSubURL}}/covers/{{.UUID}}" alt="{{.Name}}">
+							{{end}}
+							{{else}}
+							<img class="card-img-top" src="img/test.jpg" alt="test.jpg">
+							{{end}}
 						</a>
 						<div class="card-body">
 							<h6 class="card-title">{{ .Title}}</h6>
@@ -29,7 +35,6 @@
 				</div>
 				{{end}}
 			</div>
-
 
 			<div class="row">
 				{{with .Page}}

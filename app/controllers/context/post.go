@@ -9,11 +9,6 @@ type Post struct {
 	//IsWatching   bool
 	Post  *models.Post
 	Owner *models.User
-	// BranchName string
-	// TagName    string
-	// TreePath   string
-	// CommitID   string
-	// RepoLink   string
 }
 
 // // IsOwner returns true if current user is the owner of repository.

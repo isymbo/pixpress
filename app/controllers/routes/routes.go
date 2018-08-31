@@ -212,6 +212,9 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 	for _, p := range posts {
 		u, _ := models.GetUserByID(p.AuthorID)
 		p.Author = u
+
+		cover, _ := models.GetCoverImgsByPostID(p.ID)
+		p.CoverImg = cover
 	}
 
 	c.Data["Keyword"] = keyword

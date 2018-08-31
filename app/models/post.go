@@ -36,7 +36,6 @@ type Post struct {
 	Title       string `xorm:"VARCHAR(100)"`
 	Content     string `xorm:"TEXT"`
 	PostType    PostType
-	CoverImg    string
 	NumComments int `xorm:"NOT NULL DEFAULT 0"`
 
 	Created     time.Time `xorm:"-" json:"-"`
@@ -44,7 +43,17 @@ type Post struct {
 	Updated     time.Time `xorm:"-" json:"-"`
 	UpdatedUnix int64
 
+	CoverImg    []*CoverImg   `xorm:"-" json:"-"`
 	Attachments []*Attachment `xorm:"-" json:"-"`
+}
+
+type CreatePostOptions struct {
+	PostType    PostType
+	Doer        *User
+	Title       string
+	Content     string
+	Attachments []string // UUIDs of attachments
+	CoverImg    []string // UUIDs of coverimg
 }
 
 type PostsOptions struct {
@@ -244,4 +253,99 @@ func (post *Post) DeleteCoverImg() error {
 // CoverImgPath returns post cover image file path.
 func (post *Post) CoverImgPath() string {
 	return filepath.Join(setting.Cover.Path, com.ToStr(post.ID))
+}
+
+// CreatePost creates a post.
+func CreatePostByOption(opts *CreatePostOptions) (post *Post, err error) {
+	sess := x.NewSession()
+	defer sess.Close()
+	if err = sess.Begin(); err != nil {
+		return nil, err
+	}
+
+	post, err = createPostByOption(sess, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return post, sess.Commit()
+}
+
+// type Post struct {
+// 	ID          int64
+// 	AuthorID    int64  `xorm:"NOT NULL"`
+// 	Author      *User  `xorm:"-" json:"-"`
+// 	Title       string `xorm:"VARCHAR(100)"`
+// 	Content     string `xorm:"TEXT"`
+// 	PostType    PostType
+// 	CoverImg    string
+// 	NumComments int `xorm:"NOT NULL DEFAULT 0"`
+
+// 	Created     time.Time `xorm:"-" json:"-"`
+// 	CreatedUnix int64
+// 	Updated     time.Time `xorm:"-" json:"-"`
+// 	UpdatedUnix int64
+
+// 	Attachments []*Attachment `xorm:"-" json:"-"`
+// }
+
+func createPostByOption(e *xorm.Session, opts *CreatePostOptions) (_ *Post, err error) {
+	post := &Post{
+		AuthorID: opts.Doer.ID,
+		Author:   opts.Doer,
+		PostType: opts.PostType,
+		Title:    opts.Title,
+		Content:  opts.Content,
+	}
+	if _, err = e.Insert(post); err != nil {
+		return nil, err
+	}
+
+	log.Trace("attachments length: %+v", len(opts.Attachments))
+	// Check attachments
+	attachments := make([]*Attachment, 0, len(opts.Attachments))
+	for _, uuid := range opts.Attachments {
+		attach, err := getAttachmentByUUID(e, uuid)
+		if err != nil {
+			if IsErrAttachmentNotExist(err) {
+				continue
+			}
+			return nil, fmt.Errorf("getAttachmentByUUID [%s]: %v", uuid, err)
+		}
+		attachments = append(attachments, attach)
+	}
+
+	for i := range attachments {
+		attachments[i].PostID = post.ID
+
+		// No assign value could be 0, so ignore AllCols().
+		if _, err = e.Id(attachments[i].ID).Update(attachments[i]); err != nil {
+			return nil, fmt.Errorf("update attachment [%d]: %v", attachments[i].ID, err)
+		}
+	}
+
+	log.Trace("coverimg length: %+v", len(opts.CoverImg))
+	// Check coverimg
+	coverimg := make([]*CoverImg, 0, len(opts.CoverImg))
+	for _, uuid := range opts.CoverImg {
+		cover, err := getCoverImgByUUID(e, uuid)
+		if err != nil {
+			if IsErrCoverImgNotExist(err) {
+				continue
+			}
+			return nil, fmt.Errorf("getCoverImgByUUID [%s]: %v", uuid, err)
+		}
+		coverimg = append(coverimg, cover)
+	}
+
+	for i := range coverimg {
+		coverimg[i].PostID = post.ID
+
+		// No assign value could be 0, so ignore AllCols().
+		if _, err = e.Id(coverimg[i].ID).Update(coverimg[i]); err != nil {
+			return nil, fmt.Errorf("update coverimg [%d]: %v", coverimg[i].ID, err)
+		}
+	}
+
+	return post, nil
 }

@@ -5,8 +5,10 @@
 	<base href="{{AppSubURL}}/">
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="_csrf" content="{{.CSRFToken}}" />
+	<meta name="_suburl" content="{{AppSubURL}}" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>{{AppName}}</title>
+	<title>{{if .Title}}{{.Title}} - {{end}}{{AppName}}</title>
 
   <!-- Icons-->
 	<link href="{{AppSubURL}}/vendors/@coreui/icons/css/coreui-icons.min.css" rel="stylesheet">
@@ -16,7 +18,16 @@
 
 	<!-- Main styles for this application-->
 	<link href="{{AppSubURL}}/css/style.css" rel="stylesheet">
-  <link href="{{AppSubURL}}/vendors/pace-progress/css/pace.min.css" rel="stylesheet">
+	<link href="{{AppSubURL}}/vendors/pace-progress/css/pace.min.css" rel="stylesheet">
+
+	<script type="text/javascript" src="{{AppSubURL}}/node_modules/jquery/dist/jquery.min.js"></script>
+	{{if .RequireDropzone}}
+	<link href="{{AppSubURL}}/plugins/dropzone-5.5.0/dist/dropzone.css" rel="stylesheet">
+	<script type="text/javascript" src="{{AppSubURL}}/plugins/dropzone-5.5.0/dist/dropzone.js"></script>
+	{{end}}
+	<!--
+	<script type="text/javascript" src="{{AppSubURL}}/js/pixpress.js"></script>
+	-->
 </head>
 
 {{if .IsAdmin}}
@@ -84,7 +95,6 @@
 					</div>
 					<a class="dropdown-item" href="pix">
 						<i class="fa fa-file-image-o"></i> 我的作品
-						<span class="badge badge-info">开发中</span>
 					</a>
 					<a class="dropdown-item" href="#">
 						<i class="fa fa-object-group"></i> 我的创作集
@@ -120,8 +130,7 @@
 					</a>
 					<div class="divider"></div>
 					<a class="dropdown-item" href="/user/logout">
-						<i class="fa fa-sign-out"></i> 登出
-						<span class="badge badge-danger">LOGOUT</span>
+						<i class="fa fa-sign-out text-danger"></i> 登出
 					</a>
 				</div>
 			</li>
@@ -133,14 +142,14 @@
 			</li>
 			{{end}}
 		</ul>
-
+		<!-- DO NOT NEED at this time
 		<button class="navbar-toggler aside-menu-toggler d-md-down-none" type="button" data-toggle="aside-menu-lg-show">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<button class="navbar-toggler aside-menu-toggler d-lg-none" type="button" data-toggle="aside-menu-show">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-
+    -->
 	</header>
 
 	<div class="app-body">
@@ -197,7 +206,9 @@
 		</div>
 		{{end}}
 
+
     <!-- ASIDE MENU -->
+		<!-- DO NOT NEED at this time
 		<aside class="aside-menu">
 			<ul class="nav nav-tabs" role="tablist">
 				<li class="nav-item">
@@ -216,7 +227,9 @@
 					</a>
 				</li>
 			</ul>
+			-->
 			<!-- Tab panes-->
+			<!-- DO NOT NEED at this time
 			<div class="tab-content">
 				<div class="tab-pane active" id="timeline" role="tabpanel">
 					<div class="list-group list-group-accent">
@@ -483,6 +496,7 @@
 				</div>
 			</div>
 		</aside>
+		-->
 
 
 

@@ -18,8 +18,7 @@
 				<div class="col-md-8">
 					{{template "base/alert" .}}
 
-
-					<form class="form-horizontal" action="{{.Link}}/cover" method="post" enctype="multipart/form-data">
+					<form class="form-horizontal" action="{{.Link}}" method="post">
 						<div class="card">
 							<!-- Breadcrumb-->
 							<ol class="breadcrumb">
@@ -29,23 +28,46 @@
 							</ol>
 							<div class="card-body">
 								<div class="form-group row">
-									<label class="col-md-3 col-form-label" for="file-input">上传封面图片</label>
-									<div class="col-md-9">
-										<input id="file-input" type="file" name="CoverImg">
+									<div class="coverimg"></div>
+									<div class="btn btn-block btn-light mx-3 dropzone" id="coverdropzone" style="border-style:dashed;border-width:2px;border-color:#20a8d8;">
 									</div>
-								</div>
-								<hr class="my-4">
-								<div class="row align-items-center">
-										<div class="col-md-4 text-center">
-											<button class="btn btn-primary btn-block" type="submit">
-												<i class="fa fa-dot-circle-o"></i> 上传</button>
-										</div>
+									<script type="text/javascript">
+										var coverfilenameDict = {};
+										var coverDropzone = new Dropzone("#coverdropzone", {
+											url: "{{AppSubURL}}/pix/coverimgs",
+											/* acceptedFiles: "{{.CoverAllowedTypes}}", */
+											acceptedFiles: null,
+											maxFiles: "{{.CoverMaxFiles}}",
+											maxFilesize: "{{.CoverMaxSize}}",
+											addRemoveLinks: true,
+											dictDefaultMessage: "拖曳文件到此处或单击上传",
+											dictInvalidFileType: "您不能上传该类型的文件",
+											dictFileTooBig: "文件体积超过了最大允许体积( {{.CoverMaxSize}} MB )",
+											dictMaxFilesExceeded: "只能上传 {{.CoverMaxFiles}} 个文件",
+											dictRemoveFile: "点击移除",
+											init: function () {
+													this.on("success", function (file, data) {
+															coverfilenameDict[file.name] = data.uuid;
+															var input = $('<input id="' + data.uuid + '" name="CoverImg" type="hidden">').val(data.uuid);
+															$('.coverimg').append(input);
+													});
+													this.on("removedfile", function (file) {
+															if (file.name in coverfilenameDict) {
+																	$('#' + coverfilenameDict[file.name]).remove();
+															}
+															if (this.data('remove-url')) {
+																	$.post(this.data('remove-url'), {
+																			file: coverfilenameDict[file.name],
+																	});
+															}
+													});
+											}
+										});
+									</script>
 								</div>
 							</div>
 						</div>
-					</form>
 
-					<form class="form-horizontal" action="{{.Link}}" method="post" enctype="multipart/form-data">
 						<div class="card">
 							<!-- Breadcrumb-->
 							<ol class="breadcrumb">
@@ -77,28 +99,71 @@
 							</ol>
 							<div class="card-body">
 								<div class="form-group row">
-									<label class="col-md-3 col-form-label" for="file-input">上传打包文件</label>
-									<div class="col-md-9">
-										<input id="file-input" type="file" name="file-input">
+									{{if .IsAttachmentEnabled}}
+									<!-- FIXME: try this way later
+									<div class="btn btn-block btn-light mx-3 dropzone" id="dropzone" style="border-style:dashed;border-width:2px;border-color:#20a8d8;" data-upload-url="{{AppSubURL}}/pix/attachments" data-accepts="{{.AttachmentAllowedTypes}}" data-max-file="{{.AttachmentMaxFiles}}" data-max-size="{{.AttachmentMaxSize}}" dictDefaultMessage="拖曳文件到此处或单击上传" data-invalid-input-type="您不能上传该类型的文件" data-file-too-big="文件体积（ MB）超过了最大允许体积（ MB）" data-remove-file="移除文件">
+									<div class="invisible"><input id="file-input" type="file" name="Files" multiple=""></div>
 									</div>
+									-->
+									<div class="files"></div>
+									<div class="btn btn-block btn-light mx-3 dropzone" id="dropzone" style="border-style:dashed;border-width:2px;border-color:#20a8d8;">
+									</div>
+									<script type="text/javascript">
+										var filenameDict = {};
+										var attachmentDropzone = new Dropzone("#dropzone", {
+											url: "{{AppSubURL}}/pix/attachments",
+											/* acceptedFiles: "{{.AttachmentAllowedTypes}}", */
+											acceptedFiles: null,
+											maxFiles: "{{.AttachmentMaxFiles}}",
+											maxFilesize: "{{.AttachmentMaxSize}}",
+											addRemoveLinks: true,
+											dictDefaultMessage: "拖曳文件到此处或单击上传",
+											dictInvalidFileType: "您不能上传该类型的文件",
+											dictFileTooBig: "文件体积超过了最大允许体积( {{.AttachmentMaxSize}} MB)",
+											dictMaxFilesExceeded: "最多上传 {{.AttachmentMaxFiles}} 个文件",
+											dictRemoveFile: "点击移除",
+											init: function () {
+													this.on("success", function (file, data) {
+															filenameDict[file.name] = data.uuid;
+															var input = $('<input id="' + data.uuid + '" name="Files" type="hidden">').val(data.uuid);
+															$('.files').append(input);
+													});
+													this.on("removedfile", function (file) {
+															if (file.name in filenameDict) {
+																	$('#' + filenameDict[file.name]).remove();
+															}
+															/* if ($dropzone.data('remove-url') && $dropzone.data('csrf')) { */
+														  if (this.data('remove-url')) {
+																	$.post(this.data('remove-url'), {
+																			file: filenameDict[file.name],
+																	});
+															}
+													});
+											}
+										});
+									</script>
+									{{end}}
 								</div>
 							</div>
 						</div>
 
 						<div class="card">
 							<div class="card-body">
-								<div class="row align-items-center">
+								<div class="row justify-content-center">
 										<div class="col-md-6 text-center">
 											<button class="btn btn-primary btn-block" type="submit">
 												<i class="fa fa-dot-circle-o"></i> 发布</button>
 										</div>
+										<!-- TODO: Temporarily disable reset button
 										<div class="col-md-6 text-center">
 											<button class="btn btn-danger btn-block" type="reset">
 												<i class="fa fa-ban"></i> 重置</button>
 										</div>
+										-->
 								</div>
 							</div>
 						</div>
+
 					</form>
 
 				</div>

@@ -23,10 +23,18 @@
 							<!-- Breadcrumb-->
 							<ol class="breadcrumb">
 								<li class="breadcrumb-item active" aria-current="page">
-									上传封面
+									封面
 								</li>
 							</ol>
 							<div class="card-body">
+								{{range .Post.CoverImg}}
+								<div class="row justify-content-center my-4">
+										<div class="text-center">
+											<img class="img-thumbnail" src="{{AppSubURL}}/covers/{{.UUID}}" alt="{{.Name}}">
+										</div>
+								</div>
+								{{end}}
+								<!-- FIXME: add update section later
 								<div class="form-group row">
 									<label class="col-md-3 col-form-label" for="file-input">上传封面图片</label>
 									<div class="col-md-9">
@@ -40,6 +48,7 @@
 												<i class="fa fa-dot-circle-o"></i> 上传</button>
 										</div>
 								</div>
+								-->
 							</div>
 						</div>
 
@@ -71,29 +80,44 @@
 							<!-- Breadcrumb-->
 							<ol class="breadcrumb">
 								<li class="breadcrumb-item active" aria-current="page">
-									上传附件
+									附件
 								</li>
 							</ol>
 							<div class="card-body">
+								{{if .Post.Attachments}}
+								<div class="list-group">
+								{{range .Post.Attachments}}
+									<a target="_blank" href="{{AppSubURL}}/attachments/{{.UUID}}" title="点击下载 {{ .Name}}">
+										{{if FilenameIsImage .Name}}
+											<img src="{{AppSubURL}}/attachments/{{.UUID}}" alt="{{.Name}}" title="点击下载 {{ .Name}}" class="img-thumbnail">
+										{{else}}
+											<span><i class="fa fa-download fa-2x text-primary mt-4"></i> {{ .Name}}</span>
+										{{end}}
+									</a>
+								{{end}}
+								</div>
+								{{end}}
+
+
+
+								<!-- FIXME: add update later
+								<hr class="my-4">
 								<div class="form-group row">
 									<label class="col-md-3 col-form-label" for="file-input">上传打包文件</label>
 									<div class="col-md-9">
 										<input id="file-input" type="file" name="file-input">
 									</div>
 								</div>
+								-->
 							</div>
 						</div>
 
 						<div class="card">
 							<div class="card-body">
-								<div class="row align-items-center">
+								<div class="row justify-content-center">
 										<div class="col-md-6 text-center">
 											<button class="btn btn-primary btn-block" type="submit">
-												<i class="fa fa-dot-circle-o"></i> 保存</button>
-										</div>
-										<div class="col-md-6 text-center">
-											<button class="btn btn-warning btn-block" type="reset">
-												<i class="fa fa-ban"></i> 重置</button>
+												<i class="fa fa-dot-circle-o"></i> 更新</button>
 										</div>
 								</div>
 							</div>

@@ -166,3 +166,24 @@ func IsErrAttachmentNotExist(err error) bool {
 func (err ErrAttachmentNotExist) Error() string {
 	return fmt.Sprintf("attachment does not exist [id: %d, uuid: %s]", err.ID, err.UUID)
 }
+
+// _________                          .___
+// \_   ___ \  _______  __ ___________|   | _____    ____
+// /    \  \/ /  _ \  \/ // __ \_  __ \   |/     \  / ___\
+// \     \___(  <_> )   /\  ___/|  | \/   |  Y Y  \/ /_/  >
+//  \______  /\____/ \_/  \___  >__|  |___|__|_|  /\___  /
+//         \/                 \/                \//_____/
+
+type ErrCoverImgNotExist struct {
+	ID   int64
+	UUID string
+}
+
+func IsErrCoverImgNotExist(err error) bool {
+	_, ok := err.(ErrAttachmentNotExist)
+	return ok
+}
+
+func (err ErrCoverImgNotExist) Error() string {
+	return fmt.Sprintf("cover image does not exist [id: %d, uuid: %s]", err.ID, err.UUID)
+}
