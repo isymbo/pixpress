@@ -164,7 +164,7 @@
     -->
 	</header>
 
-{{if .IsAdmin}}
+{{if or .IsAdmin .PageIsListPix .PageIsUserProfile}}
 	<div class="app-body">
 {{else}}
 	<div class="app-body flex-row align-items-center">
