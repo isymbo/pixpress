@@ -1,7 +1,7 @@
 package setting
 
 const (
-	APP_VER               string = "0.0.5"
+	APP_VER               string = "0.0.6"
 	APP_NAME              string = "PixPress"
 	APP_USAGE             string = "An Instagram like system"
 	APP_CONFIG            string = "config/app.ini"
