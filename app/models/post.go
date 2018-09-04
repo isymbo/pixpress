@@ -7,6 +7,7 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -128,7 +129,7 @@ type SearchPostOptions struct {
 	PageSize int // Can be smaller than or equal to setting.UI.ExplorePagingNum
 }
 
-// SearchUserByName takes keyword and part of user name to search,
+// SearchPostByName takes keyword and part of user name to search,
 // it returns results in given range and number of total results.
 func SearchPostByName(opts *SearchPostOptions) (posts []*Post, _ int64, _ error) {
 	if len(opts.Keyword) == 0 {
@@ -164,6 +165,48 @@ func SearchPostByName(opts *SearchPostOptions) (posts []*Post, _ int64, _ error)
 	return posts, count, sess.Limit(opts.PageSize, (opts.Page-1)*opts.PageSize).Find(&posts)
 }
 
+type SearchPostByAuthorIDOptions struct {
+	AuthorID int64
+	Type     PostType
+	OrderBy  string
+	Page     int
+	PageSize int // Can be smaller than or equal to setting.UI.ExplorePagingNum
+}
+
+// SearchPostByName takes keyword and part of user name to search,
+// it returns results in given range and number of total results.
+func SearchPostByAuthorID(opts *SearchPostByAuthorIDOptions) (posts []*Post, _ int64, _ error) {
+	if opts.AuthorID == 0 {
+		return posts, 0, nil
+	}
+
+	if opts.PageSize <= 0 || opts.PageSize > setting.UI.User.PostPagingNum {
+		opts.PageSize = setting.UI.User.PostPagingNum
+	}
+	if opts.Page <= 0 {
+		opts.Page = 1
+	}
+
+	// searchQuery := "%" + opts.Keyword + "%"
+	searchQuery := strconv.FormatInt(opts.AuthorID, 10)
+	posts = make([]*Post, 0, opts.PageSize)
+	// Append conditions
+	sess := x.Where("author_id = ?", searchQuery).
+		And("type = ?", opts.Type)
+
+	var countSess xorm.Session
+	countSess = *sess
+	count, err := countSess.Count(new(Post))
+	if err != nil {
+		return nil, 0, fmt.Errorf("Count: %v", err)
+	}
+
+	if len(opts.OrderBy) > 0 {
+		sess.OrderBy(opts.OrderBy)
+	}
+	return posts, count, sess.Limit(opts.PageSize, (opts.Page-1)*opts.PageSize).Find(&posts)
+}
+
 func countPosts(e Engine) int64 {
 	count, _ := e.Where("post_type=0").Count(new(Post))
 	return count
@@ -176,6 +219,7 @@ func CountPosts() int64 {
 
 // Posts returns number of posts in given page.
 func Posts(page, pageSize int) ([]*Post, error) {
+	log.Trace("page, pageSize: %+v, %+v", page, pageSize)
 	posts := make([]*Post, 0, pageSize)
 	return posts, x.Limit(pageSize, (page-1)*pageSize).Where("post_type=0").Desc("id").Find(&posts)
 }
