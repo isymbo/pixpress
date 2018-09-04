@@ -439,6 +439,7 @@ func NewPixPost(c *context.Context, f form.CreatePost) {
 
 func AnonViewPix(c *context.Context) {
 	c.Data["Title"] = "作品信息"
+	c.Data["PageIsExplore"] = true
 	c.Data["PageIsAnonViewPix"] = true
 	renderAttachmentSettings(c)
 	renderCoverSettings(c)
