@@ -194,14 +194,13 @@ func initRoutes(m *macaron.Macaron) {
 	m.NotFound(routes.NotFound)
 
 	m.Get("/", context.IgnSignIn, routes.Home)
-	// m.Group("/explore", func() {
-	// 	m.Get("", func(c *context.Context) {
-	// 		c.Redirect(setting.AppSubURL + "/explore/repos")
-	// 	})
-	// 	m.Get("/repos", routes.ExploreRepos)
-	// 	m.Get("/users", routes.ExploreUsers)
-	// 	m.Get("/organizations", routes.ExploreOrganizations)
-	// }, ignSignIn)
+	m.Group("/explore", func() {
+		m.Get("", func(c *context.Context) {
+			c.Redirect(setting.AppSubURL + "/explore/works")
+		})
+		m.Get("/works", routes.ExploreWorks)
+		m.Get("/works/:pixid", post.AnonViewPix)
+	}, context.IgnSignIn)
 
 	setting.InitRoutes(m)
 	admin.InitRoutes(m)

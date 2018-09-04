@@ -24,6 +24,8 @@ const (
 	PIXDELETE = "pix/delete"
 	PIXES     = "pix/list"
 	PIXHOME   = "/pix"
+
+	EXPLORE_PIX = "explore/pix"
 )
 
 func InitRoutes(m *macaron.Macaron) {
@@ -224,13 +226,14 @@ func ListPix(c *context.Context) {
 		c.Flash.Error(c.Data["ErrorMsg"].(string))
 	}
 
-	routes.RenderPostSearch(c, &routes.PostSearchOptions{
+	routes.RenderPostSearchByAuthorID(c, &routes.PostSearchByAuthorIDOptions{
 		Type:     models.POST_TYPE_PIX,
 		Counter:  models.CountPosts,
 		Ranger:   models.Posts,
 		PageSize: setting.UI.User.PostPagingNum,
 		OrderBy:  "updated_unix DESC",
 		TplName:  PIXES,
+		AuthorID: c.User.ID,
 	})
 }
 
@@ -432,4 +435,51 @@ func NewPixPost(c *context.Context, f form.CreatePost) {
 	log.Trace("Post created: %d", post.ID)
 
 	c.SubURLRedirect(PIXHOME)
+}
+
+func AnonViewPix(c *context.Context) {
+	c.Data["Title"] = "作品信息"
+	c.Data["PageIsAnonViewPix"] = true
+	renderAttachmentSettings(c)
+	renderCoverSettings(c)
+
+	post, err := models.GetPostByID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrPostNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetPostByID", err)
+		}
+		return
+	}
+
+	post.Attachments, err = models.GetAttachmentsByPostID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrAttachmentNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetAttachmentsByPostID", err)
+		}
+		return
+	}
+
+	post.CoverImg, err = models.GetCoverImgsByPostID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrCoverImgNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetCoverImgsByPostID", err)
+		}
+		return
+	}
+
+	c.Data["title"] = post.Title
+	c.Data["content"] = post.Content
+	c.Data["Post"] = post
+
+	log.Trace("Post: %+v", post)
+	log.Trace("Post.Attachments: %+v", post.Attachments)
+	log.Trace("Post.CoverImg: %+v", post.CoverImg)
+
+	c.Success(EXPLORE_PIX)
 }

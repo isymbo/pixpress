@@ -11,7 +11,7 @@ import (
 
 const (
 	HOME                  = "home"
-	EXPLORE_REPOS         = "explore/repos"
+	EXPLORE_WORKS         = "explore/works"
 	EXPLORE_USERS         = "explore/users"
 	EXPLORE_ORGANIZATIONS = "explore/organizations"
 )
@@ -46,39 +46,19 @@ func Home(c *context.Context) {
 	c.Success(HOME)
 }
 
-func ExploreRepos(c *context.Context) {
-	// c.Data["Title"] = c.Tr("explore")
-	// c.Data["PageIsExplore"] = true
-	// c.Data["PageIsExploreRepositories"] = true
+func ExploreWorks(c *context.Context) {
+	c.Data["Title"] = "发现"
+	c.Data["PageIsExplore"] = true
+	c.Data["PageIsExploreWorks"] = true
 
-	// page := c.QueryInt("page")
-	// if page <= 0 {
-	// 	page = 1
-	// }
-
-	// keyword := c.Query("q")
-	// repos, count, err := models.SearchRepositoryByName(&models.SearchRepoOptions{
-	// 	Keyword:  keyword,
-	// 	UserID:   c.UserID(),
-	// 	OrderBy:  "updated_unix DESC",
-	// 	Page:     page,
-	// 	PageSize: setting.UI.ExplorePagingNum,
-	// })
-	// if err != nil {
-	// 	c.ServerError("SearchRepositoryByName", err)
-	// 	return
-	// }
-	// c.Data["Keyword"] = keyword
-	// c.Data["Total"] = count
-	// c.Data["Page"] = paginater.New(int(count), setting.UI.ExplorePagingNum, page, 5)
-
-	// if err = models.RepositoryList(repos).LoadAttributes(); err != nil {
-	// 	c.ServerError("RepositoryList.LoadAttributes", err)
-	// 	return
-	// }
-	// c.Data["Repos"] = repos
-
-	// c.Success(EXPLORE_REPOS)
+	RenderPostSearch(c, &PostSearchOptions{
+		Type:     models.POST_TYPE_PIX,
+		Counter:  models.CountPosts,
+		Ranger:   models.Posts,
+		PageSize: setting.UI.ExplorePagingNum,
+		OrderBy:  "updated_unix DESC",
+		TplName:  EXPLORE_WORKS,
+	})
 }
 
 type UserSearchOptions struct {
@@ -195,6 +175,8 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 			return
 		}
 		count = opts.Counter()
+		log.Trace("Posts: %+v", posts)
+		log.Trace("count: %+v", count)
 	} else {
 		posts, count, err = models.SearchPostByName(&models.SearchPostOptions{
 			Keyword:  keyword,
@@ -222,6 +204,8 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 	c.Data["Page"] = paginater.New(int(count), opts.PageSize, page, 5)
 	c.Data["Posts"] = posts
 
+	log.Trace("Posts: %+v", posts)
+
 	c.Success(opts.TplName)
 }
 
@@ -239,3 +223,63 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 // 		TplName:  EXPLORE_PIXES,
 // 	})
 // }
+
+type PostSearchByAuthorIDOptions struct {
+	Type     models.PostType
+	Counter  func() int64
+	Ranger   func(int, int) ([]*models.Post, error)
+	PageSize int
+	OrderBy  string
+	TplName  string
+	AuthorID int64
+}
+
+func RenderPostSearchByAuthorID(c *context.Context, opts *PostSearchByAuthorIDOptions) {
+	page := c.QueryInt("page")
+	if page <= 1 {
+		page = 1
+	}
+
+	var (
+		posts []*models.Post
+		count int64
+		err   error
+	)
+
+	keyword := c.Query("q")
+	if len(keyword) == 0 {
+		posts, err = opts.Ranger(page, opts.PageSize)
+		if err != nil {
+			c.ServerError("Ranger", err)
+			return
+		}
+		count = opts.Counter()
+	} else {
+		posts, count, err = models.SearchPostByAuthorID(&models.SearchPostByAuthorIDOptions{
+			AuthorID: opts.AuthorID,
+			Type:     opts.Type,
+			OrderBy:  opts.OrderBy,
+			Page:     page,
+			PageSize: opts.PageSize,
+		})
+		if err != nil {
+			c.ServerError("SearchPostByAuthorID", err)
+			return
+		}
+	}
+
+	for _, p := range posts {
+		u, _ := models.GetUserByID(p.AuthorID)
+		p.Author = u
+
+		cover, _ := models.GetCoverImgsByPostID(p.ID)
+		p.CoverImg = cover
+	}
+
+	c.Data["Keyword"] = keyword
+	c.Data["Total"] = count
+	c.Data["Page"] = paginater.New(int(count), opts.PageSize, page, 5)
+	c.Data["Posts"] = posts
+
+	c.Success(opts.TplName)
+}

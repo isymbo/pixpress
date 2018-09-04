@@ -1,0 +1,116 @@
+{{template "base/header" .}}
+
+<!--Main layout-->
+<main class="main">
+	<!-- Breadcrumb-->
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item">
+		  <a href="explore">发现</a>
+		</li>
+		<li class="breadcrumb-item">
+		  <a href="explore/works">作品</a>
+		</li>
+		<li class="breadcrumb-item active" aria-current="page">
+			详细信息
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+  	<div class="animated fadeIn">
+			<div class="row justify-content-center">
+				<div class="col-md-8">
+
+						<div class="row">
+							<div class="col-12">
+								<div class="card">
+									<div class="card-body">
+										<h2> {{.title}} </h2>
+										<hr>
+										<p> {{.content}} </p>
+										<hr>
+										<p> 作者: {{.Post.AuthorID}}
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="card">
+							<!-- Breadcrumb-->
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item active" aria-current="page">
+									封面
+								</li>
+							</ol>
+							<div class="card-body">
+								{{range .Post.CoverImg}}
+								<div class="row justify-content-center my-4">
+										<div class="text-center">
+											<img class="img-thumbnail" src="{{AppSubURL}}/covers/{{.UUID}}" alt="{{.Name}}">
+										</div>
+								</div>
+								{{end}}
+								<!-- FIXME: add update section later
+								<div class="form-group row">
+									<label class="col-md-3 col-form-label" for="file-input">上传封面图片</label>
+									<div class="col-md-9">
+										<input id="file-input" type="file" name="file-input">
+									</div>
+								</div>
+								<hr class="my-4">
+								<div class="row align-items-center">
+										<div class="col-md-4 text-center">
+											<button class="btn btn-primary btn-block" type="submit">
+												<i class="fa fa-dot-circle-o"></i> 上传</button>
+										</div>
+								</div>
+								-->
+							</div>
+						</div>
+
+						<div class="card">
+							<!-- Breadcrumb-->
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item active" aria-current="page">
+									附件
+								</li>
+							</ol>
+							<div class="card-body">
+								{{if .Post.Attachments}}
+								<div class="list-group">
+								{{range .Post.Attachments}}
+									<a target="_blank" href="{{AppSubURL}}/attachments/{{.UUID}}" title="点击下载 {{ .Name}}">
+										{{if FilenameIsImage .Name}}
+											<img src="{{AppSubURL}}/attachments/{{.UUID}}" alt="{{.Name}}" title="点击下载 {{ .Name}}" class="img-thumbnail">
+										{{else}}
+											<span><i class="fa fa-download fa-2x text-primary mt-4"></i> {{ .Name}}</span>
+										{{end}}
+									</a>
+								{{end}}
+								</div>
+								{{end}}
+
+
+
+								<!-- FIXME: add update later
+								<hr class="my-4">
+								<div class="form-group row">
+									<label class="col-md-3 col-form-label" for="file-input">上传打包文件</label>
+									<div class="col-md-9">
+										<input id="file-input" type="file" name="file-input">
+									</div>
+								</div>
+								-->
+							</div>
+						</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+</main>
+<!--Main layout-->
+
+{{template "base/footer" .}}

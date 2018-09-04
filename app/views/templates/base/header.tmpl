@@ -69,8 +69,7 @@
 				<span class="badge badge-secondary">开发中</span>
 			</li>
 			<li class="nav-item px-3">
-				<a class="nav-link" href="/">发现</a>
-				<span class="badge badge-secondary">开发中</span>
+				<a class="nav-link" href="/explore">发现</a>
 			</li>
 		</ul>
 
@@ -164,7 +163,7 @@
     -->
 	</header>
 
-{{if or .IsAdmin .PageIsListPix .PageIsUserProfile}}
+{{if or .IsAdmin .PageIsListPix .PageIsUserProfile .PageIsExplore}}
 	<div class="app-body">
 {{else}}
 	<div class="app-body flex-row align-items-center">

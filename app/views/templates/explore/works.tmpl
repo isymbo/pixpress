@@ -1,0 +1,82 @@
+{{template "base/header" .}}
+
+<main class="main">
+	<!-- Breadcrumb-->
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item">
+		  <a href="/explore">发现</a>
+		</li>
+		<li class="breadcrumb-item active" aria-current="page">
+			作品
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			{{if .Posts}}
+			<div class="row">
+			  {{$Link := .Link}}
+				{{range .Posts}}
+				<div class="col-md-3">
+					<div class="card">
+						<a href="{{ $Link}}/{{ .ID}}">
+							{{if .CoverImg}}
+							{{range .CoverImg}}
+							<img class="card-img-top" src="{{AppSubURL}}/covers/{{.UUID}}" alt="{{.Name}}">
+							{{end}}
+							{{else}}
+							<img class="card-img-top" src="img/test.jpg" alt="test.jpg">
+							{{end}}
+						</a>
+						<div class="card-body">
+							<h6 class="card-title">{{ .Title}}</h6>
+							<p class="card-text">{{ .Author.DisplayName}}</p>
+						</div>
+					</div>
+				</div>
+				{{end}}
+			</div>
+			{{else}}
+			{{end}}
+
+
+			<div class="row">
+				{{with .Page}}
+				{{if gt .TotalPages 1}}
+				<div class="col-md-12">
+					<ul class="pagination justify-content-center">
+						<li class="page-item {{if .IsFirst}}disabled{{end}}">
+							<a class="page-link" href="{{$.Link}}?q={{$.Keyword}}"><i class="fa fa-fast-backward"></i> 首页</a>
+						</li>
+						<li class="page-item {{if not .HasPrevious}}disabled{{end}}">
+							<a class="page-link" href="{{$.Link}}?page={{.Previous}}&q={{$.Keyword}}"><i class="fa fa-backward"></i></a>
+						</li>
+						{{ range .Pages}}
+							{{if eq .Num -1}}
+							<li class="page-item disabled">
+								<a class="page-link" href="#" tabindex="-1">...</a>
+							</li>
+							{{else}}
+							<li class="page-item {{if .IsCurrent}}active{{end}}">
+								<a class="page-link" {{if not .IsCurrent}}href="{{$.Link}}?page={{.Num}}&q={{$.Keyword}}"{{end}}>{{.Num}}</a>
+							</li>
+							{{end}}
+						{{end}}
+						<li class="page-item {{if not .HasNext}}disabled{{end}}">
+							<a class="page-link" href="{{$.Link}}?page={{.Next}}&q={{$.Keyword}}"><i class="fa fa-forward"></i></a>
+						</li>
+						<li class="page-item {{if .IsLast}}disabled{{end}}">
+							<a class="page-link" href="{{$.Link}}?page={{.TotalPages}}&q={{$.Keyword}}">末页 <i class="fa fa-fast-forward"></i></a>
+						</li>
+					</ul>
+				</div>
+				{{end}}
+				{{end}}
+			</div>
+
+
+		</div>
+	</div>
+</main>
+
+{{template "base/footer" .}}
