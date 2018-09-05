@@ -2,6 +2,19 @@ package models
 
 import "fmt"
 
+type ErrUserNotExist struct {
+	LoginName string
+}
+
+func IsErrUserNotExist(err error) bool {
+	_, ok := err.(ErrUserNotExist)
+	return ok
+}
+
+func (err ErrUserNotExist) Error() string {
+	return fmt.Sprintf("user does not exist [login name: %s]", err.LoginName)
+}
+
 // .____                 .__         _______
 // |    |    ____   ____ |__| ____   \      \ _____    _____   ____
 // |    |   /  _ \ / ___\|  |/    \  /   |   \\__  \  /     \_/ __ \

@@ -454,6 +454,16 @@ func AnonViewPix(c *context.Context) {
 		return
 	}
 
+	post.Author, err = models.GetUserByPostID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrUserNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetAttachmentsByPostID", err)
+		}
+		return
+	}
+
 	post.Attachments, err = models.GetAttachmentsByPostID(c.ParamsInt64(":pixid"))
 	if err != nil {
 		if models.IsErrAttachmentNotExist(err) {

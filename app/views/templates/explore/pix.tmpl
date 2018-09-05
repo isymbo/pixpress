@@ -18,23 +18,33 @@
 	<div class="container-fluid">
   	<div class="animated fadeIn">
 			<div class="row justify-content-center">
-				<div class="col-md-8">
+				<div class="col-8">
 
 						<div class="row">
 							<div class="col-12">
-								<div class="card">
-									<div class="card-body">
-										<h2> {{.title}} </h2>
-										<hr>
-										<p> {{.content}} </p>
-										<hr>
-										<p> 作者: {{.Post.AuthorID}}
-										</p>
+								<div class="card-group my-4">
+									<div class="card col-9">
+										<div class="card-body">
+											<h2> {{.title}} </h2>
+											<p class="text-muted"> {{.content}} </p>
+											<div class="row">
+												<div><i class="icon-eye icons font-xl mt-4 col-6"></i> 100 次</div>
+												<div><i class="icon-cloud-download icons font-xl mt-4 col-6 "></i> 200 次</div>
+											</div>
+										</div>
+									</div>
+									<div class="card col-3">
+										<div class="card-body text-center">
+											<div>
+												<img class="img-avatar" src="{{ .Post.Author.AvatarLink }}" alt="{{ .Post.Author.LoginName }}">
+												<p>
+												<p> {{.Post.Author.DisplayName}} </p>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-
 
 						<div class="card">
 							<!-- Breadcrumb-->

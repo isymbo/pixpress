@@ -1164,3 +1164,23 @@ func SearchUserByName(opts *SearchUserOptions) (users []*User, _ int64, _ error)
 // 	}
 // 	return sess.Commit()
 // }
+
+func getUserByPostID(e Engine, id int64) (*User, error) {
+	p := new(Post)
+
+	has, err := e.Id(id).Get(p)
+	if err != nil {
+		return nil, err
+	} else if !has {
+		return nil, errors.PostNotExist{id, 0}
+	}
+
+	u := new(User)
+	u, err = GetUserByID(p.AuthorID)
+	return u, nil
+}
+
+// GetUserByPostID returns the user object by given post ID if exists.
+func GetUserByPostID(id int64) (*User, error) {
+	return getUserByPostID(x, id)
+}
