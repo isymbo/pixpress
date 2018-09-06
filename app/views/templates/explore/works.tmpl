@@ -30,7 +30,19 @@
 						</a>
 						<div class="card-body">
 							<h6 class="card-title">{{ .Title}}</h6>
-							<p class="card-text">{{ .Author.DisplayName}}</p>
+							<div class="row text-muted font-sm my-0">
+								<!--
+								<div><i class="icon-eye icons font-sm col-3"> 100</i></div>
+								<div><i class="icon-cloud-download icons font-sm col-3"> 200</i></div>
+								-->
+								<div>
+									<i class="icon-eye icons font-sm mt-4 mx-2"> 100</i>
+									<i class="icon-cloud-download icons font-sm"> 200</i>
+								</div>
+							</div>
+						</div>
+						<div class="card-footer">
+							<img class="img-avatar avatar-sm" src="{{ .Author.AvatarLink }}" alt="{{ .Author.LoginName }}">&nbsp  {{ .Author.DisplayName}}
 						</div>
 					</div>
 				</div>
