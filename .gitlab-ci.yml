@@ -119,6 +119,25 @@ deploy_testenv_job:
   only:
     - master
 
+
+deploy_alphaenv_job:
+  tags:
+    - ssh
+    - testdeploy
+  script:
+    - cd $PIXPRESS_DCOMPOSE_PATH
+    - docker-compose stop
+    - docker pull ${IMAGE_NAME}:${VERSION}
+    - docker-compose up -d
+  environment:
+    name: pixpress_alpha_stage
+    url: http://10.201.51.195/
+  stage: testenv_deploy
+  only:
+    - master
+  when:
+    - manual
+
 # prodenv_copy_job:
 #   tags:
 #     - ssh
