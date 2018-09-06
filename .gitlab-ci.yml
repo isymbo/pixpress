@@ -123,7 +123,7 @@ deploy_testenv_job:
 deploy_alphaenv_job:
   tags:
     - ssh
-    - testdeploy
+    - alphadeploy
   script:
     - cd $PIXPRESS_DCOMPOSE_PATH
     - docker-compose stop
@@ -135,8 +135,7 @@ deploy_alphaenv_job:
   stage: testenv_deploy
   only:
     - master
-  when:
-    - manual
+  when: manual
 
 # prodenv_copy_job:
 #   tags:
