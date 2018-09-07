@@ -199,7 +199,7 @@ func initRoutes(m *macaron.Macaron) {
 			c.Redirect(setting.AppSubURL + "/explore/works")
 		})
 		m.Get("/works", routes.ExploreWorks)
-		m.Get("/works/:pixid", post.AnonViewPix)
+		m.Get("/works/:pixid", post.NumViewsUpdate, post.AnonViewPix)
 	}, context.IgnSignIn)
 
 	setting.InitRoutes(m)

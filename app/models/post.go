@@ -31,13 +31,16 @@ const (
 // type ContentType string
 
 type Post struct {
-	ID          int64
-	AuthorID    int64  `xorm:"NOT NULL"`
-	Author      *User  `xorm:"-" json:"-"`
-	Title       string `xorm:"VARCHAR(100)"`
-	Content     string `xorm:"TEXT"`
-	PostType    PostType
-	NumComments int `xorm:"NOT NULL DEFAULT 0"`
+	ID           int64
+	AuthorID     int64  `xorm:"NOT NULL"`
+	Author       *User  `xorm:"-" json:"-"`
+	Title        string `xorm:"VARCHAR(100)"`
+	Content      string `xorm:"TEXT"`
+	PostType     PostType
+	NumComments  int `xorm:"NOT NULL DEFAULT 0"`
+	NumViews     int `xorm:"NOT NULL DEFAULT 0"`
+	NumLikes     int `xorm:"NOT NULL DEFAULT 0"`
+	NumDownloads int `xorm:"NOT NULL DEFAULT 0"`
 
 	Created     time.Time `xorm:"-" json:"-"`
 	CreatedUnix int64
@@ -220,6 +223,7 @@ func CountPosts() int64 {
 // Posts returns number of posts in given page.
 func Posts(page, pageSize int) ([]*Post, error) {
 	log.Trace("page, pageSize: %+v, %+v", page, pageSize)
+
 	posts := make([]*Post, 0, pageSize)
 	return posts, x.Limit(pageSize, (page-1)*pageSize).Where("post_type=0").Desc("id").Find(&posts)
 }
@@ -392,4 +396,9 @@ func createPostByOption(e *xorm.Session, opts *CreatePostOptions) (_ *Post, err 
 	}
 
 	return post, nil
+}
+
+func PostIncNumViews(p *Post) error {
+	p.NumViews += 1
+	return updatePost(x, p)
 }

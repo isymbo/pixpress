@@ -489,8 +489,20 @@ func AnonViewPix(c *context.Context) {
 	c.Data["Post"] = post
 
 	log.Trace("Post: %+v", post)
-	log.Trace("Post.Attachments: %+v", post.Attachments)
-	log.Trace("Post.CoverImg: %+v", post.CoverImg)
 
 	c.Success(EXPLORE_PIX)
+}
+
+func NumViewsUpdate(c *context.Context) {
+	post, err := models.GetPostByID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrPostNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetPostByID", err)
+		}
+		return
+	}
+
+	models.PostIncNumViews(post)
 }
