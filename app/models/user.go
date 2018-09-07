@@ -295,9 +295,9 @@ func (u *User) RelAvatarLink() string {
 // AvatarLink returns user avatar absolute link.
 func (u *User) AvatarLink() string {
 	link := u.RelAvatarLink()
-	if link[0] == '/' && link[1] != '/' {
-		return setting.AppURL + strings.TrimPrefix(link, setting.AppSubURL)[1:]
-	}
+	// if link[0] == '/' && link[1] != '/' {
+	// 	return setting.AppURL + strings.TrimPrefix(link, setting.AppSubURL)[1:]
+	// }
 	return link
 }
 
