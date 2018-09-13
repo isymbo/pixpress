@@ -1,11 +1,9 @@
 package post
 
 import (
-	"fmt"
+	"errors"
 	"io"
-	"os"
 
-	"github.com/Unknwon/com"
 	"github.com/go-macaron/binding"
 	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
@@ -28,6 +26,11 @@ const (
 	EXPLORE_PIX = "explore/pix"
 )
 
+var (
+	ErrFileTypeForbidden = errors.New("File type is not allowed")
+	ErrTooManyFiles      = errors.New("Maximum number of files to upload exceeded")
+)
+
 func InitRoutes(m *macaron.Macaron) {
 
 	reqSignIn := context.ReqSignIn
@@ -47,62 +50,9 @@ func InitRoutes(m *macaron.Macaron) {
 		m.Post("/coverimgs", UploadPixCoverImg)
 	})
 
-	m.Group("", func() {
-
-	})
-
-	m.Get("/attachments/:uuid", func(c *context.Context) {
-		attach, err := models.GetAttachmentByUUID(c.Params(":uuid"))
-		if err != nil {
-			c.NotFoundOrServerError("GetAttachmentByUUID", models.IsErrAttachmentNotExist, err)
-			return
-		} else if !com.IsFile(attach.LocalPath()) {
-			c.NotFound()
-			return
-		}
-
-		fr, err := os.Open(attach.LocalPath())
-		if err != nil {
-			c.Handle(500, "Open", err)
-			return
-		}
-		defer fr.Close()
-
-		c.Header().Set("Cache-Control", "public,max-age=86400")
-		fmt.Println("attach.Name:", attach.Name)
-		c.Header().Set("Content-Disposition", fmt.Sprintf(`inline; filename="%s"`, attach.Name))
-		if err = ServeData(c, attach.Name, fr); err != nil {
-			c.Handle(500, "ServeData", err)
-			return
-		}
-	})
-
-	m.Get("/covers/:uuid", func(c *context.Context) {
-		cover, err := models.GetCoverImgByUUID(c.Params(":uuid"))
-		if err != nil {
-			c.NotFoundOrServerError("GetCoverImgByUUID", models.IsErrCoverImgNotExist, err)
-			return
-		} else if !com.IsFile(cover.LocalPath()) {
-			c.NotFound()
-			return
-		}
-
-		fr, err := os.Open(cover.LocalPath())
-		if err != nil {
-			c.Handle(500, "Open", err)
-			return
-		}
-		defer fr.Close()
-
-		c.Header().Set("Cache-Control", "public,max-age=86400")
-		fmt.Println("cover.Name:", cover.Name)
-		c.Header().Set("Content-Disposition", fmt.Sprintf(`inline; filename="%s"`, cover.Name))
-		if err = ServeData(c, cover.Name, fr); err != nil {
-			c.Handle(500, "ServeData", err)
-			return
-		}
-	})
-
+	m.Get("/attachments/:uuid", RenderPixAttachment)
+	m.Get("/attachments/:uuid/action/:action", NumDownloadsUpdate, DownloadPixAttachment)
+	m.Get("/covers/:uuid", RenderPixCoverImg)
 }
 
 func ServeData(c *context.Context, name string, reader io.Reader) error {
@@ -116,6 +66,20 @@ func ServeData(c *context.Context, name string, reader io.Reader) error {
 		c.Resp.Header().Set("Content-Disposition", "attachment; filename=\""+name+"\"")
 		c.Resp.Header().Set("Content-Transfer-Encoding", "binary")
 	}
+	c.Resp.Write(buf)
+	_, err := io.Copy(c.Resp, reader)
+	return err
+}
+
+func ServeDownloadData(c *context.Context, name string, reader io.Reader) error {
+	buf := make([]byte, 1024)
+	n, _ := reader.Read(buf)
+	if n >= 0 {
+		buf = buf[:n]
+	}
+
+	c.Resp.Header().Set("Content-Disposition", "attachment; filename=\""+name+"\"")
+	c.Resp.Header().Set("Content-Transfer-Encoding", "binary")
 	c.Resp.Write(buf)
 	_, err := io.Copy(c.Resp, reader)
 	return err
@@ -176,9 +140,9 @@ func EditPix(c *context.Context) {
 	c.Data["content"] = post.Content
 	c.Data["Post"] = post
 
-	log.Trace("Post: %+v", post)
-	log.Trace("Post.Attachments: %+v", post.Attachments)
-	log.Trace("Post.CoverImg: %+v", post.CoverImg)
+	// log.Trace("Post: %+v", post)
+	// log.Trace("Post.Attachments: %+v", post.Attachments)
+	// log.Trace("Post.CoverImg: %+v", post.CoverImg)
 
 	c.Success(PIXEDIT)
 }
@@ -432,7 +396,7 @@ func NewPixPost(c *context.Context, f form.CreatePost) {
 		return
 	}
 
-	log.Trace("Post created: %d", post.ID)
+	log.Info("Post created: %d", post.ID)
 
 	c.SubURLRedirect(PIXHOME)
 }
@@ -488,8 +452,6 @@ func AnonViewPix(c *context.Context) {
 	c.Data["content"] = post.Content
 	c.Data["Post"] = post
 
-	log.Trace("Post: %+v", post)
-
 	c.Success(EXPLORE_PIX)
 }
 
@@ -505,4 +467,24 @@ func NumViewsUpdate(c *context.Context) {
 	}
 
 	models.PostIncNumViews(post)
+}
+
+func NumDownloadsUpdate(c *context.Context) {
+	attachment, err := models.GetAttachmentByUUID(c.Params(":uuid"))
+	if err != nil {
+		c.NotFoundOrServerError("GetAttachmentByUUID", models.IsErrAttachmentNotExist, err)
+		return
+	}
+
+	post, err := models.GetPostByID(attachment.PostID)
+	if err != nil {
+		if models.IsErrPostNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetPostByID", err)
+		}
+		return
+	}
+
+	models.PostIncNumDownloads(post)
 }

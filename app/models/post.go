@@ -402,3 +402,8 @@ func PostIncNumViews(p *Post) error {
 	p.NumViews += 1
 	return updatePost(x, p)
 }
+
+func PostIncNumDownloads(p *Post) error {
+	p.NumDownloads += 1
+	return updatePost(x, p)
+}

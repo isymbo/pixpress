@@ -1,21 +1,16 @@
 package post
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
-	log "gopkg.in/clog.v1"
+	"github.com/Unknwon/com"
 
 	"github.com/isymbo/pixpress/app/controllers/context"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
-)
-
-var (
-	ErrFileTypeForbidden = errors.New("File type is not allowed")
-	ErrTooManyFiles      = errors.New("Maximum number of files to upload exceeded")
 )
 
 func renderAttachmentSettings(c *context.Context) {
@@ -29,7 +24,7 @@ func renderAttachmentSettings(c *context.Context) {
 
 func uploadAttachment(c *context.Context, allowedTypes []string) {
 	file, header, err := c.Req.FormFile("file")
-	log.Trace("Attachment form file: %+v", file)
+	// log.Trace("Attachment form file: %+v", file)
 	if err != nil {
 		c.Error(500, fmt.Sprintf("FormFile: %v", err))
 		return
@@ -63,7 +58,7 @@ func uploadAttachment(c *context.Context, allowedTypes []string) {
 		return
 	}
 
-	log.Trace("New attachment uploaded: %s", attach.UUID)
+	// log.Trace("New attachment uploaded: %s", attach.UUID)
 	c.JSON(200, map[string]string{
 		"uuid": attach.UUID,
 	})
@@ -76,4 +71,56 @@ func UploadPixAttachment(c *context.Context) {
 	}
 
 	uploadAttachment(c, strings.Split(setting.Attachment.AllowedTypes, ","))
+}
+
+func RenderPixAttachment(c *context.Context) {
+	attach, err := models.GetAttachmentByUUID(c.Params(":uuid"))
+	if err != nil {
+		c.NotFoundOrServerError("GetAttachmentByUUID", models.IsErrAttachmentNotExist, err)
+		return
+	} else if !com.IsFile(attach.LocalPath()) {
+		c.NotFound()
+		return
+	}
+
+	fr, err := os.Open(attach.LocalPath())
+	if err != nil {
+		c.Handle(500, "Open", err)
+		return
+	}
+	defer fr.Close()
+
+	c.Header().Set("Cache-Control", "public,max-age=86400")
+	fmt.Println("attach.Name:", attach.Name)
+	c.Header().Set("Content-Disposition", fmt.Sprintf(`inline; filename="%s"`, attach.Name))
+	if err = ServeData(c, attach.Name, fr); err != nil {
+		c.Handle(500, "ServeData", err)
+		return
+	}
+}
+
+func DownloadPixAttachment(c *context.Context) {
+	attach, err := models.GetAttachmentByUUID(c.Params(":uuid"))
+	if err != nil {
+		c.NotFoundOrServerError("GetAttachmentByUUID", models.IsErrAttachmentNotExist, err)
+		return
+	} else if !com.IsFile(attach.LocalPath()) {
+		c.NotFound()
+		return
+	}
+
+	fr, err := os.Open(attach.LocalPath())
+	if err != nil {
+		c.Handle(500, "Open", err)
+		return
+	}
+	defer fr.Close()
+
+	c.Header().Set("Cache-Control", "public,max-age=86400")
+	fmt.Println("attach.Name:", attach.Name)
+	c.Header().Set("Content-Disposition", fmt.Sprintf(`inline; filename="%s"`, attach.Name))
+	if err = ServeDownloadData(c, attach.Name, fr); err != nil {
+		c.Handle(500, "ServeDownloadData", err)
+		return
+	}
 }

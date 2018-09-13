@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-xorm/xorm"
 	gouuid "github.com/satori/go.uuid"
-	log "gopkg.in/clog.v1"
 
 	"github.com/isymbo/pixpress/setting"
 )
@@ -58,7 +57,7 @@ func NewCoverImg(name string, buf []byte, file multipart.File) (_ *CoverImg, err
 		Name: name,
 	}
 
-	log.Trace("cover image: %+v", attach)
+	// log.Trace("cover image: %+v", attach)
 
 	localPath := attach.LocalPath()
 	if err = os.MkdirAll(path.Dir(localPath), os.ModePerm); err != nil {
@@ -115,7 +114,7 @@ func getCoverImgsByPostID(e Engine, postID int64) ([]*CoverImg, error) {
 
 	// return attachments, e.Where("post_id = ?", postID).Find(&attachments)
 	err := e.Where("post_id = ?", postID).Find(&attachments)
-	log.Trace("attachments: %+v", attachments)
+	// log.Trace("cover image: %+v", attachments)
 
 	return attachments, err
 }

@@ -3,19 +3,15 @@ package post
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
-	log "gopkg.in/clog.v1"
+	"github.com/Unknwon/com"
 
 	"github.com/isymbo/pixpress/app/controllers/context"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/setting"
 )
-
-// var (
-// 	ErrFileTypeForbidden = errors.New("File type is not allowed")
-// 	ErrTooManyFiles      = errors.New("Maximum number of files to upload exceeded")
-// )
 
 func renderCoverSettings(c *context.Context) {
 	c.Data["RequireDropzone"] = true
@@ -61,7 +57,7 @@ func uploadCoverImg(c *context.Context, allowedTypes []string) {
 		return
 	}
 
-	log.Trace("New cover image uploaded: %s", attach.UUID)
+	// log.Trace("New cover image uploaded: %s", attach.UUID)
 	c.JSON(200, map[string]string{
 		"uuid": attach.UUID,
 	})
@@ -69,4 +65,30 @@ func uploadCoverImg(c *context.Context, allowedTypes []string) {
 
 func UploadPixCoverImg(c *context.Context) {
 	uploadCoverImg(c, strings.Split(setting.Cover.AllowedTypes, ","))
+}
+
+func RenderPixCoverImg(c *context.Context) {
+	cover, err := models.GetCoverImgByUUID(c.Params(":uuid"))
+	if err != nil {
+		c.NotFoundOrServerError("GetCoverImgByUUID", models.IsErrCoverImgNotExist, err)
+		return
+	} else if !com.IsFile(cover.LocalPath()) {
+		c.NotFound()
+		return
+	}
+
+	fr, err := os.Open(cover.LocalPath())
+	if err != nil {
+		c.Handle(500, "Open", err)
+		return
+	}
+	defer fr.Close()
+
+	c.Header().Set("Cache-Control", "public,max-age=86400")
+	fmt.Println("cover.Name:", cover.Name)
+	c.Header().Set("Content-Disposition", fmt.Sprintf(`inline; filename="%s"`, cover.Name))
+	if err = ServeData(c, cover.Name, fr); err != nil {
+		c.Handle(500, "ServeData", err)
+		return
+	}
 }

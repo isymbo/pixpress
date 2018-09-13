@@ -115,7 +115,7 @@ func getAttachmentsByPostID(e Engine, postID int64) ([]*Attachment, error) {
 
 	// return attachments, e.Where("post_id = ?", postID).Find(&attachments)
 	err := e.Where("post_id = ?", postID).Find(&attachments)
-	log.Trace("attachments: %+v", attachments)
+	// log.Trace("attachments: %+v", attachments)
 
 	return attachments, err
 }

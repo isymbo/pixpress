@@ -175,8 +175,6 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 			return
 		}
 		count = opts.Counter()
-		log.Trace("Posts: %+v", posts)
-		log.Trace("count: %+v", count)
 	} else {
 		posts, count, err = models.SearchPostByName(&models.SearchPostOptions{
 			Keyword:  keyword,
@@ -203,8 +201,6 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 	c.Data["Total"] = count
 	c.Data["Page"] = paginater.New(int(count), opts.PageSize, page, 5)
 	c.Data["Posts"] = posts
-
-	log.Trace("Posts: %+v", posts)
 
 	c.Success(opts.TplName)
 }
