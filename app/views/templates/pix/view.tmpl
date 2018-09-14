@@ -1,0 +1,99 @@
+{{template "base/header" .}}
+
+<!--Main layout-->
+<main class="main">
+	<!-- Breadcrumb-->
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item">
+		  <a href="user/home">我的</a>
+		</li>
+		<li class="breadcrumb-item">
+		  <a href="pix">作品</a>
+		</li>
+		<li class="breadcrumb-item active" aria-current="page">
+			详细信息
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+  	<div class="animated fadeIn">
+			<div class="row justify-content-center">
+				<div class="col-md-8">
+
+					<div class="row">
+						<div class="col-12">
+							<div class="card-group my-4">
+								<div class="card">
+									<div class="card-body pb-1">
+										<h2> {{.title}} </h2>
+										<p class="text-muted my-4"> {{.content}} </p>
+										<div class="row text-muted my-3">
+											<div><i class="icon-eye icons font-2xl col-6"></i> {{ .Post.NumViews }} </div>
+											<div><i class="icon-like icons font-2xl col-6"></i> {{ .Post.NumLikes }} </div>
+											<div><i class="icon-cloud-download icons font-2xl col-6"></i> {{ .Post.NumDownloads }} </div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<!-- Breadcrumb-->
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item active" aria-current="page">
+								封面
+							</li>
+						</ol>
+						<div class="card-body mt-0 pt-0">
+							{{range .Post.CoverImg}}
+							<div class="row justify-content-center mx-auto">
+									<div class="text-center">
+										<img class="img-thumbnail" src="{{AppSubURL}}/covers/{{.UUID}}" alt="{{.Name}}">
+									</div>
+							</div>
+							{{end}}
+						</div>
+					</div>
+
+					<div class="card">
+						<!-- Breadcrumb-->
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item active" aria-current="page">
+								附件
+							</li>
+						</ol>
+						<div class="card-body mt-0 pt-0">
+							<div class="alert alert-warning alert-dismissible fade show" role="alert">
+								点击下列附件即可下载！
+								<button class="close" type="button" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">×</span>
+								</button>
+							</div>
+
+							{{if .Post.Attachments}}
+							<div class="list-group">
+							{{range .Post.Attachments}}
+								<a target="_blank" href="{{AppSubURL}}/attachments/{{.UUID}}/action/download" title="点击下载 {{ .Name}}">
+									{{if FilenameIsImage .Name}}
+										<img src="{{AppSubURL}}/attachments/{{.UUID}}" alt="{{.Name}}" title="点击下载 {{ .Name}}" class="img-thumbnail">
+									{{else}}
+										<span><i class="fa fa-download fa-x text-primary mt-4"></i> {{ .Name}}</span>
+									{{end}}
+								</a>
+							{{end}}
+							</div>
+							{{end}}
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+</main>
+<!--Main layout-->
+
+{{template "base/footer" .}}

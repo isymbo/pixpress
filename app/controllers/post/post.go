@@ -21,6 +21,7 @@ const (
 	PIXEDIT   = "pix/edit"
 	PIXDELETE = "pix/delete"
 	PIXES     = "pix/list"
+	PIXVIEW   = "pix/view"
 	PIXHOME   = "/pix"
 
 	EXPLORE_PIX = "explore/pix"
@@ -38,14 +39,14 @@ func InitRoutes(m *macaron.Macaron) {
 
 	m.Group("/pix", func() {
 		m.Get("", reqSignIn, ListPix)
-		m.Combo("/:pixid").
+		m.Get("/:pixid", reqSignIn, ViewPix)
+		m.Combo("/:pixid/edit").
 			Get(reqSignIn, EditPix).
 			Post(bindIgnErr(form.CreatePost{}), EditPixPost)
 		m.Get("/:pixid/delete", reqSignIn, DeletePix)
 		m.Combo("/new").
 			Get(reqSignIn, NewPix).
 			Post(bindIgnErr(form.CreatePost{}), NewPixPost)
-		// m.Post("/new/cover", reqSignIn, binding.MultipartForm(form.CoverImg{}), PixCoverImgPost)
 		m.Post("/attachments", UploadPixAttachment)
 		m.Post("/coverimgs", UploadPixCoverImg)
 	})
@@ -423,7 +424,7 @@ func AnonViewPix(c *context.Context) {
 		if models.IsErrUserNotExist(err) {
 			c.Handle(404, "", nil)
 		} else {
-			c.Handle(500, "GetAttachmentsByPostID", err)
+			c.Handle(500, "GetUserByPostID", err)
 		}
 		return
 	}
@@ -487,4 +488,58 @@ func NumDownloadsUpdate(c *context.Context) {
 	}
 
 	models.PostIncNumDownloads(post)
+}
+
+func ViewPix(c *context.Context) {
+	c.Data["Title"] = "作品信息"
+	c.Data["PageIsPix"] = true
+	c.Data["PageIsViewPix"] = true
+	renderAttachmentSettings(c)
+	renderCoverSettings(c)
+
+	post, err := models.GetPostByID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrPostNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetPostByID", err)
+		}
+		return
+	}
+
+	post.Author, err = models.GetUserByPostID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrUserNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetUserByPostID", err)
+		}
+		return
+	}
+
+	post.Attachments, err = models.GetAttachmentsByPostID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrAttachmentNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetAttachmentsByPostID", err)
+		}
+		return
+	}
+
+	post.CoverImg, err = models.GetCoverImgsByPostID(c.ParamsInt64(":pixid"))
+	if err != nil {
+		if models.IsErrCoverImgNotExist(err) {
+			c.Handle(404, "", nil)
+		} else {
+			c.Handle(500, "GetCoverImgsByPostID", err)
+		}
+		return
+	}
+
+	c.Data["title"] = post.Title
+	c.Data["content"] = post.Content
+	c.Data["Post"] = post
+
+	c.Success(PIXVIEW)
 }
