@@ -194,6 +194,8 @@ func SearchPostByAuthorID(opts *SearchPostByAuthorIDOptions) (posts []*Post, _ i
 	searchQuery := strconv.FormatInt(opts.AuthorID, 10)
 	posts = make([]*Post, 0, opts.PageSize)
 	// Append conditions
+	log.Trace("opts.AuthorID: %+v", opts.AuthorID)
+	log.Trace("searchQuery: %+v", searchQuery)
 	sess := x.Where("author_id = ?", searchQuery).
 		And("type = ?", opts.Type)
 
@@ -406,4 +408,22 @@ func PostIncNumViews(p *Post) error {
 func PostIncNumDownloads(p *Post) error {
 	p.NumDownloads += 1
 	return updatePost(x, p)
+}
+
+func countPostsByAuthorID(e Engine, authorID int64) int64 {
+	count, _ := e.Where("author_id = ?", authorID).And("post_type=0").Count(new(Post))
+	return count
+}
+
+// CountPosts returns number of posts by authorID.
+func CountPostsByAuthorID(authorID int64) int64 {
+	return countPostsByAuthorID(x, authorID)
+}
+
+// Posts returns number of posts in given page.
+func PostsByAuthorID(page, pageSize int, authorID int64) ([]*Post, error) {
+	log.Trace("page, pageSize, authorID: %+v, %+v, %+v", page, pageSize, authorID)
+
+	posts := make([]*Post, 0, pageSize)
+	return posts, x.Limit(pageSize, (page-1)*pageSize).Where("author_id = ?", authorID).And("post_type=0").Desc("id").Find(&posts)
 }

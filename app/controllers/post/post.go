@@ -182,7 +182,7 @@ func EditPixPost(c *context.Context, f form.CreatePost) {
 }
 
 func ListPix(c *context.Context) {
-	c.Data["Title"] = "作品列表"
+	c.Data["Title"] = "我的作品列表"
 	c.Data["PageIsPixes"] = true
 	c.Data["PageIsListPix"] = true
 
@@ -192,8 +192,8 @@ func ListPix(c *context.Context) {
 
 	routes.RenderPostSearchByAuthorID(c, &routes.PostSearchByAuthorIDOptions{
 		Type:     models.POST_TYPE_PIX,
-		Counter:  models.CountPosts,
-		Ranger:   models.Posts,
+		Counter:  models.CountPostsByAuthorID,
+		Ranger:   models.PostsByAuthorID,
 		PageSize: setting.UI.User.PostPagingNum,
 		OrderBy:  "updated_unix DESC",
 		TplName:  PIXES,

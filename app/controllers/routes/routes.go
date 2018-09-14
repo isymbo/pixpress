@@ -222,8 +222,8 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 
 type PostSearchByAuthorIDOptions struct {
 	Type     models.PostType
-	Counter  func() int64
-	Ranger   func(int, int) ([]*models.Post, error)
+	Counter  func(int64) int64
+	Ranger   func(int, int, int64) ([]*models.Post, error)
 	PageSize int
 	OrderBy  string
 	TplName  string
@@ -242,14 +242,16 @@ func RenderPostSearchByAuthorID(c *context.Context, opts *PostSearchByAuthorIDOp
 		err   error
 	)
 
+	log.Trace("routes/PostSearchByAuthorID: Options.AuthorID %+v", opts.AuthorID)
 	keyword := c.Query("q")
 	if len(keyword) == 0 {
-		posts, err = opts.Ranger(page, opts.PageSize)
+		posts, err = opts.Ranger(page, opts.PageSize, opts.AuthorID)
 		if err != nil {
 			c.ServerError("Ranger", err)
 			return
 		}
-		count = opts.Counter()
+		count = opts.Counter(opts.AuthorID)
+		log.Trace("routes/PostSearchByAuthorID: count %+v", count)
 	} else {
 		posts, count, err = models.SearchPostByAuthorID(&models.SearchPostByAuthorIDOptions{
 			AuthorID: opts.AuthorID,
@@ -258,6 +260,7 @@ func RenderPostSearchByAuthorID(c *context.Context, opts *PostSearchByAuthorIDOp
 			Page:     page,
 			PageSize: opts.PageSize,
 		})
+		log.Trace("routes/PostSearchByAuthorID: opts.count %+v", count)
 		if err != nil {
 			c.ServerError("SearchPostByAuthorID", err)
 			return
