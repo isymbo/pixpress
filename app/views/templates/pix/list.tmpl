@@ -14,7 +14,6 @@
 	<div class="container-fluid">
 		<div class="animated fadeIn">
 
-			<!--
 			{{if .Posts}}
 			<div class="row">
 			  {{$Link := .Link}}
@@ -34,41 +33,9 @@
 							<div class="row pl-2 my-1"><h6>{{ .Title}}</h6></div>
 							<div class="row text-muted">
 									<i class="icon-eye icons font-sm mx-2"> {{ .NumViews }} </i>
+									<!--
 									<i class="icon-like icons font-sm mx-2"> {{ .NumLikes }} </i>
-									<i class="icon-cloud-download icons font-sm mx-2"> {{ .NumDownloads }} </i>
-							</div>
-						</div>
-						<div class="card-footer">
-							<img class="img-avatar avatar-sm" src="{{ .Author.AvatarLink }}" alt="{{ .Author.LoginName }}">&nbsp  {{ .Author.DisplayName}}
-						</div>
-					</div>
-				</div>
-				{{end}}
-			</div>
-			{{else}}
-			{{end}}
-			-->
-
-			{{if .Posts}}
-			<div class="row">
-			  {{$Link := .Link}}
-				{{range .Posts}}
-				<div class="col-md-3">
-					<div class="card">
-						<a href="{{ $Link}}/{{ .ID}}">
-							{{if .CoverImg}}
-							{{range .CoverImg}}
-							<img class="card-img-top" src="{{AppSubURL}}/covers/{{.UUID}}" alt="{{.Name}}">
-							{{end}}
-							{{else}}
-							<img class="card-img-top" src="img/test.jpg" alt="test.jpg">
-							{{end}}
-						</a>
-						<div class="card-body">
-							<div class="row pl-2 my-1"><h6>{{ .Title}}</h6></div>
-							<div class="row text-muted">
-									<i class="icon-eye icons font-sm mx-2"> {{ .NumViews }} </i>
-									<i class="icon-like icons font-sm mx-2"> {{ .NumLikes }} </i>
+									-->
 									<i class="icon-cloud-download icons font-sm mx-2"> {{ .NumDownloads }} </i>
 							</div>
 						</div>
