@@ -41,7 +41,30 @@
 						</div>
 						<div class="card-footer">
 							<a class="badge badge-light text-muted font-weight-normal" href="#" style="font-size:12px">编辑</a>
-							<a class="badge badge-light text-muted font-weight-normal" href="#" style="font-size:12px">删除</a>
+							<!--
+							<a class="badge badge-light text-muted font-weight-normal" href="{{ $Link}}/{{ .ID}}/delete" style="font-size:12px">删除</a>
+							-->
+ 							<a class="badge badge-light text-muted font-weight-normal" href="" data-toggle="modal" data-target="#ModalDelete{{.ID}}" style="font-size:12px">删除</a>
+						</div>
+						<!-- Modal -->
+						<div class="modal fade" id="ModalDelete{{.ID}}" tabindex="-1" role="dialog" aria-labelledby="ModalDeleteTitle" aria-hidden="true">
+							<div class="modal-dialog modal-dialog-centered" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="ModalDeleteTitle">删除操作提示</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										删除操作不可恢复，确认删除吗？
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">呃，我再想想</button>
+										<a class="btn btn-primary" href="{{ $Link}}/{{ .ID}}/delete" role="button">是，确认删除</a>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -83,6 +106,7 @@
 				{{end}}
 				{{end}}
 			</div>
+
 
 
 		</div>
