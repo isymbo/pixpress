@@ -194,8 +194,6 @@ func SearchPostByAuthorID(opts *SearchPostByAuthorIDOptions) (posts []*Post, _ i
 	searchQuery := strconv.FormatInt(opts.AuthorID, 10)
 	posts = make([]*Post, 0, opts.PageSize)
 	// Append conditions
-	log.Trace("opts.AuthorID: %+v", opts.AuthorID)
-	log.Trace("searchQuery: %+v", searchQuery)
 	sess := x.Where("author_id = ?", searchQuery).
 		And("type = ?", opts.Type)
 
@@ -224,8 +222,6 @@ func CountPosts() int64 {
 
 // Posts returns number of posts in given page.
 func Posts(page, pageSize int) ([]*Post, error) {
-	log.Trace("page, pageSize: %+v, %+v", page, pageSize)
-
 	posts := make([]*Post, 0, pageSize)
 	return posts, x.Limit(pageSize, (page-1)*pageSize).Where("post_type=0").Desc("id").Find(&posts)
 }
@@ -351,7 +347,6 @@ func createPostByOption(e *xorm.Session, opts *CreatePostOptions) (_ *Post, err 
 		return nil, err
 	}
 
-	log.Trace("attachments length: %+v", len(opts.Attachments))
 	// Check attachments
 	attachments := make([]*Attachment, 0, len(opts.Attachments))
 	for _, uuid := range opts.Attachments {
@@ -374,7 +369,6 @@ func createPostByOption(e *xorm.Session, opts *CreatePostOptions) (_ *Post, err 
 		}
 	}
 
-	log.Trace("coverimg length: %+v", len(opts.CoverImg))
 	// Check coverimg
 	coverimg := make([]*CoverImg, 0, len(opts.CoverImg))
 	for _, uuid := range opts.CoverImg {
@@ -422,8 +416,6 @@ func CountPostsByAuthorID(authorID int64) int64 {
 
 // Posts returns number of posts in given page.
 func PostsByAuthorID(page, pageSize int, authorID int64) ([]*Post, error) {
-	log.Trace("page, pageSize, authorID: %+v, %+v, %+v", page, pageSize, authorID)
-
 	posts := make([]*Post, 0, pageSize)
 	return posts, x.Limit(pageSize, (page-1)*pageSize).Where("author_id = ?", authorID).And("post_type=0").Desc("id").Find(&posts)
 }

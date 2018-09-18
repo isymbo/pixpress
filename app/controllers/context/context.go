@@ -288,10 +288,12 @@ func Contexter() macaron.Handler {
 			c.Data["LoggedUserID"] = c.User.ID
 			c.Data["LoggedUserName"] = c.User.LoginName
 			c.Data["IsAdmin"] = c.User.IsAdmin
+			c.Data["LoggedUserPostsNum"] = models.CountPostsByAuthorID(c.User.ID)
 			log.Trace("%s is logged in.", c.User.LoginName)
 		} else {
 			c.Data["LoggedUserID"] = 0
 			c.Data["LoggedUserName"] = ""
+			c.Data["LoggedUserPostsNum"] = ""
 			log.Trace("User is not logged in yet.")
 		}
 
