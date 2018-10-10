@@ -3,6 +3,7 @@ package post
 import (
 	"errors"
 	"io"
+	"time"
 
 	"github.com/go-macaron/binding"
 	log "gopkg.in/clog.v1"
@@ -418,6 +419,7 @@ func AnonViewPix(c *context.Context) {
 		}
 		return
 	}
+	post.Updated = time.Unix(post.UpdatedUnix, 0).Local()
 
 	post.Author, err = models.GetUserByPostID(c.ParamsInt64(":pixid"))
 	if err != nil {

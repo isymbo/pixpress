@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"html/template"
 	"math/big"
+	"reflect"
 	"strings"
 	"time"
 	"unicode"
@@ -331,13 +332,63 @@ func timeSince(then time.Time, lang string) string {
 	}
 }
 
+func timeSince_zhCN(then time.Time, lang string) string {
+	now := time.Now()
+
+	lbl := "之前"
+	diff := now.Unix() - then.Unix()
+	if then.After(now) {
+		lbl = "之后"
+		diff = then.Unix() - now.Unix()
+	}
+
+	switch {
+	case diff <= 0:
+		return "刚刚"
+	case diff <= 2:
+		return Tr("1 秒%s", lbl)
+	case diff < 1*Minute:
+		return Tr("%d 秒%s", diff, lbl)
+
+	case diff < 2*Minute:
+		return Tr("1 分钟%s", lbl)
+	case diff < 1*Hour:
+		return Tr("%d 分钟%s", diff/Minute, lbl)
+
+	case diff < 2*Hour:
+		return Tr("1 小时%s", lbl)
+	case diff < 1*Day:
+		return Tr("%d 小时%s", diff/Hour, lbl)
+
+	case diff < 2*Day:
+		return i18n.Tr(lang, "1 天%s", lbl)
+	case diff < 1*Week:
+		return i18n.Tr(lang, "%d 天%s", diff/Day, lbl)
+
+	case diff < 2*Week:
+		return i18n.Tr(lang, "1 周%s", lbl)
+	case diff < 1*Month:
+		return i18n.Tr(lang, "%d 周%s", diff/Week, lbl)
+
+	case diff < 2*Month:
+		return i18n.Tr(lang, "1 月%s", lbl)
+	case diff < 1*Year:
+		return i18n.Tr(lang, "%d 月%s", diff/Month, lbl)
+
+	case diff < 2*Year:
+		return i18n.Tr(lang, "1 年%s", lbl)
+	default:
+		return i18n.Tr(lang, "%d 年%s", diff/Year, lbl)
+	}
+}
+
 func RawTimeSince(t time.Time, lang string) string {
 	return timeSince(t, lang)
 }
 
 // TimeSince calculates the time interval and generate user-friendly string.
 func TimeSince(t time.Time, lang string) template.HTML {
-	return template.HTML(fmt.Sprintf(`<span class="time-since" title="%s">%s</span>`, t.Format(setting.Time.Format), timeSince(t, lang)))
+	return template.HTML(fmt.Sprintf(`<span class="time-since" title="%s">%s</span>`, t.Format(setting.Time.Format), timeSince_zhCN(t, lang)))
 }
 
 // Subtract deals with subtraction of all types of number.
@@ -439,4 +490,40 @@ func Int64sToMap(ints []int64) map[int64]bool {
 // https://github.com/golang/go/blob/master/src/go/scanner/scanner.go#L257
 func IsLetter(ch rune) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_' || ch >= 0x80 && unicode.IsLetter(ch)
+}
+
+// Tr translates string to target format.
+func Tr(format string, args ...interface{}) string {
+	// var section string
+
+	// idx := strings.IndexByte(format, '.')
+	// if idx > 0 {
+	// 	section = format[:idx]
+	// 	format = format[idx+1:]
+	// }
+
+	// value, ok := locales.Get(lang, section, format)
+	// if ok {
+	// 	format = value
+	// }
+
+	if len(args) > 0 {
+		params := make([]interface{}, 0, len(args))
+		for _, arg := range args {
+			if arg == nil {
+				continue
+			}
+
+			val := reflect.ValueOf(arg)
+			if val.Kind() == reflect.Slice {
+				for i := 0; i < val.Len(); i++ {
+					params = append(params, val.Index(i).Interface())
+				}
+			} else {
+				params = append(params, arg)
+			}
+		}
+		return fmt.Sprintf(format, params...)
+	}
+	return format
 }

@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"time"
+
 	"github.com/Unknwon/paginater"
 	log "gopkg.in/clog.v1"
 
@@ -192,6 +194,8 @@ func RenderPostSearch(c *context.Context, opts *PostSearchOptions) {
 	for _, p := range posts {
 		u, _ := models.GetUserByID(p.AuthorID)
 		p.Author = u
+
+		p.Updated = time.Unix(p.UpdatedUnix, 0).Local()
 
 		cover, _ := models.GetCoverImgsByPostID(p.ID)
 		p.CoverImg = cover
