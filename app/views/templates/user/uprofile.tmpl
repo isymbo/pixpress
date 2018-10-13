@@ -18,30 +18,30 @@
 						<div class="card-body">
 							<div class="row justify-content-center my-4">
 									<div class="img-avatar">
-                  	<img class="img-avatar" src="{{ .LoggedUser.AvatarLink }}" alt="{{.LoggedUserName}}" style="width:100px">
+                  	<img class="img-avatar" src="{{ .UUser.AvatarLink }}" alt="{{.UUser.LoginName}}" style="width:100px">
                 	</div>
 							</div>
 							<table class="table table-responsive-sm">
 								<tbody>
 									<tr>
 										<td>用户 ID</td>
-										<td>{{.LoggedUserID}}</td>
+										<td>{{.UUser.ID}}</td>
 									</tr>
 									<tr>
 										<td>姓名</td>
-										<td>{{.LoggedUser.DisplayName}}</td>
+										<td>{{.UUser.DisplayName}}</td>
 									</tr>
 									<tr>
 										<td>用户名称</td>
-										<td>{{.LoggedUserName}}</td>
+										<td>{{.UUser.LoginName}}</td>
 									</tr>
 									<tr>
 										<td>电子邮件</td>
-										<td>{{.LoggedUser.Email}}</td>
+										<td>{{.UUser.Email}}</td>
 									</tr>
 									<tr>
 										<td>手机号码</td>
-										<td>{{.LoggedUser.Mobile}}</td>
+										<td>{{.UUser.Mobile}}</td>
 									</tr>
 								</tbody>
 							</table>

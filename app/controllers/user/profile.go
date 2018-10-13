@@ -105,13 +105,14 @@ func Profile(c *context.Context) {
 func UProfile(c *context.Context) {
 	uid := c.ParamsInt64(":uid")
 
-	ctxUser := GetUserByID(c, uid)
+	UUser := GetUserByID(c, uid)
 	if c.Written() {
 		return
 	}
 
-	c.Data["Title"] = ctxUser.DisplayName
-	c.Data["PageIsUserUProfile"] = true
+	c.Data["Title"] = UUser.DisplayName
+	c.Data["PageIsUProfile"] = true
+	c.Data["UUser"] = UUser
 
 	c.Success(UPROFILE)
 }
