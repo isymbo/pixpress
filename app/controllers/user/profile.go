@@ -4,8 +4,6 @@ import (
 	"path"
 	"strings"
 
-	log "gopkg.in/clog.v1"
-
 	"github.com/isymbo/pixpress/app/controllers/context"
 	"github.com/isymbo/pixpress/app/models"
 	"github.com/isymbo/pixpress/app/models/errors"
@@ -21,14 +19,23 @@ func GetUserByName(c *context.Context, name string) *models.User {
 	return user
 }
 
-// GetUserByParams returns user whose name is presented in URL paramenter.
-func GetUserByParams(c *context.Context) *models.User {
-	return GetUserByName(c, c.Params(":username"))
+// // GetUserByParams returns user whose name is presented in URL paramenter.
+// func GetUserByParams(c *context.Context) *models.User {
+// 	return GetUserByName(c, c.Params(":username"))
+// }
+
+func GetUserByID(c *context.Context, id int64) *models.User {
+	user, err := models.GetUserByID(id)
+	if err != nil {
+		c.NotFoundOrServerError("GetUserByName", errors.IsUserNotExist, err)
+		return nil
+	}
+	return user
 }
 
 func Profile(c *context.Context) {
 	uname := c.Params(":loginname")
-	log.Trace("loginname: %+v", uname)
+	//log.Trace("loginname: %+v", uname)
 	// Special handle for FireFox requests favicon.ico.
 	if uname == "favicon.ico" {
 		c.ServeFile(path.Join(setting.Server.StaticRootPath, "public/img/favicon.png"))
@@ -39,7 +46,7 @@ func Profile(c *context.Context) {
 	}
 
 	ctxUser := GetUserByName(c, strings.TrimSuffix(uname, ".keys"))
-	log.Trace("ctxUser: %+v", ctxUser)
+	//log.Trace("ctxUser: %+v", ctxUser)
 	if c.Written() {
 		return
 	}
@@ -51,7 +58,7 @@ func Profile(c *context.Context) {
 
 	c.Data["Title"] = ctxUser.DisplayName
 	c.Data["PageIsUserProfile"] = true
-	c.Data["Owner"] = ctxUser
+	//c.Data["Owner"] = ctxUser
 
 	// orgs, err := models.GetOrgsByUserID(ctxUser.ID, c.IsLogged && (c.User.IsAdmin || c.User.ID == ctxUser.ID))
 	// if err != nil {
@@ -93,4 +100,18 @@ func Profile(c *context.Context) {
 
 	//c.HTML(200, PROFILE)
 	c.Success(PROFILE)
+}
+
+func UProfile(c *context.Context) {
+	uid := c.ParamsInt64(":uid")
+
+	ctxUser := GetUserByID(c, uid)
+	if c.Written() {
+		return
+	}
+
+	c.Data["Title"] = ctxUser.DisplayName
+	c.Data["PageIsUserUProfile"] = true
+
+	c.Success(UPROFILE)
 }

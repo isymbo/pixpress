@@ -21,6 +21,8 @@ const (
 	HOME            = "user/home"
 	PROFILE         = "user/profile"
 	SETTINGS_AVATAR = "user/settings/avatar"
+
+	UPROFILE = "user/uprofile"
 )
 
 type User struct {
@@ -54,6 +56,10 @@ func InitRoutes(m *macaron.Macaron) {
 		m.Combo("/avatar").
 			Get(reqSignIn, SettingsAvatar).
 			Post(bindIgnErr(form.Avatar{}), SettingsAvatarPost)
+	})
+
+	m.Group("/u", func() {
+		m.Get("/:uid", reqSignIn, UProfile)
 	})
 
 	// m.Group("/user", func() {

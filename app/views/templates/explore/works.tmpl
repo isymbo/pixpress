@@ -39,8 +39,11 @@
 							</div>
 						</div>
 						<div class="card-footer">
-							<div class="row pl-2 my-1">
-								<div class="col-6"><img class="img-avatar avatar-sm" src="{{ .Author.AvatarLink }}" alt="{{ .Author.LoginName }}">&nbsp {{ .Author.DisplayName}}</div>
+							<div class="row my-1">
+								<div class="col-6">
+									<img class="img-avatar avatar-sm" src="{{ .Author.AvatarLink }}" alt="{{ .Author.LoginName }}">
+									<a href="/u/{{.Author.ID}}"><small>{{ .Author.DisplayName}}</small></a>
+								</div>
 								<div class="d-flex align-content-end col-6"><div class="p-0"><small>更新于 {{TimeSince .Updated "CN"}}</small></div></div>
 							</div>
 						</div>
