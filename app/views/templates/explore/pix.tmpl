@@ -42,9 +42,13 @@
 								<div class="card col-3">
 									<div class="card-body text-center pb-1">
 										<div>
+											<a href="/u/{{.Post.Author.ID}}">
 											<img class="img-avatar" src="{{ .Post.Author.AvatarLink }}" alt="{{ .Post.Author.LoginName }}" style="width:100px">
+											</a>
 											<p>
+											<a href="/u/{{.Post.Author.ID}}">
 											<p> {{.Post.Author.DisplayName}} </p>
+											</a>
 										</div>
 									</div>
 								</div>
