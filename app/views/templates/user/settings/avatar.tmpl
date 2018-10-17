@@ -18,7 +18,9 @@
 	<div class="container-fluid">
   	<div class="animated fadeIn">
 		  <div class="row justify-content-center">
+					<!--
 					{{template "user/settings/navbar" .}}
+					-->
 					<div class="col-md-6">
 						{{template "base/alert" .}}
 
@@ -34,6 +36,14 @@
 
 								<form class="form-horizontal" action="{{.Link}}" method="post" enctype="multipart/form-data">
 								<hr class="my-4">
+									<div class="alert alert-warning alert-dismissible fade show" role="alert">
+									  如若修改本方式显示的头像图片，请用本邮箱登录 cn.gravatar.com 里设置。
+										<!--
+										<button class="close" type="button" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">×</span>
+										</button>
+										-->
+									</div>
 								<div class="col-md-10 justify-content-center">
 									<div class="form-group row">
 										<div class="form-check">

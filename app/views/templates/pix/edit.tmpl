@@ -19,6 +19,15 @@
   	<div class="animated fadeIn">
 			<div class="row justify-content-center">
 				<div class="col-md-8">
+						<div class="alert alert-warning alert-dismissible fade show" role="alert">
+							如若需要更新封面图片和附件文件，请新建一个作品进行操作。<br>
+							本版本暂只能支持更新作品标题和说明。下个版本将会支持封面和附件的更新操作。
+							<!--
+							<button class="close" type="button" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+							-->
+						</div>
 						<div class="card">
 							<!-- Breadcrumb-->
 							<ol class="breadcrumb">
@@ -26,29 +35,14 @@
 									封面
 								</li>
 							</ol>
-							<div class="card-body">
+							<div class="card-body mt-0 pt-0">
 								{{range .Post.CoverImg}}
-								<div class="row justify-content-center my-4">
+								<div class="row justify-content-center mx-auto">
 										<div class="text-center">
 											<img class="img-thumbnail" src="{{AppSubURL}}/covers/{{.UUID}}" alt="{{.Name}}">
 										</div>
 								</div>
 								{{end}}
-								<!-- FIXME: add update section later
-								<div class="form-group row">
-									<label class="col-md-3 col-form-label" for="file-input">上传封面图片</label>
-									<div class="col-md-9">
-										<input id="file-input" type="file" name="file-input">
-									</div>
-								</div>
-								<hr class="my-4">
-								<div class="row align-items-center">
-										<div class="col-md-4 text-center">
-											<button class="btn btn-primary btn-block" type="submit">
-												<i class="fa fa-dot-circle-o"></i> 上传</button>
-										</div>
-								</div>
-								-->
 							</div>
 						</div>
 
@@ -64,13 +58,15 @@
 
 							<div class="card-body was-validated">
 								<div class="form-group row">
-									<div class="col-sm-12">
-										<input class="form-control is-invalid" type="text" name="Title" placeholder="请输入作品名称" required="" value="{{.title}}">
+									<label for="staticEmail" class="col-md-2 col-form-label">作品标题</label>
+									<div class="col-md-10">
+									<input class="form-control is-invalid" type="text" name="Title" required="" value="{{.title}}">
 									</div>
 								</div>
 								<div class="form-group row">
-									<div class="col-md-12">
-										<textarea class="form-control is-invalid" name="Content" rows="12" placeholder="作品说明" required="">{{.content}}</textarea>
+									<label for="staticEmail" class="col-md-2 col-form-label">作品说明</label>
+									<div class="col-md-10">
+										<textarea class="form-control is-invalid" name="Content" rows="5" required="">{{.content}}</textarea>
 									</div>
 								</div>
 							</div>
