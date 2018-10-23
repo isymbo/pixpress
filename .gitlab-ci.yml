@@ -55,7 +55,7 @@ build_docker_binary_job:
     - mv -f $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/templates $DOCKER_CACHE_PATH/${PROJECT_NAME}_${CI_COMMIT_SHA:0:8}/app/views
   stage: binary_build
   only:
-    - master
+    - dev
 
 # build_ubuntu_binary_job:
 #   tags:
@@ -101,7 +101,7 @@ build_image_job:
     - docker push ${IMAGE_NAME}:${VERSION}
   stage: image_build
   only:
-    - master
+    - dev
 
 deploy_testenv_job:
   tags:
@@ -117,7 +117,7 @@ deploy_testenv_job:
     url: http://10.201.51.154:7611/
   stage: testenv_deploy
   only:
-    - master
+    - dev
 
 
 deploy_alphaenv_job:
@@ -134,7 +134,7 @@ deploy_alphaenv_job:
     url: http://10.201.51.195/
   stage: testenv_deploy
   only:
-    - master
+    - dev
   when: manual
 
 # prodenv_copy_job:
