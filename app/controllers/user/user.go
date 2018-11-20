@@ -221,7 +221,7 @@ func isValidRedirect(url string) bool {
 }
 
 func LoginPost(c *context.Context, u User) {
-	c.Title("sign_in")
+	c.Title("登录")
 
 	// loginSources, err := models.ActivatedLoginSources()
 	// if err != nil {
@@ -251,9 +251,16 @@ func LoginPost(c *context.Context, u User) {
 	// 	return
 	// }
 
-	user, _ := models.UserLogin(u.LoginName, u.Password, 101)
+	user, err := models.UserLogin(u.LoginName, u.Password, 101)
 
-	afterLogin(c, user, true)
+	if err != nil {
+		c.Flash.Error("用户名/密码不匹配")
+
+		c.SubURLRedirect("/user/login")
+		return
+	} else {
+		afterLogin(c, user, true)
+	}
 
 	c.Success(HOME)
 }

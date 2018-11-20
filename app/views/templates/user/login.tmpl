@@ -3,54 +3,6 @@
 <!--Main layout-->
 <main class="main">
 
-		<!-->
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <div class="card-group">
-            <div class="card p-4">
-              <div class="card-body">
-                <h1>登入</h1>
-								<p class="text-muted"></p>
-								<form action="{{.Link}}" method="post">
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">
-                      <i class="icon-user"></i>
-                    </span>
-                  </div>
-                  <input class="form-control" type="text" name="LoginName" placeholder="帐号">
-                </div>
-                <div class="input-group mb-4">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">
-                      <i class="icon-lock"></i>
-                    </span>
-                  </div>
-                  <input class="form-control" type="password" name="Password" placeholder="密码">
-                </div>
-								<div class="form-check">
-									<label class="CheckRememberPassword">
-									<input class="form-check-input" type="checkbox">记住密码</label>
-								</div>
-								<p class="text-muted"></p>
-                <div class="row">
-                  <div class="col-6">
-                    <button class="btn btn-primary px-4" type="submit">登录</button>
-                  </div>
-                  <div class="col-6 text-right">
-                    <button class="btn btn-link px-0" type="button">忘记密码?</button>
-                  </div>
-                </div>
-								</form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-		-->
-
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-8">
@@ -69,7 +21,7 @@
             </div>
             <div class="card p-3">
               <div class="card-body">
-								<form action="{{.Link}}" method="post">
+								<form action="{{.Link}}" method="post" class="needs-validation" novalidate>
 									<div class="row my-3">
 										<div class="col-6"><h1>登录<h1></div>
 										<div class="col-6 text-right"><img class="rounded float-right px-0" src="/img/brand/bestv_icon_208px.png" alt="bestv logo" style="width:30%"></div>
@@ -81,10 +33,11 @@
 												<i class="icon-user"></i>
 											</span>
 										</div>
-										<input class="form-control" type="text" name="LoginName" placeholder="用户名">
+										<input class="form-control" type="text" name="LoginName" placeholder="用户名" required="">
 										<div class="input-group-append">
 											<span class="input-group-text">@bestv.com.cn</span>
 										</div>
+										<div class="invalid-feedback">请输入用户名</div>
 									</div>
 									<div class="input-group mb-4">
 										<div class="input-group-prepend">
@@ -92,8 +45,10 @@
 												<i class="icon-lock"></i>
 											</span>
 										</div>
-										<input class="form-control" type="password" name="Password" placeholder="密码">
+										<input class="form-control" type="password" name="Password" placeholder="密码" required="">
+										<div class="invalid-feedback">请输入密码</div>
 									</div>
+									{{template "base/alert" .}}
 									<div class="row justify-content-center">
 										<div class="col-md-4">
 											<button class="btn btn-primary px-4" type="submit">登入</button>
@@ -105,6 +60,28 @@
 										-->
 									</div>
 								</form>
+
+								<script type="text/javascript">
+								// Example starter JavaScript for disabling form submissions if there are invalid fields
+								(function() {
+									'use strict';
+									window.addEventListener('load', function() {
+										// Fetch all the forms we want to apply custom Bootstrap validation styles to
+										var forms = document.getElementsByClassName('needs-validation');
+										// Loop over them and prevent submission
+										var validation = Array.prototype.filter.call(forms, function(form) {
+											form.addEventListener('submit', function(event) {
+												if (form.checkValidity() === false) {
+													event.preventDefault();
+													event.stopPropagation();
+												}
+												form.classList.add('was-validated');
+											}, false);
+										});
+									}, false);
+								})();
+								</script>
+
               </div>
             </div>
 
@@ -112,9 +89,6 @@
         </div>
       </div>
     </div>
-
-
-
 
 </main>
 <!--Main layout-->
