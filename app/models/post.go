@@ -150,10 +150,15 @@ func SearchPostByName(opts *SearchPostOptions) (posts []*Post, _ int64, _ error)
 
 	searchQuery := "%" + opts.Keyword + "%"
 	posts = make([]*Post, 0, opts.PageSize)
+
 	// Append conditions
-	sess := x.Where("LOWER(lower_name) LIKE ?", searchQuery).
-		Or("LOWER(full_name) LIKE ?", searchQuery).
-		And("type = ?", opts.Type)
+	// sess := x.Where("LOWER(lower_name) LIKE ?", searchQuery).
+	// 	Or("LOWER(full_name) LIKE ?", searchQuery).
+	// 	And("type = ?", opts.Type)
+	sess := x.Where("title LIKE ?", searchQuery).Or("title LIKE ?", searchQuery)
+	if DbCfg.DbType == "mysql" {
+		sess = x.Where("MATCH (title, content) AGAINST (? IN NATURAL LANGUAGE MODE)", opts.Keyword)
+	}
 
 	var countSess xorm.Session
 	countSess = *sess

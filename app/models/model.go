@@ -202,6 +202,18 @@ func NewEngine() (err error) {
 		return fmt.Errorf("sync database struct error: %v\n", err)
 	}
 
+	if DbCfg.DbType == "mysql" {
+		var (
+			sql string = "CREATE FULLTEXT INDEX search_index ON post (title,content) WITH PARSER ngram"
+		)
+
+		_, err := x.Exec(sql)
+
+		if err != nil {
+			log.Warn("create index for fulltext search has failed!")
+		}
+	}
+
 	return nil
 }
 
