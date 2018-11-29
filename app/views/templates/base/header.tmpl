@@ -28,6 +28,10 @@
 	<!--
 	<script type="text/javascript" src="{{AppSubURL}}/js/pixpress.js"></script>
 	-->
+	{{if .IsLogged}}
+	<link href="{{AppSubURL}}/css/search.css" rel="stylesheet">
+	<script type="text/javascript" src="{{AppSubURL}}/js/search.js"></script>
+	{{end}}
 </head>
 
 {{if .IsAdmin}}
@@ -78,7 +82,13 @@
 			</li>
 		</ul>
 
+
 		<ul class="nav navbar-nav ml-auto">
+		{{if .IsLogged}}
+		<li class="nav-item">
+		<input class="form-control global-search" type="text" name="search" placeholder="输入后按回车搜索" value="{{$.Keyword}}" id="globalSearch">
+		</li>
+		{{end}}
 			<li class="nav-item dropdown px-3">
 				<a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
 					<i class="fa fa-plus-circle fa-md"></i> 新建

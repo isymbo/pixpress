@@ -1,0 +1,8 @@
+.global-search {
+    transition: box-shadow ease-in .1s;
+    box-shadow: 0 0 0;
+}
+
+.global-search:focus {
+    box-shadow: 0px 2px 6px 0px rgba(204, 204, 204, .6);
+}

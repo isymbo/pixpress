@@ -141,9 +141,9 @@ func SearchPostByName(opts *SearchPostOptions) (posts []*Post, _ int64, _ error)
 
 	opts.Keyword = strings.ToLower(opts.Keyword)
 
-	if opts.PageSize <= 0 || opts.PageSize > setting.UI.User.PostPagingNum {
-		opts.PageSize = setting.UI.User.PostPagingNum
-	}
+	// if opts.PageSize <= 0 || opts.PageSize > setting.UI.User.PostPagingNum {
+	// 	opts.PageSize = setting.UI.User.PostPagingNum
+	// }
 	if opts.Page <= 0 {
 		opts.Page = 1
 	}
